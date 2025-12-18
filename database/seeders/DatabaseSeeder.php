@@ -82,6 +82,7 @@ class DatabaseSeeder extends Seeder
             'tahun_masuk_id' => $tahunId,
             'nisn' => '1234567890',
             'nama_lengkap' => 'Budi Santoso',
+            'jenis_kelamin' => 'L',
             'alamat' => 'Jl. Merpati No. 10, Bandar Lampung',
             'no_telp_wali' => '081234567890',
             'created_at' => now(), 'updated_at' => now(),

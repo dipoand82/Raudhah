@@ -21,6 +21,7 @@ return new class extends Migration
         // Data Pribadi
         $table->string('nisn')->unique();
         $table->string('nama_lengkap');
+        $table->enum('jenis_kelamin', ['L', 'P']);
         $table->text('alamat');
         $table->string('no_telp_wali')->nullable();
         
