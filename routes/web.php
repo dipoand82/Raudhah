@@ -5,22 +5,36 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\GuruController;
 use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\ProfilSekolahController;
-use App\Models\ProfilSekolah; // <--- PENTING: Panggil Model
+use App\Http\Controllers\Admin\TahunAjaranController; // <--- JANGAN LUPA IMPORT INI
+use App\Models\ProfilSekolah; 
 
+/*
+|--------------------------------------------------------------------------
+| PUBLIC ROUTES
+|--------------------------------------------------------------------------
+*/
 Route::get('/', function () {
-    $profil_sekolah = ProfilSekolah::first(); // <--- Ambil data profil sekolah
+    // Kita pakai variabel '$profil_sekolah' sesuai request Abang
+    $profil_sekolah = ProfilSekolah::first(); 
     return view('welcome', compact('profil_sekolah'));
 });
 
+/*
+|--------------------------------------------------------------------------
+| AUTH ROUTES
+|--------------------------------------------------------------------------
+*/
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified', 'force.change.password'])
-  ->name('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Route tambahan untuk Update Data Sekolah dari halaman Profile
+    Route::patch('/profile/sekolah', [ProfileController::class, 'updateSekolah'])->name('profile.sekolah.update');
 });
 
 require __DIR__.'/auth.php';
@@ -57,12 +71,26 @@ Route::middleware(['auth', 'verified'])
                 Route::post('/import', 'import')->name('import');
             });
 
-        // === PROFIL SEKOLAH ===
+        // === PROFIL SEKOLAH (Admin) ===
         Route::controller(ProfilSekolahController::class)
             ->prefix('profil')
             ->name('profil.')
             ->group(function () {
                 Route::get('/', 'edit')->name('edit');
                 Route::patch('/', 'update')->name('update');
+            });
+
+        // === TAHUN AJARAN & AKADEMIK (BARU) ===
+        Route::controller(TahunAjaranController::class)
+            ->group(function () {
+                // CRUD Dasar
+                Route::get('/tahun-ajaran', 'index')->name('tahun-ajaran.index');
+                Route::post('/tahun-ajaran', 'store')->name('tahun-ajaran.store');
+                Route::put('/tahun-ajaran/{tahunAjaran}', 'update')->name('tahun-ajaran.update');
+                Route::delete('/tahun-ajaran/{tahunAjaran}', 'destroy')->name('tahun-ajaran.destroy');
+                
+                // Fitur Khusus: Aktivasi & Kelulusan Massal
+                Route::post('/tahun-ajaran/{id}/activate', 'activate')->name('tahun-ajaran.activate');
+                Route::post('/tahun-ajaran/luluskan', 'processGraduation')->name('tahun-ajaran.graduation');
             });
 });

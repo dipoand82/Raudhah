@@ -9,13 +9,21 @@ class TahunAjaran extends Model
 {
     use HasFactory;
     
-    // Karena nama tabelnya jamak 'tahun_ajarans', Laravel otomatis tahu.
-    // Tapi kita definisikan saja biar aman.
     protected $table = 'tahun_ajarans'; 
+    
+    // Ini sudah benar (Whitelist kolom yang boleh diisi)
     protected $fillable = ['tahun', 'semester', 'is_active'];
 
+    // Relasi ke Siswa (One to Many)
     public function siswas()
     {
         return $this->hasMany(Siswa::class, 'tahun_masuk_id');
+    }
+
+    // --- TAMBAHAN (HELPER) ---
+    // Gunanya biar gampang cari mana tahun yang aktif
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
     }
 }
