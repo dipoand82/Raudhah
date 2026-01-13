@@ -13,9 +13,9 @@
             <div class="flex justify-between h-16 items-center">
                 <div class="flex items-center gap-3">
                     @if($profil_sekolah && $profil_sekolah->logo_path)
-                        <img src="{{ asset('storage/' . $profil_sekolah->logo_path) }}" alt="Logo" class="h-10 w-10 object-contain">
+                        {{-- <img src="{{ asset('storage/' . $profil_sekolah->logo_path) }}" alt="Logo" class="h-10 w-10 object-contain"> --}}
                     @else
-                        <div class="h-10 w-10 bg-gray-300 rounded-full flex items-center justify-center text-xs font-bold">LOGO</div>
+                        {{-- <div class="h-10 w-10 bg-gray-300 rounded-full flex items-center justify-center text-xs font-bold">LOGO</div> --}}
                     @endif
                     <span class="font-bold text-xl text-blue-900">{{ $profil_sekolah->nama_sekolah ?? 'SMP IT Raudhah' }}</span>
                 </div>

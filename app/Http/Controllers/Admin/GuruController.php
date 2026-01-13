@@ -44,12 +44,22 @@ class GuruController extends Controller
     }
 
     // 4. Import Guru (Massal)
-    public function import(Request $request)
-    {
-        $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
+    // public function import(Request $request)
+    // {
+    //     $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
         
-        Excel::import(new GuruImport, $request->file('file'));
+    //     Excel::import(new GuruImport, $request->file('file'));
 
-        return redirect()->route('admin.gurus.index')->with('success', 'Data Guru berhasil diimport!');
-    }
+    //     return redirect()->route('admin.gurus.index')->with('success', 'Data Guru berhasil diimport!');
+    // }
+    public function import(Request $request)
+{
+     $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
+        
+    Excel::import(new GuruImport, $request->file('file'));
+
+    return redirect()->route('admin.gurus.index')
+        ->with('success', 'Data Guru berhasil diimport!');
+}
+
 }

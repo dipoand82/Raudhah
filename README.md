@@ -64,3 +64,29 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+scroll tabel
+<div class="overflow-x-auto bg-white rounded shadow">
+
+Warna #1072B8
+#0A7ABF
+
+warna kedua (dari button diambil)
+<x-primary-button class="w-full justify-center !bg-[#3B3E42] hover:!bg-[#2f3235] focus:!bg-[#2f3235] active:!bg-[#1f2123]">
+    {{ __('Simpan Kelas') }}
+</x-primary-button>
+
+notif (ada silang)
+
+before 
+<div class="mb-4 bg-green-100 text-green-700 p-4 rounded shadow-sm border border-green-200">
+    {{ session('success') }}
+</div>
+
+after
+<div x-data="{ show: true }" x-show="show" class="mb-4 flex items-center justify-between bg-green-100 border border-green-200 text-green-700 px-4 py-3 rounded shadow-sm">
+    <span class="text-sm font-medium">{{ session('success') }}</span>
+    <button @click="show = false" class="text-green-500 hover:text-green-700">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    </button>
+</div>

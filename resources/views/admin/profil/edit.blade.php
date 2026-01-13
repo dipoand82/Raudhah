@@ -51,12 +51,12 @@
                                 <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Branding & Tujuan</h3>
 
                                 <div>
-                                    <x-input-label for="logo" :value="__('Logo Sekolah')" />
+                                    {{-- <x-input-label for="logo" :value="__('Logo Sekolah')" /> --}}
                                     
                                     @if($profil->logo_path)
-                                        <div class="mb-2">
+                                        {{-- <div class="mb-2">
                                             <img src="{{ asset('storage/' . $profil->logo_path) }}" alt="Logo" class="h-20 w-auto object-contain border p-1 rounded">
-                                        </div>
+                                        </div> --}}
                                     @endif
                                     
                                     <input type="file" name="logo" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />

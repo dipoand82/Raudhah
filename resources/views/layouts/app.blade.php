@@ -14,8 +14,34 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased" x-data="{ sidebarOpen: false }"> <div class="min-h-screen bg-gray-100">
+        
+        @include('layouts.sidebar')
+
+        <div class="md:ml-64 transition-all duration-300">
+            @include('layouts.navigation')
+
+            @isset($header)
+                <header class="bg-white shadow">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {{ $header }}
+                    </div>
+                </header>
+            @endisset
+
+            <main>
+                {{ $slot }}
+            </main>
+            </div>
+        </div>
+    </body>
+    {{-- <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
+            
+            @include('layouts.sidebar')
+
+        <!-- <div class="ml-64 transition-all duration-300"></div> -->
+        <div class="ml-64 transition-all duration-300 ">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
@@ -32,5 +58,5 @@
                 {{ $slot }}
             </main>
         </div>
-    </body>
+    </body> --}}
 </html>

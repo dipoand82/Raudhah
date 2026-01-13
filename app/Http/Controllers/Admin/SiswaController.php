@@ -3,53 +3,72 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use App\Imports\SiswaImport;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Siswa;
+use App\Models\Kelas;
+use App\Models\TahunAjaran;
 
 class SiswaController extends Controller
 {
-    // 1. Tampilkan HANYA Siswa
-    public function index()
+    // === 1. HALAMAN BUKU INDUK SISWA ===
+    public function index(Request $request)
     {
-        $siswas = User::where('role', 'siswa')->latest()->paginate(10);
-        return view('admin.siswas.index', compact('siswas'));
+        $search = $request->input('search');
+
+        // Note: Pastikan relasi di Model Siswa bernama 'tahunMasuk' (bukan tahun_masuk)
+        $siswas = Siswa::with(['user', 'kelas', 'tahunMasuk'])
+            ->when($search, function($query) use ($search) {
+                $query->where('nisn', 'like', "%{$search}%")
+                      ->orWhereHas('user', function($q) use ($search) {
+                          $q->where('name', 'like', "%{$search}%");
+                      });
+            })
+            ->latest()
+            ->paginate(10);
+
+        return view('admin.data_siswa.index', compact('siswas'));
     }
 
-    // 2. Form Tambah Siswa (Manual)
-    public function create()
+    // === 2. HALAMAN EDIT DETAIL ===
+    public function edit($id)
     {
-        return view('admin.siswas.create');
+        $siswa = Siswa::findOrFail($id);
+        
+        // Data pendukung dropdown
+        $kelas = Kelas::orderBy('nama_kelas')->get();
+        $tahunAjaran = TahunAjaran::orderBy('tahun', 'desc')->get();
+        
+        return view('admin.data_siswa.edit', compact('siswa', 'kelas', 'tahunAjaran'));
     }
 
-    // 3. Simpan Siswa (Manual)
-    public function store(Request $request)
+    // === 3. PROSES UPDATE ===
+    public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-        ]);
-
-        User::create([
+        $siswa = Siswa::findOrFail($id);
+        
+        // Update User (Nama & Email)
+        $siswa->user->update([
             'name' => $request->name,
             'email' => $request->email,
-            'role' => 'siswa', // Otomatis Role Siswa
-            'password' => Hash::make('12345678'),
-            'must_change_password' => true,
         ]);
 
-        return redirect()->route('admin.siswas.index')->with('success', 'Akun Siswa berhasil dibuat!');
+        // Update Data Siswa
+        $siswa->update([
+            'nisn' => $request->nisn,
+            'kelas_id' => $request->kelas_id,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'tahun_masuk_id' => $request->tahun_masuk_id,
+            'status' => $request->status,
+        ]);
+
+        return redirect()->route('admin.siswas.index')->with('success', 'Data siswa diperbarui!');
     }
 
-    // 4. Import Siswa (Massal)
-    public function import(Request $request)
+    // === 4. HAPUS SISWA ===
+    public function destroy($id)
     {
-        $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
-        
-        Excel::import(new SiswaImport, $request->file('file'));
-
-        return redirect()->route('admin.siswas.index')->with('success', 'Data Siswa massal berhasil diimport!');
+        $siswa = Siswa::findOrFail($id);
+        $siswa->user->delete(); // Otomatis hapus siswa juga (Cascade)
+        return back()->with('success', 'Data siswa dihapus.');
     }
 }

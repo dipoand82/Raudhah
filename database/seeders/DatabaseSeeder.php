@@ -5,7 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-
+use App\Models\User;
+use App\Models\Siswa;
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
@@ -17,7 +18,7 @@ class DatabaseSeeder extends Seeder
         // Akun Admin (Tata Usaha) - ID 1
         $adminId = DB::table('users')->insertGetId([
             'name' => 'Staff Tata Usaha',
-            'username' => 'admin',
+            // 'username' => 'admin',
             'email' => 'admin@sekolah.com',
             'password' => Hash::make('password123'),
             'role' => 'admin',
@@ -27,7 +28,7 @@ class DatabaseSeeder extends Seeder
         // Akun Guru (Kepala Sekolah) - ID 2
         $guruId = DB::table('users')->insertGetId([
             'name' => 'Bapak Kepala Sekolah',
-            'username' => 'kepsek',
+            // 'username' => 'kepsek',
             'email' => 'kepsek@sekolah.com',
             'password' => Hash::make('password123'),
             'role' => 'guru',
@@ -37,7 +38,7 @@ class DatabaseSeeder extends Seeder
         // Akun Siswa (Budi) - ID 3
         $siswaUserId = DB::table('users')->insertGetId([
             'name' => 'Budi Santoso',
-            'username' => 'budi123',
+            // 'username' => 'budi123',
             'email' => 'budi@siswa.com',
             'password' => Hash::make('password123'),
             'role' => 'siswa',
@@ -56,11 +57,10 @@ class DatabaseSeeder extends Seeder
             'created_at' => now(), 'updated_at' => now(),
         ]);
 
-        // Kelas VII A
+        // Kelas 7A
         $kelasId = DB::table('kelas')->insertGetId([
-            'nama_kelas' => 'VII A',
+            'nama_kelas' => '7A',
             'tingkat' => 7,
-            'kode_kelas' => '7A',
             'created_at' => now(), 'updated_at' => now(),
         ]);
 
@@ -83,12 +83,12 @@ class DatabaseSeeder extends Seeder
             'nisn' => '1234567890',
             'nama_lengkap' => 'Budi Santoso',
             'jenis_kelamin' => 'L',
-            'alamat' => 'Jl. Merpati No. 10, Bandar Lampung',
-            'no_telp_wali' => '081234567890',
+            // 'alamat' => 'Jl. Merpati No. 10, Bandar Lampung',
+            // 'no_telp_wali' => '081234567890',
             'created_at' => now(), 'updated_at' => now(),
         ]);
 
-        // Riwayat Budi masuk Kelas VII A
+        // Riwayat Budi masuk Kelas  7A
         $riwayatId = DB::table('riwayat_akademiks')->insertGetId([
             'siswa_id' => $siswaId,
             'kelas_id' => $kelasId,
