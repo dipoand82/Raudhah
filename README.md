@@ -69,12 +69,18 @@ scroll tabel
 <div class="overflow-x-auto bg-white rounded shadow">
 
 Warna #1072B8
-#0A7ABF
+#45a4df
+
+sec #313F4B
 
 warna kedua (dari button diambil)
 <x-primary-button class="w-full justify-center !bg-[#3B3E42] hover:!bg-[#2f3235] focus:!bg-[#2f3235] active:!bg-[#1f2123]">
     {{ __('Simpan Kelas') }}
 </x-primary-button>
+
+atau ada round
+<button type="submit" class="w-full !bg-[#3B3E42] focus:!bg-[#2f3235] active:!bg-[#1f2123] text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
+
 
 notif (ada silang)
 
@@ -90,3 +96,36 @@ after
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
     </button>
 </div>
+
+Button simpan style
+ class="inline-flex items-center px-4 py-2 border border-transparent rounded-md font-bold text-xs text-white uppercase tracking-widest transition duration-150 ease-in-out !bg-[#3B3E42] hover:!bg-[#2f3235] focus:!bg-[#2f3235] active:!bg-[#1f2123] focus:outline-none focus:ring-2 focus:ring-[#3B3E42] focus:ring-offset-2"
+
+ button select modal responsive
+ class="block mt-1 w-full max-w-full border-gray-300 rounded-md"
+
+Kontrainer sebelum select agar responsive
+ <div class="relative w-full">
+
+ responsive pada tombol
+ {{-- 3. Area Tombol --}}
+                <div class="mt-8 flex flex-col sm:flex-row justify-end gap-3">
+                    <x-secondary-button x-on:click="$dispatch('close')" class="justify-center">
+                        Batal
+                    </x-secondary-button>
+                    <button type="submit" 
+                        class="inline-flex justify-center ">
+                        Simpan Perubahan
+                    </button>
+                </div>
+
+BAGIAN "flex-col sm:flex-row"
+anaknya tambah class="justify-center">
+
+select 1
+<option value="">-- Pilih Kelas --</option>
+
+
+{{ $k->tingkat }} {{ $k->nama_kelas }}
+
+<x-button> Simpan </x-button>
+<x-button variant="secondary"> Batal </x-button>

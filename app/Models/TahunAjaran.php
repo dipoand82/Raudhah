@@ -12,12 +12,12 @@ class TahunAjaran extends Model
     protected $table = 'tahun_ajarans'; 
     
     // Ini sudah benar (Whitelist kolom yang boleh diisi)
-    protected $fillable = ['tahun', 'semester', 'is_active'];
+    protected $fillable = ['tahun', 'is_active'];
 
     // Relasi ke Siswa (One to Many)
     public function siswas()
     {
-        return $this->hasMany(Siswa::class, 'tahun_masuk_id');
+        return $this->hasMany(Siswa::class, foreignKey: 'tahun_ajaran_id');
     }
 
     // --- TAMBAHAN (HELPER) ---

@@ -7,68 +7,177 @@ use Illuminate\Http\Request;
 use App\Models\Siswa;
 use App\Models\Kelas;
 use App\Models\TahunAjaran;
+use App\Exports\TemplateSiswaExport;
+use App\Exports\SiswaExport; // <-- TAMBAHAN: Untuk Export Data Real
+use App\Imports\SiswaImport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Traits\HandlesExcelImports; 
 
 class SiswaController extends Controller
 {
-    // === 1. HALAMAN BUKU INDUK SISWA ===
+    use HandlesExcelImports; 
+
+    // === 1. HALAMAN UTAMA (FILTER + SEARCH) ===
     public function index(Request $request)
     {
-        $search = $request->input('search');
+        // A. Siapkan Query Dasar
+        $query = Siswa::with(['user', 'kelas', 'tahunAjaran']);
 
-        // Note: Pastikan relasi di Model Siswa bernama 'tahunMasuk' (bukan tahun_masuk)
-        $siswas = Siswa::with(['user', 'kelas', 'tahunMasuk'])
-            ->when($search, function($query) use ($search) {
-                $query->where('nisn', 'like', "%{$search}%")
-                      ->orWhereHas('user', function($q) use ($search) {
-                          $q->where('name', 'like', "%{$search}%");
-                      });
-            })
-            ->latest()
-            ->paginate(10);
+        // B. Logika Search (Nama / NISN)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nisn', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($u) use ($search) {
+                      $u->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
 
-        return view('admin.data_siswa.index', compact('siswas'));
+        // C. Logika Filter Kelas (INI YANG BARU)
+        if ($request->filled('kelas_id')) {
+            $query->where('kelas_id', $request->kelas_id);
+        }
+
+        // [BARU] Logika Filter Status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // D. Eksekusi Query (Pagination)
+        // $siswas = $query->latest()->paginate(10);
+        // ==========================================================
+        // D. Eksekusi Query (PAGINATION DINAMIS) - [BAGIAN INI DIUBAH]
+        // ==========================================================
+        
+        // 1. Ambil input 'per_page' dari user. 
+        //    Jika user tidak memilih (kosong), default-nya adalah 10.
+        $limit = $request->input('per_page', 10);
+
+        // 2. Masukkan variabel $limit ke dalam fungsi paginate()
+        //    Ini akan otomatis mengikuti pilihan user (10, 20, 30, atau 50)
+        $siswas = $query->latest()->paginate($limit);
+
+
+        // E. Ambil Daftar Kelas untuk Dropdown (SOLUSI ERROR KELAS_LIST)
+        $kelas_list = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
+
+        // F. Kirim ke View
+        return view('admin.data_siswa.index', compact('siswas', 'kelas_list'));
     }
 
-    // === 2. HALAMAN EDIT DETAIL ===
+    // === 2. EXPORT DATA (FITUR BARU UNTUK ROUND-TRIP EXCEL) ===
+    public function export(Request $request)
+    {
+        // Kita kirim parameter kelas_id agar yang didownload sesuai filter
+        return Excel::download(new SiswaExport($request->kelas_id,$request->status), 'data_siswa_raudhah.xlsx');
+    }
+
+    // === 3. HALAMAN EDIT DETAIL ===
     public function edit($id)
     {
         $siswa = Siswa::findOrFail($id);
-        
-        // Data pendukung dropdown
         $kelas = Kelas::orderBy('nama_kelas')->get();
         $tahunAjaran = TahunAjaran::orderBy('tahun', 'desc')->get();
         
         return view('admin.data_siswa.edit', compact('siswa', 'kelas', 'tahunAjaran'));
     }
 
-    // === 3. PROSES UPDATE ===
+    // === 4. PROSES UPDATE ===
     public function update(Request $request, $id)
     {
         $siswa = Siswa::findOrFail($id);
         
-        // Update User (Nama & Email)
+        // Update data User (Nama & Email)
         $siswa->user->update([
             'name' => $request->name,
             'email' => $request->email,
         ]);
 
-        // Update Data Siswa
+        // Update data Siswa (Akademik)
         $siswa->update([
             'nisn' => $request->nisn,
             'kelas_id' => $request->kelas_id,
             'jenis_kelamin' => $request->jenis_kelamin,
-            'tahun_masuk_id' => $request->tahun_masuk_id,
+            'tahun_ajaran_id' => $request->tahun_ajaran_id, 
             'status' => $request->status,
         ]);
 
         return redirect()->route('admin.siswas.index')->with('success', 'Data siswa diperbarui!');
     }
 
-    // === 4. HAPUS SISWA ===
+    // === 5. HAPUS SISWA ===
     public function destroy($id)
     {
         $siswa = Siswa::findOrFail($id);
-        $siswa->user->delete(); // Otomatis hapus siswa juga (Cascade)
+        
+        // Hapus User-nya juga agar bersih
+        if($siswa->user) {
+            $siswa->user->delete(); 
+        } else {
+            $siswa->delete();
+        }
         return back()->with('success', 'Data siswa dihapus.');
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+    // Validasi ada ID yang dikirim
+    $request->validate([
+        'ids' => 'required|array',
+        'ids.*' => 'exists:siswas,id',
+    ]);
+
+    // Ambil semua siswa yang mau dihapus
+    $siswas = Siswa::whereIn('id', $request->ids)->get();
+
+    foreach ($siswas as $siswa) {
+        // Hapus User terkait (agar bersih)
+        if ($siswa->user) {
+            $siswa->user->delete();
+        }
+        // Hapus Siswa
+        $siswa->delete();
+    }
+
+    return back()->with('success', count($request->ids) . ' data siswa berhasil dihapus.');
+    }
+    
+    // === 6. FORM CREATE (MANUAL) ===
+    public function create()
+    {
+        $kelas = Kelas::orderBy('nama_kelas')->get();
+        $tahunAjaran = TahunAjaran::where('is_active', true)->get();
+        return view('admin.data_siswa.create', compact('kelas', 'tahunAjaran'));
+    }
+    
+    // === 7. PROSES STORE (MANUAL) ===
+    public function store(Request $request)
+    {
+         // Jika Anda punya logika store manual, masukkan di sini.
+         // Saat ini redirect saja sesuai kode lama Anda.
+         return redirect()->route('admin.siswas.index');
+    }
+
+    // === 8. DOWNLOAD TEMPLATE IMPORT ===
+    public function downloadTemplate()
+    {
+        return Excel::download(new TemplateSiswaExport, 'template_siswa.xlsx');
+    }
+
+    // === 9. PROSES IMPORT (TRAIT) ===
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:2048'
+        ]);
+
+        $result = $this->importData(new SiswaImport, $request->file('file'));
+
+        if ($result['status'] === 'validation_error') {
+            return back()->with('import_errors', $result['failures']);
+        }
+
+        return back()->with($result['status'], $result['message']);
     }
 }

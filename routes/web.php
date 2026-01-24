@@ -10,9 +10,7 @@ use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\ManajemenUserController;
 use App\Http\Controllers\Admin\ProfilSekolahController;
 use App\Http\Controllers\Admin\TahunAjaranController;
-use App\Http\Controllers\Admin\KelasController; // <-- Ditambahkan agar rapi
-use App\Http\Controllers\Admin\UserController;
-
+use App\Http\Controllers\Admin\KelasController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,8 +35,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    // Route tambahan untuk Update Data Sekolah dari halaman Profile
     Route::patch('/profile/sekolah', [ProfileController::class, 'updateSekolah'])->name('profile.sekolah.update');
 });
 
@@ -49,93 +45,74 @@ require __DIR__ . '/auth.php';
 | ADMIN AREA
 |--------------------------------------------------------------------------
 */
-
 Route::middleware(['auth', 'verified'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
 
-        // // === GURU ===
-        // Route::controller(GuruController::class)
-        //     ->prefix('guru')
-        //     ->name('gurus.')
-        //     ->group(function () {
-        //         Route::get('/', 'index')->name('index');
-        //         Route::get('/create', 'create')->name('create');
-        //         Route::post('/', 'store')->name('store');
-        //         Route::post('/import', 'import')->name('import');
-        //     });
+        // ==========================================================
+        // 1. MANAJEMEN USER (PUSAT AKUN: TAB SISWA, GURU, PASSWORD)
+        // ==========================================================
+        // Controller: App\Http\Controllers\Admin\ManajemenUserController
+        Route::controller(ManajemenUserController::class)
+            ->prefix('manajemen-user')
+            ->name('manajemen-user.') // Prefix nama route jadi 'admin.manajemen-user.' (asumsi ada group admin di luarnya)
+            ->group(function () {
+                
+                // Halaman Utama
+                Route::get('/', 'index')->name('index'); 
+                
+                // --- SISWA ---
+                Route::post('/siswa/store', 'storeSiswa')->name('siswa.store');   
+                Route::post('/siswa/import', 'importSiswa')->name('siswa.import'); 
+                
+                // [BARU] Reset Password Siswa
+                // URL Akhir: /admin/manajemen-user/siswa/{id}/reset
+                // Nama Route: admin.manajemen-user.siswa.reset
+                Route::post('/siswa/{id}/reset', 'resetPasswordSiswa')->name('siswa.reset');
 
-        // // === SISWA ===
-        // Route::controller(SiswaController::class)
-        //     ->prefix('siswa')
-        //     ->name('siswas.')
-        //     ->group(function () {
-        //         Route::get('/', 'index')->name('index');
-        //         Route::get('/create', 'create')->name('create');
-        //         Route::post('/', 'store')->name('store');
-        //         Route::post('/import', 'import')->name('import');
-        //     });
+                // --- GURU ---
+                Route::post('/guru/store', 'storeGuru')->name('guru.store');     
+                Route::post('/guru/import', 'importGuru')->name('guru.import');   
 
-        // GURU
-    // Route::controller(App\Http\Controllers\Admin\GuruController::class)
-    //     ->prefix('guru')->name('guru.')
-    //     ->group(function () {
-    //         Route::get('/', 'index')->name('index');
-    //         Route::get('/create', 'create')->name('create');
-    //         Route::post('/', 'store')->name('store');
-    //         Route::post('/import', 'import')->name('import'); // <--- INI WAJIB ADA
-    //         Route::delete('/{id}', 'destroy')->name('destroy');
-    //     });
+                // --- UTILITY ---
+                Route::put('/password', 'updatePassword')->name('password.update'); 
+                Route::delete('/{id}', 'destroy')->name('destroy');                 
+                
+                // Download Template (Pengecualian: Beda Controller)
+                // Karena beda controller, harus tulis lengkap [Class, method]
+                Route::get('/siswa/template', [\App\Http\Controllers\Admin\SiswaController::class, 'downloadTemplate'])
+                    ->name('siswa.template'); 
+            });
+            //     Route::get('/siswa/template', [SiswaController::class, 'downloadTemplate'])
+            // ->name('siswa.template');
 
-    // // SISWA
-    // Route::controller(App\Http\Controllers\Admin\SiswaController::class)
-    //     ->prefix('siswa')->name('siswas.')
-    //     ->group(function () {
-    //         Route::get('/', 'index')->name('index');
-    //         Route::get('/create', 'create')->name('create');
-    //         Route::post('/', 'store')->name('store');
-    //         Route::post('/import', 'import')->name('import'); // <--- INI WAJIB ADA
-    //         Route::delete('/{id}', 'destroy')->name('destroy');
-    //     });
 
-    //     Route::prefix('admin')->name('admin.')->group(function () {
+        // ==========================================================
+        // 2. DATA SISWA (DETAIL AKADEMIK)
+        // ==========================================================
+        // Controller: App\Http\Controllers\Admin\SiswaController
+        Route::controller(SiswaController::class)
+            ->prefix('data-siswa')
+            ->name('siswas.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');        // Tabel Detail
+                Route::get('/create', 'create')->name('create');// Form Tambah
+                Route::post('/', 'store')->name('store');       // Simpan
+                Route::post('/import', 'import')->name('import'); // Import (Jika ada menu terpisah)
+                Route::get('/export', 'export')->name('export');
+                Route::get('/{id}/edit', 'edit')->name('edit'); // Edit Lengkap
+                Route::put('/{id}', 'update')->name('update');  // Update
+                Route::delete('/{id}', 'destroy')->name('destroy'); // Hapus
+                Route::delete('/bulk-delete', 'bulkDestroy')->name('bulk_delete');
+            });
 
-    // === MENU 1: MANAJEMEN USER (PUSAT AKUN) ===
-        Route::controller(ManajemenUserController::class)->prefix('manajemen-user')->name('manajemen-user.')->group(function () {
-        Route::get('/', 'index')->name('index'); // Halaman Utama (Tabs)
+
+        // ==========================================================
+        // 3. LAIN-LAIN (Profil Sekolah, Kelas, Tahun Ajaran)
+        // ==========================================================
         
-        // Aksi Tambah & Import Siswa (Lewat menu ini)
-        Route::post('/siswa/store', 'storeSiswa')->name('siswa.store');
-        Route::post('/siswa/import', 'importSiswa')->name('siswa.import');
-        
-        // Aksi Tambah & Import Guru (Lewat menu ini)
-        Route::post('/guru/store', 'storeGuru')->name('guru.store');
-        Route::post('/guru/import', 'importGuru')->name('guru.import');
-
-        // Ubah Password Admin
-        Route::put('/password/update', 'updatePassword')->name('password.update');
-        });
-
-    // === MENU 2: DATA SISWA (DETAIL AKADEMIK) ===
-    Route::controller(SiswaController::class)->prefix('data-siswa')->name('siswas.')->group(function () {
-        Route::get('/', 'index')->name('index');        // Tabel Detail Siswa
-        
-        // --- TAMBAHAN PENTING (Biar Error Hilang) ---
-        Route::get('/create', 'create')->name('create'); // Form Tambah
-        Route::post('/', 'store')->name('store');        // Simpan Data
-        Route::post('/import', 'import')->name('import'); // <--- INI OBATNYA
-        // --------------------------------------------
-
-        Route::get('/{id}/edit', 'edit')->name('edit'); // Form Edit Lengkap
-        Route::put('/{id}', 'update')->name('update');  // Proses Update
-        Route::delete('/{id}', 'destroy')->name('destroy'); // Hapus
-    });
-
-    // ... (Route Kelas & Tahun Ajaran tetap sama) ...
-
-
-        // === PROFIL SEKOLAH (Admin) ===
+        // PROFIL SEKOLAH
         Route::controller(ProfilSekolahController::class)
             ->prefix('profil')
             ->name('profil.')
@@ -144,45 +121,28 @@ Route::middleware(['auth', 'verified'])
                 Route::patch('/', 'update')->name('update');
             });
 
-        // === TAHUN AJARAN & AKADEMIK ===
-        // Saya rapikan menggunakan prefix agar kodenya lebih pendek & konsisten
+        // TAHUN AJARAN
         Route::controller(TahunAjaranController::class)
-            ->prefix('tahun-ajaran')          // URL jadi: /admin/tahun-ajaran
-            ->name('tahun-ajaran.')           // Name jadi: admin.tahun-ajaran.index
+            ->prefix('tahun-ajaran')
+            ->name('tahun-ajaran.')
             ->group(function () {
-                // CRUD Dasar
                 Route::get('/', 'index')->name('index');
                 Route::post('/', 'store')->name('store');
-                Route::put('/{tahunAjaran}', 'update')->name('update');
-                Route::delete('/{tahunAjaran}', 'destroy')->name('destroy');
-
-                // Fitur Khusus: Aktivasi & Kelulusan Massal
+                Route::put('/{id}', 'update')->name('update');
+                Route::delete('/{id}', 'destroy')->name('destroy');
                 Route::post('/{id}/activate', 'activate')->name('activate');
-                Route::post('/luluskan', 'processGraduation')->name('graduation');
+                Route::post('/graduation', 'graduation')->name('graduation');
             });
 
-        // === MANAJEMEN KELAS ===
+        // KELAS
         Route::controller(KelasController::class)
             ->prefix('kelas')
             ->name('kelas.')
             ->group(function () {
-                Route::get('/', 'index')->name('index');      // Tampilkan Halaman
-                Route::post('/', 'store')->name('store');     // Simpan Data
-                Route::delete('/{kelas}', 'destroy')->name('destroy'); // Hapus Data
-                Route::put('/{kelas}', 'update')->name('update');  // Update Data Kelas
-            });
-
-        // === MANAJEMEN USER ===
-        Route::controller(UserController::class)
-            ->prefix('users')
-            ->name('users.')
-            ->group(function () {
-                Route::get('/', 'index')->name('index');          // Daftar User
-                Route::get('/create', 'create')->name('create');  // Form Tambah (PENTING: Ini solusi error 'defined' tadi)
-                Route::post('/', 'store')->name('store');         // Simpan User
-                Route::get('/{user}/edit', 'edit')->name('edit'); // Form Edit
-                Route::put('/{user}', 'update')->name('update');  // Update User
-                Route::delete('/{user}', 'destroy')->name('destroy'); // Hapus User
+                Route::get('/', 'index')->name('index');
+                Route::post('/', 'store')->name('store');
+                Route::put('/{id}', 'update')->name('update'); // Pakai {id} biar aman
+                Route::delete('/{id}', 'destroy')->name('destroy');
             });
 
     });

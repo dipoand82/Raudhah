@@ -74,8 +74,8 @@
                                 </td>
 
                                 <td class="py-3 px-4 text-gray-700">
-                                    {{-- Mengambil dari relasi tahun_masuk, jika null tampilkan default --}}
-                                    {{ $siswa->tahun_masuk->tahun ?? '2024/2025' }}
+                                    {{-- Mengambil dari relasi tahun_ajaran, jika null tampilkan default --}}
+                                    {{ $siswa->tahun_ajaran->tahun ?? '2024/2025' }}
                                 </td>
 
                                 <td class="py-3 px-4">

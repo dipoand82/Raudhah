@@ -5,74 +5,115 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\TahunAjaran;
 use App\Models\Siswa;
-use App\Models\ProfilSekolah; // <--- 1. JANGAN LUPA PANGGIL INI
+use App\Models\Kelas;
 use Illuminate\Http\Request;
 
 class TahunAjaranController extends Controller
 {
-    // 1. TAMPILKAN HALAMAN (KIRI: TABEL, KANAN: KELULUSAN)
+    // 1. TAMPILKAN DATA
     public function index()
     {
         $tahunAjarans = TahunAjaran::latest()->get();
+        
+        // Ambil daftar tingkat kelas (misal: 7, 8, 9) untuk dropdown kelulusan
+        $tingkatKelas = Kelas::select('tingkat')->distinct()->orderBy('tingkat', 'desc')->pluck('tingkat');
 
-        // Ambil data sekolah 
-        $profil_sekolah = ProfilSekolah::first();
-
-        return view('admin.tahun_ajaran.index', compact('tahunAjarans', 'profil_sekolah'));
-
+        return view('admin.tahun_ajaran.index', compact('tahunAjarans', 'tingkatKelas'));
     }
 
-    // 2. SIMPAN TAHUN AJARAN BARU
+    // 2. SIMPAN BARU
     public function store(Request $request)
     {
+        // PERBAIKAN: Hapus validasi semester
         $request->validate([
-            'tahun' => 'required|string', // Contoh: 2024/2025
-            'semester' => 'required|in:Ganjil,Genap',
+            'tahun' => 'required|unique:tahun_ajarans,tahun', // Tambah unique biar gak dobel
         ]);
 
-        // Kalau yang baru diset Aktif, yang lama jadi Tidak Aktif
+        // Jika user mencentang "Langsung Aktifkan"
         if ($request->has('is_active')) {
+            // Matikan semua tahun lain dulu
             TahunAjaran::query()->update(['is_active' => false]);
         }
 
         TahunAjaran::create([
             'tahun' => $request->tahun,
-            'semester' => $request->semester,
+            // PERBAIKAN: Hapus baris 'semester' => ...
             'is_active' => $request->has('is_active'),
         ]);
 
-        return back()->with('success', 'Tahun Ajaran berhasil dibuat!');
+        return back()->with('success', 'Tahun ajaran baru berhasil ditambahkan.');
     }
 
-    // 3. HAPUS TAHUN AJARAN
-    public function destroy(TahunAjaran $tahunAjaran)
-    {
-        $tahunAjaran->delete();
-        return back()->with('success', 'Data dihapus!');
-    }
-
-    // 4. SET AKTIF (Tombol Switch Cepat)
+    // 3. SET AKTIF (Ganti Tahun Berjalan)
     public function activate($id)
     {
-        // Matikan semua
+        // 1. Matikan semua
         TahunAjaran::query()->update(['is_active' => false]);
         
-        // Aktifkan yang dipilih
-        TahunAjaran::where('id', $id)->update(['is_active' => true]);
+        // 2. Aktifkan yang dipilih
+        $ta = TahunAjaran::findOrFail($id);
+        $ta->update(['is_active' => true]);
 
-        return back()->with('success', 'Tahun Ajaran aktif berhasil diganti!');
+        // PERBAIKAN: Hapus {$ta->semester} dari pesan sukses
+        return back()->with('success', "Tahun Ajaran {$ta->tahun} sekarang AKTIF.");
     }
 
-    // 5. PROSES KELULUSAN MASSAL
-    public function processGraduation(Request $request)
+    // 4. HAPUS
+    public function destroy($id)
     {
-        // Ubah semua siswa yang statusnya 'Aktif' menjadi 'Lulus'
-        $jumlah = Siswa::where('status', 'Aktif')->update(['status' => 'Lulus']);
+        $ta = TahunAjaran::findOrFail($id);
+        if ($ta->is_active) {
+            return back()->with('error', 'Tidak bisa menghapus Tahun Ajaran yang sedang AKTIF.');
+        }
+        $ta->delete();
+        return back()->with('success', 'Data berhasil dihapus.');
+    }
 
-        if ($jumlah > 0) {
-            return back()->with('success', "Alhamdulillah! {$jumlah} siswa telah dinyatakan LULUS.");
+    // 5. UPDATE (EDIT)
+    public function update(Request $request, $id)
+    {
+        $ta = TahunAjaran::findOrFail($id);
+        
+        // PERBAIKAN: Validasi unique kecuali punya sendiri
+        $request->validate([
+            'tahun' => 'required|unique:tahun_ajarans,tahun,'.$id,
+        ]);
+
+        $ta->update([
+            'tahun' => $request->tahun,
+            // PERBAIKAN: Hapus baris 'semester' => ...
+        ]);
+
+        return back()->with('success', 'Data tahun ajaran diperbarui.');
+    }
+
+    // === FITUR SPESIAL: PROSES KELULUSAN (Opsional / Jarang Dipakai jika pakai Import Excel) ===
+    public function graduation(Request $request)
+    {
+        $request->validate([
+            'tingkat_akhir' => 'required', // Admin harus pilih, misal: Tingkat 9
+        ]);
+
+        // Logika: Cari Siswa yang Statusnya 'Aktif' DAN berada di Kelas Tingkat 9
+        // PERBAIKAN: Pastikan kolom 'tingkat' sudah ada di tabel siswa (sesuai migration baru)
+        $siswaLulus = Siswa::where('status', 'Aktif')
+            ->where('tingkat', $request->tingkat_akhir) // Langsung cek kolom tingkat di tabel siswa
+            ->get();
+
+        $jumlah = $siswaLulus->count();
+
+        if ($jumlah == 0) {
+            return back()->with('error', 'Tidak ada siswa aktif ditemukan pada tingkat kelas tersebut.');
         }
 
-        return back()->with('error', 'Tidak ada siswa aktif untuk diluluskan.');
+        // Eksekusi Update Status Massal
+        foreach ($siswaLulus as $siswa) {
+            $siswa->update([
+                'status' => 'Lulus',
+                'kelas_id' => null, // Cabut kelasnya agar tidak punya kelas lagi
+            ]); 
+        }
+
+        return back()->with('success', "BERHASIL! Sebanyak {$jumlah} siswa tingkat {$request->tingkat_akhir} telah diluluskan.");
     }
 }

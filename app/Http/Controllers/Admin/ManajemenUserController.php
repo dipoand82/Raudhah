@@ -10,8 +10,10 @@ use App\Models\TahunAjaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\TemplateSiswaExport;
 use App\Imports\SiswaImport;
 use App\Imports\GuruImport;
+use Illuminate\Support\Str; // <--- WAJIB TAMBAHKAN INI (Baris Penting)
 
 class ManajemenUserController extends Controller
 {
@@ -24,9 +26,10 @@ class ManajemenUserController extends Controller
         $userSiswa = User::where('role', 'siswa')
             ->when($search, function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhereHas('dataSiswa', fn($s) => $s->where('nisn', 'like', "%{$search}%"));
             })
-            ->with('dataSiswa') 
+            ->with('dataSiswa.kelas') 
             ->latest()
             ->paginate(10, ['*'], 'siswa_page');
 
@@ -40,52 +43,69 @@ class ManajemenUserController extends Controller
             ->paginate(10, ['*'], 'guru_page');
 
         // C. Data Pendukung Modal (Kelas & Tahun)
-        $kelas = Kelas::orderBy('nama_kelas', 'asc')->get(); 
+        $kelas = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get(); 
         $tahunAjaran = TahunAjaran::where('is_active', true)->first();
 
+        // Pastikan nama folder view sesuai (biasanya admin.manajemen-user.index)
         return view('admin.manajemen_user.index', compact('userSiswa', 'userGuru', 'kelas', 'tahunAjaran'));
     }
 
     // === 2. SIMPAN SISWA (MANUAL LENGKAP) ===
     public function storeSiswa(Request $request)
     {
-        // Validasi Input (Termasuk Kelas & Gender)
+        // 1. Validasi
         $request->validate([
             'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'nisn' => 'nullable|unique:siswas,nisn',
-            'kelas_id' => 'nullable|exists:kelas,id', // Validasi ID Kelas
-            'jenis_kelamin' => 'required|in:L,P',     // Validasi L/P
+            'email' => 'nullable|email|unique:users',
+            'nisn' => 'required|unique:siswas,nisn',
+            'kelas_id' => 'nullable|exists:kelas,id', 
+            'jenis_kelamin' => 'required|in:L,P',     
         ]);
 
-        // A. Buat Akun Login
+        // 2. Ambil Data Kelas & Tahun
+        $kelas = Kelas::find($request->kelas_id);
+        $tahunAktif = TahunAjaran::where('is_active', true)->first();
+
+        // 3. LOGIKA EMAIL: NamaDepan.NISN@student...
+        if ($request->filled('email')) {
+            $email = $request->email;
+        } else {
+            // Ambil nama depan saja (Contoh: "Budi Santoso" -> "Budi")
+            $namaDepan = explode(' ', $request->name)[0]; 
+            // Bersihkan (huruf kecil, hapus simbol aneh)
+            $namaBersih = Str::slug($namaDepan);
+            // Gabung
+            $email = $namaBersih . '.' . $request->nisn . '@student.sekolah.id';
+        }
+
+        // 4. BUAT USER (Password = NISN)
         $user = User::create([
             'name' => $request->name,
-            'email' => $request->email,
+            'email' => $email,
             'role' => 'siswa',
-            'password' => Hash::make('12345678'),
-            'must_change_password' => true,
+            'password' => Hash::make($request->nisn), // <--- Password Awal = NISN
+            'must_change_password' => true, // Wajib ganti password saat login pertama
         ]);
 
-        // B. Buat Data Siswa (Langsung simpan Kelas & Gender)
+        // 5. Simpan Detail Siswa
         Siswa::create([
             'user_id' => $user->id,
             'nisn' => $request->nisn,
-            'nama_lengkap' => $request->name, // Ambil dari inputan nama user
-            'kelas_id' => $request->kelas_id,           // <--- Simpan Kelas
-            'jenis_kelamin' => $request->jenis_kelamin, // <--- Simpan Gender
+            'nama_lengkap' => $request->name, 
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'kelas_id' => $request->kelas_id,          
+            'tingkat' => $kelas ? $kelas->tingkat : 7, 
+            'tahun_ajaran_id' => $tahunAktif ? $tahunAktif->id : null, 
             'status' => 'Aktif',
-            // Otomatis set tahun masuk ke tahun ajaran yang sedang aktif
-            'tahun_masuk_id' => TahunAjaran::where('is_active', true)->value('id'), 
         ]);
 
-        return back()->with('success', 'Akun Siswa berhasil dibuat & data tersimpan!');
+        return back()->with('success', "Siswa {$request->name} ditambahkan. Password default: {$request->nisn}");
     }
 
-    // === 3. IMPORT SISWA (DENGAN PENGAMAN) ===
+    // === 3. IMPORT SISWA ===
     public function importSiswa(Request $request)
     {
-        $request->validate(['file' => 'required|mimes:xlsx,xls']);
+        $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
         
         try {
             Excel::import(new SiswaImport, $request->file('file'));
@@ -95,7 +115,13 @@ class ManajemenUserController extends Controller
         }
     }
 
-    // === 4. SIMPAN GURU ===
+    // === 4. DOWNLOAD TEMPLATE ===
+    public function downloadTemplate()
+    {
+        return Excel::download(new TemplateSiswaExport, 'template_siswa.xlsx');
+    }
+
+    // === 5. SIMPAN GURU ===
     public function storeGuru(Request $request)
     {
         $request->validate(['name' => 'required', 'email' => 'required|email|unique:users']);
@@ -104,17 +130,17 @@ class ManajemenUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'role' => 'guru',
-            'password' => Hash::make('12345678'),
-            'must_change_password' => true,
+            'password' => Hash::make('123456'),
+            'must_change_password' => false,
         ]);
 
         return back()->with('success', 'Akun Guru berhasil dibuat!');
     }
 
-    // === 5. IMPORT GURU ===
+    // === 6. IMPORT GURU ===
     public function importGuru(Request $request)
     {
-        $request->validate(['file' => 'required|mimes:xlsx,xls']);
+        $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
         
         try {
             Excel::import(new GuruImport, $request->file('file'));
@@ -124,7 +150,7 @@ class ManajemenUserController extends Controller
         }
     }
 
-    // === 6. UBAH PASSWORD ADMIN ===
+    // === 7. UBAH PASSWORD ADMIN ===
     public function updatePassword(Request $request)
     {
         $request->validate([
@@ -137,5 +163,34 @@ class ManajemenUserController extends Controller
         ]);
 
         return back()->with('success', 'Password Admin berhasil diubah!');
+    }
+
+    // === 8. HAPUS USER ===
+    public function destroy($id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete(); // Karena cascade, data siswa/guru ikut terhapus
+        return back()->with('success', 'User berhasil dihapus.');
+    }
+
+    // === 9. FITUR RESET PASSWORD (SOLUSI JIKA SISWA LUPA/AKUN DIBAJAK) ===
+    // Pastikan route-nya sudah dibuat di web.php: Route::post('/admin/siswa/{id}/reset', ...)
+    public function resetPasswordSiswa($id)
+    {
+        // 1. Cari data siswa
+        $siswa = Siswa::findOrFail($id);
+        
+        // 2. Cek apakah siswa punya akun user
+        if ($siswa->user) {
+            // 3. Reset Password kembali ke NISN
+            $siswa->user->update([
+                'password' => Hash::make($siswa->nisn), // Password jadi NISN lagi
+                'must_change_password' => true,         // Paksa ganti password saat login nanti
+            ]);
+
+            return back()->with('success', "Password siswa a.n {$siswa->nama_lengkap} berhasil di-reset kembali ke NISN ({$siswa->nisn}).");
+        }
+
+        return back()->with('error', 'Akun user tidak ditemukan untuk siswa ini.');
     }
 }

@@ -27,7 +27,9 @@
 
                 <form method="POST" action="{{ route('admin.siswas.update', $siswa->id) }}">
                     @csrf
-                    @method('PUT') <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    @method('PUT') 
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         
                         <div class="md:col-span-2">
                             <h4 class="font-bold text-indigo-600 mb-3 uppercase text-xs tracking-wider">Informasi Akun</h4>
@@ -35,12 +37,13 @@
 
                         <div>
                             <x-input-label for="name" :value="__('Nama Lengkap')" />
-                            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name', $siswa->user->name)" required />
+                            {{-- Gunakan null coalescing operator (??) untuk mencegah error jika user terhapus --}}
+                            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name', $siswa->user->name ?? '')" required />
                         </div>
 
                         <div>
                             <x-input-label for="email" :value="__('Email Login')" />
-                            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $siswa->user->email)" required />
+                            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $siswa->user->email ?? '')" required />
                         </div>
 
                         <div class="md:col-span-2 mt-4">
@@ -49,7 +52,7 @@
 
                         <div>
                             <x-input-label for="nisn" :value="__('NISN')" />
-                            <x-text-input id="nisn" class="block mt-1 w-full" type="number" name="nisn" :value="old('nisn', $siswa->nisn)" />
+                            <x-text-input id="nisn" class="block mt-1 w-full" type="number" name="nisn" :value="old('nisn', $siswa->nisn)" min="0" oninput="validity.valid||(value='');" />
                         </div>
 
                         <div>
@@ -66,19 +69,22 @@
                                 <option value="">-- Belum Masuk Kelas --</option>
                                 @foreach($kelas as $k)
                                     <option value="{{ $k->id }}" {{ $siswa->kelas_id == $k->id ? 'selected' : '' }}>
-                                        {{ $k->nama_kelas }}
+                                        {{ $k->tingkat }} {{ $k->nama_kelas }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
 
                         <div>
-                            <x-input-label for="tahun_masuk_id" :value="__('Angkatan (Tahun Masuk)')" />
-                            <select name="tahun_masuk_id" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            {{-- PERBAIKAN: Name harus tahun_ajaran_id (bukan tahun_ajarans_id) --}}
+                            <x-input-label for="tahun_ajaran_id" :value="__('Tahun Ajaran Aktif')" />
+                            
+                            <select name="tahun_ajaran_id" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 <option value="">-- Pilih Tahun --</option>
                                 @foreach($tahunAjaran as $ta)
-                                    <option value="{{ $ta->id }}" {{ $siswa->tahun_masuk_id == $ta->id ? 'selected' : '' }}>
-                                        {{ $ta->tahun }} ({{ $ta->semester }})
+                                    <option value="{{ $ta->id }}" {{ $siswa->tahun_ajaran_id == $ta->id ? 'selected' : '' }}>
+                                        {{-- PERBAIKAN: Hapus semester, cukup tahun saja --}}
+                                        {{ $ta->tahun }} @if($ta->is_active) (Aktif) @endif
                                     </option>
                                 @endforeach
                             </select>
@@ -92,7 +98,7 @@
                                 <option value="Pindah" {{ $siswa->status == 'Pindah' ? 'selected' : '' }}>🚚 Pindah</option>
                                 <option value="Keluar" {{ $siswa->status == 'Keluar' ? 'selected' : '' }}>❌ Keluar (DO)</option>
                             </select>
-                            <p class="text-xs text-gray-500 mt-1">*Hati-hati mengubah status menjadi Lulus/Keluar.</p>
+                            <p class="text-xs text-red-500 font-semibold mt-1">*Hati-hati mengubah status menjadi Lulus/Keluar.</p>
                         </div>
 
                     </div>

@@ -22,15 +22,24 @@ return new class extends Migration
             $table->string('nama_lengkap');
             $table->enum('jenis_kelamin', ['L', 'P']);
             
-            // === TAMBAHAN PENTING (KELAS) ===
-            // Default null, karena siswa baru belum punya kelas
-            // $table->string('kelas')->nullable(); 
-            $table->foreignId('kelas_id')->nullable()->constrained('kelas')->onDelete(action: 'set null');
-            // 3. Status Siswa
+            // 3. KELAS
+            $table->foreignId('kelas_id')
+                  ->nullable()
+                  ->constrained('kelas') // Pastikan nama tabel kelas Anda 'kelas' (bukan 'classes')
+                  ->onDelete('set null');
+
+            // === [BARU] ===
+            // Menambahkan kolom tingkat (7, 8, atau 9)
+            // Fungsinya: Memudahkan filter "Tampilkan semua anak kelas 7"
+            $table->integer('tingkat')->default(7); 
+            
+            // 4. Status Siswa
             $table->string('status')->default('Aktif'); 
 
-            // 4. Relasi ke Tahun Masuk
-            $table->foreignId('tahun_masuk_id')
+            // === [UBAH] ===
+            // DARI: tahun_masuk_id (Statis)
+            // KE: tahun_ajaran_id (Dinamis - Berubah tiap tahun)
+            $table->foreignId('tahun_ajaran_id')
                   ->nullable()
                   ->constrained('tahun_ajarans')
                   ->nullOnDelete(); 
