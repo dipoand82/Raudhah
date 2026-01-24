@@ -50,58 +50,59 @@ class ManajemenUserController extends Controller
         return view('admin.manajemen_user.index', compact('userSiswa', 'userGuru', 'kelas', 'tahunAjaran'));
     }
 
-    // === 2. SIMPAN SISWA (MANUAL LENGKAP) ===
     public function storeSiswa(Request $request)
     {
-        // 1. Validasi
-        $request->validate([
-            'name' => 'required',
-            'email' => 'nullable|email|unique:users',
-            'nisn' => 'required|unique:siswas,nisn',
-            'kelas_id' => 'nullable|exists:kelas,id', 
-            'jenis_kelamin' => 'required|in:L,P',     
-        ]);
+    // 1. Validasi
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'nisn' => 'required|numeric|unique:siswas,nisn',
+        'email' => 'nullable|email|unique:users,email',
+        'kelas_id' => 'nullable|exists:kelas,id', 
+        'jenis_kelamin' => 'required|in:L,P',     
+    ]);
 
-        // 2. Ambil Data Kelas & Tahun
-        $kelas = Kelas::find($request->kelas_id);
-        $tahunAktif = TahunAjaran::where('is_active', true)->first();
+    // 2. Ambil Data Pendukung
+    $tahunAktif = TahunAjaran::where('is_active', true)->first();
 
-        // 3. LOGIKA EMAIL: NamaDepan.NISN@student...
-        if ($request->filled('email')) {
-            $email = $request->email;
-        } else {
-            // Ambil nama depan saja (Contoh: "Budi Santoso" -> "Budi")
-            $namaDepan = explode(' ', $request->name)[0]; 
-            // Bersihkan (huruf kecil, hapus simbol aneh)
-            $namaBersih = Str::slug($namaDepan);
-            // Gabung
-            $email = $namaBersih . '.' . $request->nisn . '@student.sekolah.id';
+    // 3. LOGIKA EMAIL OTOMATIS
+    if ($request->filled('email')) {
+        $email = $request->email;
+    } else {
+        // Ambil kata pertama & ubah ke lowercase (Contoh: "Zahra Amalia" -> "zahra")
+        $namaDepan = Str::lower(explode(' ', trim($request->name))[0]);
+        
+        // Buat format: namadepannisn@student.sekolah.id (Tanpa titik sesuai keinginan baru)
+        $email = $namaDepan .'.'.$request->nisn . '@student.sekolah.id';
+        
+        // Cek duplikasi email hasil generate
+        if (User::where('email', $email)->exists()) {
+            $email = $namaDepan . $request->nisn . rand(1, 9) . '@student.sekolah.id';
         }
-
-        // 4. BUAT USER (Password = NISN)
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $email,
-            'role' => 'siswa',
-            'password' => Hash::make($request->nisn), // <--- Password Awal = NISN
-            'must_change_password' => true, // Wajib ganti password saat login pertama
-        ]);
-
-        // 5. Simpan Detail Siswa
-        Siswa::create([
-            'user_id' => $user->id,
-            'nisn' => $request->nisn,
-            'nama_lengkap' => $request->name, 
-            'jenis_kelamin' => $request->jenis_kelamin,
-            'kelas_id' => $request->kelas_id,          
-            'tingkat' => $kelas ? $kelas->tingkat : 7, 
-            'tahun_ajaran_id' => $tahunAktif ? $tahunAktif->id : null, 
-            'status' => 'Aktif',
-        ]);
-
-        return back()->with('success', "Siswa {$request->name} ditambahkan. Password default: {$request->nisn}");
     }
 
+    // 4. Create User (Akun Login)
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $email,
+        'password' => Hash::make($request->nisn), // Password default = NISN
+        'role' => 'siswa',
+        'must_change_password' => true,
+    ]);
+
+    // 5. Create Data Siswa
+    Siswa::create([
+        'user_id'         => $user->id,
+        'nisn'            => $request->nisn,
+        'nama_lengkap'    => $request->name,
+        'jenis_kelamin'   => $request->jenis_kelamin,
+        'kelas_id'        => $request->kelas_id,
+        'tingkat'         => $request->kelas_id ? Kelas::find($request->kelas_id)->tingkat : null,
+        'tahun_ajaran_id' => $tahunAktif ? $tahunAktif->id : null,
+        'status'          => 'Aktif',
+    ]);
+
+    return redirect()->back()->with('success', 'Siswa berhasil ditambahkan dengan email: ' . $email);
+    }
     // === 3. IMPORT SISWA ===
     public function importSiswa(Request $request)
     {

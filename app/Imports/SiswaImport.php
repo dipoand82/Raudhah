@@ -41,7 +41,16 @@ class SiswaImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFai
 
     public function model(array $row)
     {
-        // 1. LOGIKA PEMECAH KELAS (Tetap Menggunakan Regex Anda)
+        // 1. Bersihkan Data (Gunakan trim untuk menghindari spasi tak terlihat dari Excel)
+        $nisn = trim($row['nisn']);
+        $namaLengkap = trim($row['nama_lengkap']);
+
+        // LOGIKA EMAIL: namadepan.nisn@student.sekolah.id
+        // explode memecah nama, strtolower mengecilkan huruf
+        $namaDepan = strtolower(explode(' ', $namaLengkap)[0]);
+        $emailFinal = $namaDepan . '.' . $nisn . '@student.sekolah.id';
+
+        // 2. LOGIKA PEMECAH KELAS (Tetap Menggunakan Regex Anda)
         $kelas_id = null;
         $tingkat = 7; 
 
@@ -60,27 +69,24 @@ class SiswaImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFai
             }
         }
 
-        // 2. BUAT/UPDATE USER (AKUN LOGIN)
-        $emailDummy = $row['nisn'] . '@student.sekolah.id';
-        
+        // 3. BUAT/UPDATE USER (AKUN LOGIN)
         $user = User::updateOrCreate(
-            ['email' => $emailDummy],
+            ['email' => $emailFinal], // Cari berdasarkan email hasil generate
             [
-                'name' => $row['nama_lengkap'],
-                'password' => Hash::make('123456'), 
+                'name' => $namaLengkap,
+                'password' => Hash::make($nisn), // Rekomendasi: Password default = NISN
                 'role' => 'siswa',
                 'must_change_password' => true,
             ]
         );
 
-        // 3. BUAT/UPDATE DATA SISWA (LOGIKA KENAIKAN KELAS)
-        // Jika NISN sudah ada, kolom kelas_id akan diperbarui sesuai Excel baru
+        // 4. BUAT/UPDATE DATA SISWA
         return Siswa::updateOrCreate(
-            ['nisn' => $row['nisn']],
+            ['nisn' => $nisn],
             [
                 'user_id'         => $user->id,
-                'nama_lengkap'    => $row['nama_lengkap'],
-                'jenis_kelamin'   => strtoupper($row['jenis_kelamin']), 
+                'nama_lengkap'    => $namaLengkap,
+                'jenis_kelamin'   => strtoupper(trim($row['jenis_kelamin'])), 
                 'kelas_id'        => $kelas_id,
                 'tingkat'         => $tingkat, 
                 'tahun_ajaran_id' => $this->tahunAktif ? $this->tahunAktif->id : null,
