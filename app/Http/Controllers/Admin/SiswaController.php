@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Siswa;
+use App\Models\User;
 use App\Models\Kelas;
 use App\Models\TahunAjaran;
 use App\Exports\TemplateSiswaExport;
@@ -137,10 +138,12 @@ class SiswaController extends Controller
             $siswa->user->delete();
         }
         // Hapus Siswa
-        $siswa->delete();
+        // $siswa->delete();
+        $siswa->user->forceDelete();
     }
 
-    return back()->with('success', count($request->ids) . ' data siswa berhasil dihapus.');
+    return redirect()->back()->with('success', 'Data siswa terpilih berhasil dihapus!');
+    // return back()->with(    'success', count($request->ids) . ' data siswa berhasil dihapus.');
     }
     
     // === 6. FORM CREATE (MANUAL) ===

@@ -61,19 +61,37 @@
                     </form>
 
                     {{-- TOMBOL AKSI --}}
-                    <div class="flex items-center gap-3 w-full lg:w-auto justify-end">
+                    {{-- <div class="flex items-center gap-3 w-full lg:w-auto justify-end">
                         <a href="{{ route('admin.siswas.export', ['kelas_id' => request('kelas_id'), 'search' => request('search'), 'status' => request('status')]) }}" 
-                           class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                            Export
+                           class="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm ">
+                            <svg class="w-4 h-4 " fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            Export Data Siswa
                         </a>
                         <a href="{{ route('admin.manajemen-user.index') }}"
-                        class="inline-flex items-center px-4 py-2 bg-[#1072B8] border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#0d5a91] transition ease-in-out duration-150 gap-2">
+                        class="inline-flex items-center justify-center px-4 py-2 bg-[#1072B8] border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#0d5a91] transition ease-in-out duration-150 gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                             </svg>
                             Tambah Siswa
                         </a>
+                    </div> --}}
+                    {{-- TOMBOL AKSI --}}
+                    {{-- Tombol Aksi Kanan --}}
+                    <div class="flex items-center gap-3 w-full lg:w-auto justify-end">
+                        
+                        {{-- Tombol Import --}}
+                        <button x-data="" x-on:click="$dispatch('open-modal', 'import-siswa')" 
+                            class="inline-flex items-center justify-center gap-2 bg-green-600 text-white px-6 py-2 rounded-md text-sm font-semibold hover:bg-green-700 transition shadow whitespace-nowrap">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            Import Akun
+                        </button>
+
+                        {{-- Tombol Tambah --}}
+                        <x-primary-button x-data="" x-on:click="$dispatch('open-modal', 'add-siswa')" 
+                            class="flex items-center justify-center gap-2 px-6 whitespace-nowrap">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            Tambah Siswa
+                        </x-primary-button>
                     </div>
                 </div>
 
@@ -130,7 +148,7 @@
                                                     {{ $siswa->kelas->tingkat }} {{ $siswa->kelas->nama_kelas }}
                                                 </span>
                                             @else
-                                                <span class="text-xs text-red-400 italic">No Class</span>
+                                                <span class="text-xs text-red-400 font font-semibold">No Class</span>
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-500">
@@ -163,7 +181,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="8" class="px-6 py-12 text-center text-gray-400 italic flex-col">
-                                            <span class="block mb-2 text-xl">📂</span>
+                                            <span class="block mb-2 text-xl"></span>
                                             Data siswa tidak ditemukan untuk pencarian/filter ini.
                                         </td>
                                     </tr>

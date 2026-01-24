@@ -103,8 +103,8 @@ Route::middleware(['auth', 'verified'])
                 Route::get('/export', 'export')->name('export');
                 Route::get('/{id}/edit', 'edit')->name('edit'); // Edit Lengkap
                 Route::put('/{id}', 'update')->name('update');  // Update
-                Route::delete('/{id}', 'destroy')->name('destroy'); // Hapus
                 Route::delete('/bulk-delete', 'bulkDestroy')->name('bulk_delete');
+                Route::delete('/{id}', 'destroy')->name('destroy'); // Hapus
             });
 
 
