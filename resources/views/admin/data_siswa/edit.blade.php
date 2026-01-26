@@ -107,7 +107,7 @@
                         <a href="{{ route('admin.siswas.index') }}" class="text-gray-600 hover:text-gray-900 underline text-sm">
                             Batal & Kembali
                         </a>
-                        <x-primary-button class="bg-indigo-600 hover:bg-indigo-700">
+                        <x-primary-button>
                             {{ __('Simpan Perubahan') }}
                         </x-primary-button>
                     </div>

@@ -68,10 +68,27 @@ class SiswaController extends Controller
     }
 
     // === 2. EXPORT DATA (FITUR BARU UNTUK ROUND-TRIP EXCEL) ===
-    public function export(Request $request)
+    public function export(Request $request) 
     {
-        // Kita kirim parameter kelas_id agar yang didownload sesuai filter
-        return Excel::download(new SiswaExport($request->kelas_id,$request->status), 'data_siswa_raudhah.xlsx');
+        // 1. Inisialisasi bagian nama file
+        $namaKelas = 'Semua_Kelas';
+        $statusSiswa = $request->status ? ucfirst($request->status) : 'Semua_Status';
+
+        // 2. Cari nama kelas asli jika filter kelas_id ada
+        if ($request->filled('kelas_id')) {
+            $kelas = \App\Models\Kelas::find($request->kelas_id);
+            if ($kelas) {
+                // str_slug atau str_replace agar nama file tidak mengandung spasi aneh
+                $namaKelas = str_replace(' ', '_', $kelas->nama_kelas);
+            }
+        }
+
+        // 3. Gabungkan menjadi nama file yang cantik
+        // Hasilnya: Data_Siswa_Kelas_XII_RPL_1_Aktif.xlsx
+        $fileName = "Data_Siswa_{$namaKelas}_{$statusSiswa}.xlsx";
+
+        // 4. Kirim ke proses download
+        return Excel::download(new SiswaExport($request), $fileName);
     }
 
     // === 3. HALAMAN EDIT DETAIL ===

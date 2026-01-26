@@ -105,7 +105,7 @@
                                         @if(!$ta->is_active)
                                             <form action="{{ route('admin.tahun-ajaran.destroy', $ta->id) }}" method="POST" class="inline" onsubmit="return confirm('Hapus Tahun Ajaran {{ $ta->tahun }}? Data terkait mungkin ikut terhapus!');">
                                                 @csrf @method('DELETE')
-                                                <button class="text-red-600 hover:text-red-900 font-semibold transition">Hapus</button>
+                                                    x-danger-button>Hapus</x-danger-button>
                                             </form>
                                         @endif
 
