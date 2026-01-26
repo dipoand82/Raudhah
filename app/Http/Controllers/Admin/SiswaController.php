@@ -13,6 +13,8 @@ use App\Exports\SiswaExport; // <-- TAMBAHAN: Untuk Export Data Real
 use App\Imports\SiswaImport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Traits\HandlesExcelImports; 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class SiswaController extends Controller
 {
@@ -58,27 +60,28 @@ class SiswaController extends Controller
     }
 
     // === 2. EXPORT DATA (FITUR BARU UNTUK ROUND-TRIP EXCEL) ===
-    public function export(Request $request) 
+     public function export(Request $request) 
     {
-        // 1. Inisialisasi bagian nama file
-        $namaKelas = 'Semua_Kelas';
-        $statusSiswa = $request->status ? ucfirst($request->status) : 'Semua_Status';
+    // Ambil nilai asli dari request (bisa null jika tidak dipilih)
+    $kelasId = $request->get('kelas_id');
+    $status = $request->get('status'); 
 
-        // 2. Cari nama kelas asli jika filter kelas_id ada
-        if ($request->filled('kelas_id')) {
-            $kelas = \App\Models\Kelas::find($request->kelas_id);
-            if ($kelas) {
-                // str_slug atau str_replace agar nama file tidak mengandung spasi aneh
-                $namaKelas = str_replace(' ', '_', $kelas->nama_kelas);
-            }
+    // Logika untuk LABEL Nama File saja
+    $labelStatus = $status ?: 'Semua-Status';
+    $labelKelas = 'Semua-Kelas';
+
+    if ($kelasId) {
+        $kelas = \App\Models\Kelas::find($kelasId);
+        if ($kelas) {
+            $labelKelas = "Kelas-" .$kelas->nama_lengkap; 
         }
+    }
 
-        // 3. Gabungkan menjadi nama file yang cantik
-        // Hasilnya: Data_Siswa_Kelas_XII_RPL_1_Aktif.xlsx
-        $fileName = "Data_Siswa_{$namaKelas}_{$statusSiswa}.xlsx";
+    // Susun nama file
+    $fileName = "Data-Siswa-{$labelKelas}-{$labelStatus} " . ".xlsx";
 
-        // 4. Kirim ke proses download
-        return Excel::download(new SiswaExport($request), $fileName);
+    // Kirim $status yang asli (null/isi) agar query database di SiswaExport benar
+    return Excel::download(new \App\Exports\SiswaExport($kelasId, $status), $fileName);
     }
 
     // === 3. HALAMAN EDIT DETAIL ===
@@ -95,16 +98,27 @@ class SiswaController extends Controller
     public function update(Request $request, $id)
     {
         $siswa = Siswa::findOrFail($id);
-        
-        // Update data User (Nama & Email)
-        $siswa->user->update([
-            'name' => $request->name,
-            'email' => $request->email,
+
+        // Validasi email agar tidak bentrok dengan email orang lain (kecuali email dia sendiri)
+        $request->validate([
+            'email' => 'required|email|unique:users,email,' . $siswa->user_id,
+            'nisn' => 'required|numeric|unique:siswas,nisn,' . $siswa->id,
+            'name' => 'required|string|max:255', // Nama dari form
         ]);
+        return DB::transaction(function () use ($request, $siswa) {
+    
+        // 1. TAMBAHKAN INI: Update data User agar Nama & Email sinkron
+            if ($siswa->user) {
+                $siswa->user->update([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                ]);
+            }
 
         // Update data Siswa (Akademik)
         $siswa->update([
             'nisn' => $request->nisn,
+            'nama_lengkap' => $request->name, // <--- BARU: Sinkronkan nama di tabel siswa
             'kelas_id' => $request->kelas_id,
             'jenis_kelamin' => $request->jenis_kelamin,
             'tahun_ajaran_id' => $request->tahun_ajaran_id, 
@@ -112,6 +126,7 @@ class SiswaController extends Controller
         ]);
 
         return redirect()->route('admin.siswas.index')->with('success', 'Data siswa diperbarui!');
+    });
     }
 
     // === 5. HAPUS SISWA ===
@@ -162,12 +177,60 @@ class SiswaController extends Controller
     }
     
     // === 7. PROSES STORE (MANUAL) ===
-    public function store(Request $request)
-    {
-         // Jika Anda punya logika store manual, masukkan di sini.
-         // Saat ini redirect saja sesuai kode lama Anda.
-         return redirect()->route('admin.siswas.index');
+public function store(Request $request)
+{
+    // Buat email otomatis jika input email kosong
+    if (!$request->filled('email')) {
+        // Ganti spasi jadi titik dan kecilkan semua huruf
+        $cleanName = strtolower(str_replace(' ', '.', $request->name));
+        $generatedEmail = $cleanName . '.' . $request->nisn . '@sekolah.id';
+        $request->merge(['email' => $generatedEmail]);
     }
+    // 1. Validasi Input
+    $request->validate([
+        'nisn' => 'required|numeric|unique:siswas,nisn',
+        'nama_lengkap' => 'required|string|max:255',
+        'jenis_kelamin' => 'required|in:L,P',
+        'kelas_id' => 'required|exists:kelas,id',
+        'tingkat' => 'required',
+        'email' => 'required|email|unique:users,email',
+    ]);
+        // AMBIL TAHUN AKTIF (Inilah obat untuk error "tahunAktif")
+        $tahunAktif = TahunAjaran::where('is_active', true)->first();
+
+        // Menggunakan Transaction agar jika salah satu gagal, semua dibatalkan
+        return DB::transaction(function () use ($request,$tahunAktif) {
+            
+            // 2. BUAT/UPDATE USER (Sama dengan logika Import)
+          $user = User::updateOrCreate(
+            ['email' => $request->email],
+            [
+                'name' => $request->nama_lengkap,
+                'password' => Hash::make($request->nisn), // Password default = NISN
+                'role' => 'siswa',
+                'must_change_password' => true,
+            ]
+        );
+
+        // 3. BUAT/UPDATE DATA SISWA (Sama dengan logika Import)
+        Siswa::updateOrCreate(
+            ['nisn' => $request->nisn],
+            [
+                'user_id'         => $user->id,
+                'nama_lengkap'    => $request->nama_lengkap,
+                'jenis_kelamin'   => strtoupper($request->jenis_kelamin),
+                'kelas_id'        => $request->kelas_id,
+                'tingkat'         => $request->tingkat,
+                // Pastikan variabel $this->tahunAktif sudah didefinisikan di __construct atau method lain
+                'tahun_ajaran_id' => $tahunAktif ? $tahunAktif->id : null,
+                'status'          => 'Aktif',
+            ]
+        );
+
+        return redirect()->route('admin.siswas.index')
+            ->with('success', 'Data Siswa dan Akun Login berhasil dibuat.');
+    });
+}
 
     // === 8. DOWNLOAD TEMPLATE IMPORT ===
     public function downloadTemplate()

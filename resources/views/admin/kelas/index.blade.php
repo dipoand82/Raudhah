@@ -10,15 +10,23 @@
             
             {{-- ALERT SUCCESS --}}
             @if(session('success'))
-                <div x-data="{ show: true }" x-show="show" class="mb-4 flex items-center justify-between bg-green-100 border border-green-200 text-green-700 px-4 py-3 rounded shadow-sm">
-                    <span class="text-sm font-medium flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        {{ session('success') }}
-                    </span>
-                    <button @click="show = false" class="text-green-500 hover:text-green-700">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
+                <x-alert-success>
+                    {{ session('success') }}
+                </x-alert-success>
+            @endif
+            {{-- Tampilkan Alert Gagal (Misal dari Session Error) --}}
+            @if(session('error'))
+                <x-alert-danger>
+                    {{ session('error') }}
+                </x-alert-danger>
+            @endif
+            
+            @if ($errors->any())
+                @foreach ($errors->all() as $error)
+                    <x-alert-danger timeout="8000"> {{-- Waktu 8 detik agar sempat dibaca --}}
+                        {{ $error }}
+                    </x-alert-danger>
+                @endforeach
             @endif
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -49,7 +57,7 @@
                                 <x-input-label for="nama_kelas" :value="__('Label Kelas')" />
                                 <select name="nama_kelas" id="nama_kelas" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-[#3B3E42] focus:border-[#3B3E42]" required>
                                     <option value="">-- Pilih Label --</option>
-                                    @foreach(['A','B','C','D','E'] as $label)
+                                    @foreach(['A','B','C'] as $label)
                                         <option value="{{ $label }}">{{ $label }}</option>
                                     @endforeach
                                 </select>
@@ -64,8 +72,8 @@
                 </div>
 
                 {{-- TABEL DATA (KANAN) --}}
-                <div class="md:col-span-2">
-                    <div class="overflow-hidden bg-white rounded-xl shadow border border-gray-200">
+                <div class="md:col-span-2 ">
+                    <div class="overflow-x-auto bg-white rounded shadow overflow-hidden bg-white rounded-xl shadow border border-gray-200">
                         <table class="min-w-full divide-y divide-gray-200">
                             {{-- HEADER GELAP --}}
                             <thead class="bg-[#3B3E42]">
@@ -137,7 +145,7 @@
                                                 <div>
                                                     <x-input-label value="Label Kelas" />
                                                     <select name="nama_kelas" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-[#3B3E42] focus:border-[#3B3E42]">
-                                                        @foreach(['A','B','C','D','E'] as $h)
+                                                        @foreach(['A','B','C'] as $h)
                                                             <option value="{{ $h }}" {{ $k->nama_kelas == $h ? 'selected' : '' }}>{{ $h }}</option>
                                                         @endforeach
                                                     </select>

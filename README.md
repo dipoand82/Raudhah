@@ -130,3 +130,5 @@ select 1
 <x-button> Simpan </x-button>
 <x-button variant="secondary"> Batal </x-button>
 
+Pass scrol,tabel ga kebawah
+class="whitespace-nowrap"

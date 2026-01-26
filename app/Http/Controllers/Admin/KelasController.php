@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Kelas;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log; // Sudah ada, jangan pakai tanda "\" lagi di bawah
 
 class KelasController extends Controller
 {
     public function index()
     {
-        // Tetap sama, sudah oke
         $kelas = Kelas::orderBy('tingkat', 'asc')
                       ->orderBy('nama_kelas', 'asc')
                       ->paginate(10);
@@ -24,38 +24,35 @@ class KelasController extends Controller
         $request->validate([
             'tingkat'    => 'required|integer|in:7,8,9', 
             'nama_kelas' => [
-                'required',
-                'string',
-                'max:5',
-                // 🔥 VALIDASI: Cek kombinasi Tingkat + Nama Kelas
-                // Agar tidak ada dua kelas "7A"
+                'required', 'string', 'max:5',
                 Rule::unique('kelas')->where(function ($query) use ($request) {
                     return $query->where('tingkat', $request->tingkat);
                 }),
             ], 
         ], [
-            // Custom pesan error
             'nama_kelas.unique' => "Gagal! Kelas {$request->tingkat}{$request->nama_kelas} sudah ada.",
         ]);
 
-        Kelas::create([
-            'tingkat' => $request->tingkat,
-            'nama_kelas' => $request->nama_kelas,
-        ]);
+        try {
+            Kelas::create([
+                'tingkat' => $request->tingkat,
+                'nama_kelas' => $request->nama_kelas,
+            ]);
+            return back()->with('success', 'Kelas berhasil dibuat!');
 
-        return back()->with('success', 'Kelas berhasil dibuat!');
+        } catch (\Exception $e) {
+            // Perbaikan: Hapus "\" dan panggil langsung Log::error
+            Log::error("Gagal simpan kelas: " . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan sistem saat menyimpan data.');
+        }
     }
 
-    // Ubah $id agar konsisten dengan route web.php
     public function update(Request $request, $id) 
     {
         $request->validate([
             'tingkat'    => 'required|integer|in:7,8,9',
             'nama_kelas' => [
-                'required',
-                'string',
-                'max:5',
-                // Validasi unique update (abaikan diri sendiri)
+                'required', 'string', 'max:5',
                 Rule::unique('kelas')->where(function ($query) use ($request) {
                     return $query->where('tingkat', $request->tingkat);
                 })->ignore($id),
@@ -64,31 +61,37 @@ class KelasController extends Controller
             'nama_kelas.unique' => "Gagal! Kelas {$request->tingkat}{$request->nama_kelas} sudah digunakan.",
         ]);
 
-        $kelas = Kelas::findOrFail($id);
-        $kelas->update([
-            'tingkat' => $request->tingkat,
-            'nama_kelas' => $request->nama_kelas,
-        ]);
+        try {
+            $kelas = Kelas::findOrFail($id);
+            $kelas->update([
+                'tingkat' => $request->tingkat,
+                'nama_kelas' => $request->nama_kelas,
+            ]);
+            return back()->with('success', 'Data Kelas berhasil diperbarui!');
 
-        return back()->with('success', 'Data Kelas berhasil diperbarui!');
+        } catch (\Exception $e) {
+            // Tambahkan Error Handling di Update juga agar aman
+            Log::error("Gagal update kelas ID {$id}: " . $e->getMessage());
+            return back()->with('error', 'Gagal memperbarui data karena kesalahan sistem.');
+        }
     }
 
-    // 🔥 PERBAIKAN UTAMA ADA DI SINI (DESTROY) 🔥
     public function destroy($id)
     {
-        // 1. Cari Kelas berdasarkan ID
-        $kelas = Kelas::findOrFail($id);
+        try {
+            $kelas = Kelas::findOrFail($id);
 
-        // 2. CEK KEAMANAN: Apakah kelas ini punya siswa?
-        // Menggunakan relasi 'siswa' yang ada di Model Kelas
-        if ($kelas->siswas()->count() > 0) {
-            // Jika ada siswa, BATALKAN penghapusan dan beri pesan Error Merah
-            return back()->with('error', 'Gagal Hapus! Kelas ini masih memiliki siswa aktif. Pindahkan siswa terlebih dahulu.');
+            // Cek apakah ada siswa di kelas ini
+            if ($kelas->siswas()->count() > 0) {
+                return back()->with('error', 'Gagal Hapus! Kelas ini masih memiliki siswa aktif.');
+            }
+
+            $kelas->delete();
+            return back()->with('success', 'Kelas berhasil dihapus.');
+
+        } catch (\Exception $e) {
+            Log::error("Gagal hapus kelas ID {$id}: " . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat mencoba menghapus data.');
         }
-
-        // 3. Jika aman (kosong), baru dihapus
-        $kelas->delete();
-        
-        return back()->with('success', 'Kelas berhasil dihapus.');
     }
 }

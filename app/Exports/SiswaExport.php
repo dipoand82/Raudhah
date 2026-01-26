@@ -9,30 +9,25 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class SiswaExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithStyles
 {
     protected $kelas_id;
-    protected $status; // <--- TAMBAHAN
+    protected $status;
+    private $rowNumber = 0; // 1. TAMBAHKAN INI: Untuk menghitung nomor urut
 
-    // Menerima filter kelas_id dari Controller
     public function __construct($kelas_id = null, $status = null)
     {
         $this->kelas_id = $kelas_id;
         $this->status = $status;
     }
 
-    /**
-     * MENGAMBIL DATA DARI DATABASE
-     */
     public function collection()
     {
-        // Ambil data siswa beserta relasi user dan kelas
         $query = Siswa::with(['user', 'kelas']);
 
-        // Jika ada filter kelas, ambil kelas itu saja
         if ($this->kelas_id) {
             $query->where('kelas_id', $this->kelas_id);
         }
@@ -45,51 +40,49 @@ class SiswaExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
     }
 
     /**
-     * JUDUL KOLOM (Harus sama persis dengan TemplateSiswaExport)
-     * Agar saat diupload ulang, sistem bisa membacanya.
+     * 2. TAMBAHKAN 'NO' DI HEADINGS
      */
     public function headings(): array
     {
         return [
-            'nama_lengkap',
-            'nisn',
-            'kelas',         // Nanti isinya "7A", "8B", dll
-            'jenis_kelamin',
+            'NO',
+            'NAMA LENGKAP',
+            'NISN',
+            'KELAS',
+            'JENIS KELAMIN',
         ];
     }
 
     /**
-     * MAPPING DATA DATABASE KE KOLOM EXCEL
+     * 3. TAMBAHKAN LOGIKA NOMOR DI MAPPING
      */
     public function map($siswa): array
     {
-        // Logic menggabungkan Tingkat + Nama Kelas (Misal: 7 + A = 7A)
-        $namaKelas = $siswa->kelas ? ($siswa->kelas->tingkat . $siswa->kelas->nama_kelas) : '';
+        $this->rowNumber++; // Tambah angka 1 setiap baris baru
 
         return [
-            $siswa->user->name ?? '', // Kolom nama_lengkap
-            $siswa->nisn,             // Kolom nisn
-            $namaKelas,               // Kolom kelas (Format: 7A)
-            $siswa->jenis_kelamin,    // Kolom jenis_kelamin
+            $this->rowNumber, // Masukkan nomor ke kolom pertama
+            $siswa->user->name ?? '-',
+            $siswa->nisn ?? '-',
+            $siswa->kelas ? $siswa->kelas->nama_lengkap : '-', 
+            $siswa->jenis_kelamin ?? '-',
         ];
     }
 
-    /**
-     * STYLING (BIAR SAMA KERENNYA DENGAN TEMPLATE ANDA)
-     */
     public function styles(Worksheet $sheet)
     {
+        $lastRow = $sheet->getHighestRow();
+        // Karena kolom nambah (NO), jangkauan border jadi A1 sampai E
+        $rangeTabel = 'A1:E' . $lastRow;
+
+        $sheet->getStyle($rangeTabel)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+        $sheet->getParent()->getDefaultStyle()->getFont()->setName('Times New Roman');
+        $sheet->getParent()->getDefaultStyle()->getFont()->setSize(10);
+
         return [
-            // Header Biru (Baris 1)
             1 => [
-                'font' => [
-                    'bold' => true,
-                    'color' => ['rgb' => 'FFFFFF']
-                ],
-                'fill' => [
-                    'fillType' => Fill::FILL_SOLID,
-                    'startColor' => ['rgb' => '0A78BD'] // Warna Biru Raudhah
-                ],
+                'font' => ['bold' => true],
                 'alignment' => [
                     'horizontal' => Alignment::HORIZONTAL_CENTER,
                 ],

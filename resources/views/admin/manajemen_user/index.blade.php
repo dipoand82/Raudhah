@@ -23,13 +23,23 @@
 
             {{-- ALERT SUCCESS --}}
             @if(session('success'))
-                <div x-data="{ show: true }" x-show="show" class="mb-4 flex items-center justify-between bg-green-100 border border-green-200 text-green-700 px-4 py-3 rounded shadow-sm">
-                    <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span>{{ session('success') }}</span>
-                    </div>
-                    <button @click="show = false" class="text-green-500 hover:text-green-700">&times;</button>
-                </div>
+                <x-alert-success>
+                    {{ session('success') }}
+                </x-alert-success>
+            @endif
+            {{-- Tampilkan Alert Gagal (Misal dari Session Error) --}}
+            @if(session('error'))
+                <x-alert-danger>
+                    {{ session('error') }}
+                </x-alert-danger>
+            @endif
+            
+            @if ($errors->any())
+                @foreach ($errors->all() as $error)
+                    <x-alert-danger timeout="8000"> {{-- Waktu 8 detik agar sempat dibaca --}}
+                        {{ $error }}
+                    </x-alert-danger>
+                @endforeach
             @endif
 
             <div class="bg-gray-100 p-6 rounded-lg shadow-sm border border-gray-200">
@@ -77,26 +87,39 @@
 
                                 {{-- Filter Status --}}
                                 <div class="w-full md:w-1/5">
-                                    <select name="status" onchange="this.form.submit()" class="w-full rounded-full border-gray-300 py-2 pl-4 pr-8 shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42] cursor-pointer text-gray-700 text-sm">
-                                        <option value="">-- Status --</option>
+                                    @php
+                                        $selectedStatus = request('status');
+                                        $filterStatusClass = match($selectedStatus) {
+                                            'Aktif'  => 'bg-green-100 text-green-800 border-green-200',
+                                            'Lulus'  => 'bg-blue-100 text-blue-800 border-blue-200',
+                                            'Keluar' => 'bg-red-100 text-red-800 border-red-200',
+                                            'Pindah' => 'bg-yellow-100 text-yellow-800 border-yellow-200',
+                                            default  => 'bg-white text-gray-700 border-gray-300',
+                                        };
+                                    @endphp
+                                    <select name="status" onchange="this.form.submit()" 
+                                        class="w-full rounded-full py-2 pl-4 pr-8 shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42] cursor-pointer text-sm border {{ $filterStatusClass }}">
+                                        <option value="" class="bg-white text-gray-700">-- Status --</option>
                                         @foreach(['Aktif', 'Lulus', 'Pindah', 'Keluar'] as $st)
-                                            <option value="{{ $st }}" {{ request('status') == $st ? 'selected' : '' }}>{{ $st }}</option>
+                                            <option value="{{ $st }}" {{ $selectedStatus == $st ? 'selected' : '' }} class="bg-white text-gray-700">
+                                                {{ $st }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
                             </form>
 
                             {{-- Tombol Aksi Kanan --}}
-                            <div class="flex items-center gap-3 w-full lg:w-auto justify-end">
-                                <button x-data="" x-on:click="$dispatch('open-modal', 'import-siswa')" class="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                                    Import Akun Siswa
+                            <div class="flex flex-col sm:flex-row items-center gap-3 mb-2 w-full lg:w-auto justify-end">
+                                    <button x-data="" x-on:click="$dispatch('open-modal', 'import-siswa')" class="inline-flex w-full items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                        Import Akun Siswa
+                                    </button>
+                                <button type="button" x-data="" x-on:click="$dispatch('open-modal', 'add-siswa')" class="inline-flex w-full items-center justify-center gap-2 bg-[#1072B8] hover:bg-[#0d5a91] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                    Tambah Siswa
                                 </button>
-                            <button type="button" x-data="" x-on:click="$dispatch('open-modal', 'add-siswa')" class="inline-flex items-center justify-center gap-2 bg-[#1072B8] hover:bg-[#0d5a91] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap capitalize">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                                Tambah Siswa
-                            </button>
-                            </div>
+                            </div>  
                         </div>
 
                         {{-- MODAL IMPORT SISWA --}}
@@ -138,7 +161,7 @@
                                 </div>
                                 <div class="flex justify-end gap-3 pt-4 border-t">
                                     <x-secondary-button x-on:click="$dispatch('close')" type="button">Batal</x-secondary-button>
-                                    <x-primary-button class="bg-[#3B3E42] hover:bg-gray-700" ::disabled="isLoading"><span x-text="isLoading ? 'Memproses...' : 'Proses Import'"></span></x-primary-button>
+                                    <x-primary-button ::disabled="isLoading"><span x-text="isLoading ? 'Memproses...' : 'Proses Import'"></span></x-primary-button>
                                 </div>
                             </form>
                         </x-modal>
@@ -147,7 +170,7 @@
                         
                         {{-- PERUBAHAN 1: FORM BULK DELETE DIPISAH KELUAR (Standalone) --}}
                         {{-- Form ini kosong, hanya sebagai wadah untuk submit DELETE massal --}}
-                        <form id="bulkDeleteForm" action="{{ route('admin.siswas.bulk_delete') }}" method="POST" onsubmit="return confirm('Yakin hapus data terpilih? Data user terkait juga akan dihapus!')">
+                        <form id="bulkDeleteForm" action="{{ route('admin.siswas.bulk_delete') }}" method="POST">
                             @csrf @method('DELETE')
                         </form>
 
@@ -156,7 +179,10 @@
                             <span class="text-red-700 text-sm font-semibold ml-2"><span id="selectedCount">0</span> Siswa dipilih</span>
                             
                             {{-- PERUBAHAN 2: Tombol ini dihubungkan ke form di atas pakai attribute form="bulkDeleteForm" --}}
-                            <button type="submit" form="bulkDeleteForm" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-bold transition">Hapus Terpilih</button>
+                            {{-- <button type="submit" form="bulkDeleteForm" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-bold transition">Hapus Terpilih</button> --}}
+                            <x-danger-button type="button" x-data="" x-on:click="$dispatch('open-modal', 'bulk-delete-confirm')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-bold transition">
+                                Hapus Terpilih
+                            </x-danger-button>
                         </div>
 
                         {{-- Tabel Tidak Lagi Dibungkus Form --}}
@@ -170,96 +196,95 @@
                                         <th class="px-4 py-4 text-center text-xs font-bold text-white uppercase w-12">No</th>
                                         <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase">Nama Siswa</th>
                                         <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase">NISN</th>
-                                        <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase">Kelas</th>
+                                        <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase">Kelas</th>
                                         <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase">Status</th>
-                                        <th class="px-6 py-4 text-right text-xs font-bold text-white uppercase">Aksi</th>
+                                        <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-100">
-                                    @foreach($userSiswa as $u)
+                                   @foreach($userSiswa as $u)
                                         <tr class="hover:bg-indigo-50/50 transition even:bg-gray-50">
-                                            {{-- CHECKBOX --}}
                                             <td class="px-4 py-4 text-center">
                                                 @if($u->dataSiswa)
-                                                    {{-- PERUBAHAN 3: Checkbox dihubungkan ke form bulk pakai attribute form="bulkDeleteForm" --}}
                                                     <input type="checkbox" name="ids[]" form="bulkDeleteForm" value="{{ $u->dataSiswa->id }}" class="select-item rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 cursor-pointer">
                                                 @else
                                                     <span class="text-gray-300">-</span>
                                                 @endif
                                             </td>
-
                                             <td class="px-4 py-4 text-center text-sm font-medium text-gray-500">{{ $userSiswa->firstItem() + $loop->index }}</td>
-                                            
                                             <td class="px-6 py-4">
                                                 <div class="text-sm font-bold text-gray-900">{{ $u->name }}</div>
                                                 <div class="text-xs text-gray-400">{{ $u->email }}</div>
                                             </td>
-
                                             <td class="px-6 py-4 text-sm font-mono text-gray-600">
-                                                @if($u->dataSiswa)
-                                                    {{ $u->dataSiswa->nisn }}
-                                                @else
-                                                    <span class="text-red-400 italic text-xs">Unlinked</span>
-                                                @endif
+                                                {{ $u->dataSiswa->nisn ?? 'Unlinked' }}
                                             </td>
-
-                                            <td class="px-6 py-4">
+                                            <td class="px-6 py-4 text-center">
                                                 @if($u->dataSiswa && $u->dataSiswa->kelas)
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 whitespace-nowrap">
                                                         {{ $u->dataSiswa->kelas->tingkat }} {{ $u->dataSiswa->kelas->nama_kelas }}
                                                     </span>
                                                 @else
-                                                    <span class="text-xs text-red-400 font font-semibold">No Class</span>
+                                                    <span class="text-xs text-red-400 font-semibold whitespace-nowrap">No Class</span>
                                                 @endif
                                             </td>
-
                                             <td class="px-6 py-4 text-center">
-                                                @if($u->dataSiswa)
+                                                @if($u->dataSiswa && $u->dataSiswa->status)
                                                     @php
-                                                        $statusClass = match($u->dataSiswa->status) {
-                                                            'Aktif' => 'bg-green-100 text-green-800 border-green-200',
-                                                            'Lulus' => 'bg-blue-100 text-blue-800 border-blue-200',
+                                                        $statusSiswa = $u->dataSiswa->status;
+                                                        $badgeClass = match($statusSiswa) {
+                                                            'Aktif'  => 'bg-green-100 text-green-800 border-green-200',
+                                                            'Lulus'  => 'bg-blue-100 text-blue-800 border-blue-200',
                                                             'Keluar' => 'bg-red-100 text-red-800 border-red-200',
                                                             'Pindah' => 'bg-yellow-100 text-yellow-800 border-yellow-200',
-                                                            default => 'bg-gray-100 text-gray-800 border-gray-200',
+                                                            default  => 'bg-gray-100 text-gray-800 border-gray-200',
                                                         };
                                                     @endphp
-                                                    <span class="px-3 py-1 inline-flex text-[10px] font-bold border rounded-full {{ $statusClass }}">
-                                                        {{ strtoupper($u->dataSiswa->status) }}
+                                                    <span class="px-3 py-1 inline-flex text-[10px] font-bold border rounded-full {{ $badgeClass }}">
+                                                        {{ strtoupper($statusSiswa) }}
                                                     </span>
                                                 @else
-                                                    -
+                                                    <span class="text-gray-300">-</span>
                                                 @endif
                                             </td>
-
-                                            {{-- AKSI --}}
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end items-center gap-3">
                                                 @if($u->dataSiswa)
-                                                    {{-- Reset Password (AMAN: Form ini sekarang mandiri, tidak di dalam form lain) --}}
-                                                    <form action="{{ route('admin.manajemen-user.siswa.reset', $u->dataSiswa->id) }}" method="POST" onsubmit="return confirm('Yakin reset password siswa ini kembali ke NISN?');" class="inline-flex">
+                                                    <form action="{{ route('admin.manajemen-user.siswa.reset', $u->dataSiswa->id) }}" method="POST" onsubmit="return confirm('Yakin reset password?');" class="inline-flex">
                                                         @csrf
-                                                        <button type="submit" class="text-yellow-600 hover:text-yellow-700 transition transform hover:scale-110 p-1" title="Reset Password ke NISN">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
+                                                        <button type="submit" class="text-yellow-600 hover:text-yellow-700 p-1" title="Reset Password">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
                                                         </button>
                                                     </form>
                                                     
-                                                    {{-- Edit --}}
-                                                    <a href="{{ route('admin.siswas.edit', $u->dataSiswa->id) }}" class="text-indigo-600 hover:text-indigo-900 font-semibold">Edit</a>
-                                                    
-                                                    {{-- Hapus (AMAN: Form ini sekarang mandiri) --}}
-                                                    <form action="{{ route('admin.siswas.destroy', $u->dataSiswa->id) }}" method="POST" style="display:inline-block;">
-                                                        @csrf @method('DELETE')
-                                                        
-                                                        <x-danger-button type="submit" onclick="return confirm('Apakah Anda yakin ingin menghapus {{ $u->name }}?')">
-                                                            Hapus
-                                                        </x-danger-button>
-                                                    </form>
+                                                    {{-- MODAL EDIT DI BAGIAN KEYWORD EDIT --}}
+                                                    <button type="button" x-data x-on:click="$dispatch('open-modal', 'edit-siswa-{{ $u->id }}')" class="text-indigo-600 hover:text-indigo-900 font-semibold">Edit</button>
+
+                                                    <x-modal name="edit-siswa-{{ $u->id }}" focusable>
+                                                        <form method="POST" action="{{ route('admin.siswas.update', $u->dataSiswa->id) }}" class="p-6 text-left">
+                                                            @csrf @method('PUT')
+                                                            <h2 class="text-lg font-bold mb-4 border-b pb-2 text-gray-900">Edit Data Siswa: {{ $u->name }}</h2>
+                                                            <x-siswa.edit-form :siswa="$u->dataSiswa" :kelas="$kelas" :tahunAjaran="$tahunAjaranList" />
+                                                            <div class="mt-6 flex justify-end gap-3 border-t pt-4">
+                                                                <x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button>
+                                                                <x-primary-button>Simpan Perubahan</x-primary-button>
+                                                            </div>
+                                                        </form>
+                                                    </x-modal>
+
+                                                    <x-siswa.delete-modal trigger="delete-siswa-{{ $u->dataSiswa->id }}" action="{{ route('admin.manajemen-user.destroy', $u->id) }}" message="{{ $u->name }}" />
                                                 @else
-                                                    {{-- Hapus User Saja (Tanpa Data Siswa) --}}
-                                                    <form action="{{ route('admin.manajemen-user.destroy', $u->id) }}" method="POST" class="inline" onsubmit="return confirm('Hapus User ini?');">
-                                                        @csrf @method('DELETE')
-                                                        <button type="submit" class="text-red-600 hover:text-red-900 font-semibold">Hapus User</button>
-                                                    </form>
+                                                    <button x-data x-on:click="$dispatch('open-modal', 'delete-user-{{ $u->id }}')" class="text-red-600 hover:text-red-900 font-semibold">Hapus User</button>
+                                                    <x-modal name="delete-user-{{ $u->id }}" focusable>
+                                                        <form method="post" action="{{ route('admin.manajemen-user.destroy', $u->id) }}" class="p-6">
+                                                            @csrf @method('delete')
+                                                            <h2 class="text-lg font-bold">Hapus User?</h2>
+                                                            <p class="mt-2 text-sm text-gray-600">Yakin hapus <strong>{{ $u->name }}</strong>?</p>
+                                                            <div class="mt-6 flex justify-end gap-3">
+                                                                <x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button>
+                                                                <x-danger-button>Hapus</x-danger-button>
+                                                            </div>
+                                                        </form>
+                                                    </x-modal>
                                                 @endif
                                             </td>
                                         </tr>
@@ -267,6 +292,26 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        {{-- TAMBAHKAN KODE INI: --}}
+                        <x-modal name="bulk-delete-confirm" focusable>
+                            <div class="p-6">
+                                <h2 class="text-lg font-bold text-gray-900">Konfirmasi Hapus Massal</h2>
+                                <p class="mt-1 text-sm text-gray-600">
+                                    Apakah Anda yakin ingin menghapus <strong>semua data siswa yang dipilih</strong>?
+                                    <br>
+                                    <span class="text-red-500 font-bold text-xs">Peringatan: Data akun user, nilai, dan tagihan terkait juga akan dihapus permanen.</span>
+                                </p>
+                                <div class="mt-6 flex justify-end gap-3">
+                                    <x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button>
+                                    
+                                    {{-- Perhatikan: Tombol ini yang "menekan" form hidden di atas via ID form --}}
+                                    <x-danger-button type="submit" form="bulkDeleteForm">
+                                        Ya, Hapus Semua
+                                    </x-danger-button>
+                                </div>
+                            </div>
+                        </x-modal>
 
                         {{-- 3. PAGINATION & SHOW ENTRIES --}}
                         <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -387,7 +432,7 @@
             </div>
         </div>
     </div>
-    <x-add-student-modal :kelas="$kelas" />
+    <x-siswa.add-student-modal :kelas="$kelas" />
     {{-- MODAL TAMBAH SISWA MANUAL --}}
     {{-- <x-modal name="add-siswa" focusable>
         <form method="POST" action="{{ route('admin.manajemen-user.siswa.store') }}" class="p-6">
@@ -411,12 +456,12 @@
             <h2 class="text-lg font-bold text-gray-900 mb-4 pb-2 border-b">Tambah Akun Guru</h2>
             <div class="mb-3"><x-input-label value="Nama Guru" /><x-text-input name="name" class="w-full focus:border-[#3B3E42] focus:ring-[#3B3E42]" required /></div>
             <div class="mb-3"><x-input-label value="Email" /><x-text-input name="email" type="email" class="w-full focus:border-[#3B3E42] focus:ring-[#3B3E42]" required /></div>
-            <div class="mt-6 flex justify-end gap-3"><x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button><x-primary-button class="bg-[#3B3E42] hover:bg-gray-700">Simpan</x-primary-button></div>
+            <div class="mt-6 flex justify-end gap-3"><x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button><x-primary-button >Simpan</x-primary-button></div>
         </form>
     </x-modal>
 
     {{-- Form Cadangan untuk delete satuan pakai JS (Jika masih digunakan oleh bagian Hapus User tanpa siswa) --}}
-    <form id="deleteForm" method="POST" class="hidden">@csrf @method('DELETE')</form>
+    {{-- <form id="deleteForm" method="POST" class="hidden">@csrf @method('DELETE')</form> --}}
 
     <script>
         // SCRIPT BULK DELETE & CHECKBOX

@@ -13,6 +13,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\TemplateSiswaExport;
 use App\Imports\SiswaImport;
 use App\Imports\GuruImport;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str; // <--- WAJIB TAMBAHKAN INI (Baris Penting)
 
 class ManajemenUserController extends Controller
@@ -22,86 +23,108 @@ class ManajemenUserController extends Controller
     {
         $search = $request->input('search');
         $perPage = $request->input('per_page', 10);
-        // A. Ambil Data User Role SISWA
+
+        // A. Ambil Data User Role SISWA (Tetap sama)
         $userSiswa = User::where('role', 'siswa')
             ->when($search, function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhereHas('dataSiswa', fn($s) => $s->where('nisn', 'like', "%{$search}%"));
+                ->orWhere('email', 'like', "%{$search}%")
+                ->orWhereHas('dataSiswa', fn($s) => $s->where('nisn', 'like', "%{$search}%"));
             })
             ->with('dataSiswa.kelas') 
             ->latest()
-            ->paginate( $perPage, ['*'], 'siswa_page');
+            ->paginate($perPage, ['*'], 'siswa_page');
 
-        // B. Ambil Data User Role GURU
+        // B. Ambil Data User Role GURU (Tetap sama)
         $userGuru = User::where('role', 'guru')
             ->when($search, function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                ->orWhere('email', 'like', "%{$search}%");
             })
             ->latest()
             ->paginate(10, ['*'], 'guru_page');
 
-        // C. Data Pendukung Modal (Kelas & Tahun)
+        // C. Data Pendukung Modal
         $kelas = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get(); 
+        
+        // --- PENAMBAHAN DI SINI ---
+        // Kita butuh 'first()' untuk modal TAMBAH (logic lama kamu)
         $tahunAjaran = TahunAjaran::where('is_active', true)->first();
+        
+        // Kita butuh 'get()' (koleksi) untuk modal EDIT (agar dropdown tahun bisa muncul semua)
+        $tahunAjaranList = TahunAjaran::orderBy('tahun', 'desc')->get(); 
+        // --------------------------
 
-        // Pastikan nama folder view sesuai (biasanya admin.manajemen-user.index)
-        return view('admin.manajemen_user.index', compact('userSiswa', 'userGuru', 'kelas', 'tahunAjaran'));
+        return view('admin.manajemen_user.index', compact(
+            'userSiswa', 
+            'userGuru', 
+            'kelas', 
+            'tahunAjaran', 
+            'tahunAjaranList' // Tambahkan ini ke compact
+        ));
     }
 
     public function storeSiswa(Request $request)
     {
-    // 1. Validasi
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'nisn' => 'required|numeric|unique:siswas,nisn',
-        'email' => 'nullable|email|unique:users,email',
-        'kelas_id' => 'nullable|exists:kelas,id', 
-        'jenis_kelamin' => 'required|in:L,P',     
-    ]);
+        // 1. Validasi
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'nisn' => 'required|numeric|unique:siswas,nisn',
+            'email' => 'nullable|email|unique:users,email',
+            'kelas_id' => 'nullable|exists:kelas,id', 
+            'jenis_kelamin' => 'required|in:L,P',     
+        ]);
 
-    // 2. Ambil Data Pendukung
-    $tahunAktif = TahunAjaran::where('is_active', true)->first();
+        // 2. Ambil Data Pendukung
+        $tahunAktif = TahunAjaran::where('is_active', true)->first();
 
-    // 3. LOGIKA EMAIL OTOMATIS
-    if ($request->filled('email')) {
-        $email = $request->email;
-    } else {
-        // Ambil kata pertama & ubah ke lowercase (Contoh: "Zahra Amalia" -> "zahra")
-        $namaDepan = Str::lower(explode(' ', trim($request->name))[0]);
-        
-        // Buat format: namadepannisn@student.sekolah.id (Tanpa titik sesuai keinginan baru)
-        $email = $namaDepan .'.'.$request->nisn . '@student.sekolah.id';
-        
-        // Cek duplikasi email hasil generate
-        if (User::where('email', $email)->exists()) {
-            $email = $namaDepan . $request->nisn . rand(1, 9) . '@student.sekolah.id';
+        // 3. LOGIKA EMAIL OTOMATIS
+        if ($request->filled('email')) {
+            $emailFinal = $request->email;
+        } else {
+            // Ambil kata pertama & ubah ke lowercase
+            $namaDepan = Str::lower(explode(' ', trim($request->name))[0]);
+            
+            // Format: namadepan.nisn@student.sekolah.id
+            $emailFinal = $namaDepan . '.' . $request->nisn . '@student.sekolah.id';
+            
+            // Cek duplikasi email hasil generate
+            if (User::where('email', $emailFinal)->exists()) {
+                $emailFinal = $namaDepan . $request->nisn . rand(1, 9) . '@student.sekolah.id';
+            }
         }
-    }
 
-    // 4. Create User (Akun Login)
-    $user = User::create([
-        'name' => $request->name,
-        'email' => $email,
-        'password' => Hash::make($request->nisn), // Password default = NISN
-        'role' => 'siswa',
-        'must_change_password' => true,
-    ]);
+        // 4. Eksekusi dengan Database Transaction (Sangat Disarankan)
+        return DB::transaction(function () use ($request, $emailFinal, $tahunAktif) {
+            
+            // 5. Create/Update User (Akun Login)
+            // Menggunakan updateOrCreate agar lebih "tahan banting" terhadap error data ganda
+            $user = User::updateOrCreate(
+                ['email' => $emailFinal],
+                [
+                    'name' => $request->name,
+                    'password' => Hash::make($request->nisn),
+                    'role' => 'siswa',
+                    'must_change_password' => true,
+                ]
+            );
 
-    // 5. Create Data Siswa
-    Siswa::create([
-        'user_id'         => $user->id,
-        'nisn'            => $request->nisn,
-        'nama_lengkap'    => $request->name,
-        'jenis_kelamin'   => $request->jenis_kelamin,
-        'kelas_id'        => $request->kelas_id,
-        'tingkat'         => $request->kelas_id ? Kelas::find($request->kelas_id)->tingkat : null,
-        'tahun_ajaran_id' => $tahunAktif ? $tahunAktif->id : null,
-        'status'          => 'Aktif',
-    ]);
+            // 6. Create/Update Data Siswa
+            Siswa::updateOrCreate(
+                ['nisn' => $request->nisn],
+                [
+                    'user_id'         => $user->id,
+                    'nama_lengkap'    => $request->name,
+                    'jenis_kelamin'   => $request->jenis_kelamin,
+                    'kelas_id'        => $request->kelas_id,
+                    'tingkat'         => $request->kelas_id ? Kelas::find($request->kelas_id)->tingkat : null,
+                    'tahun_ajaran_id' => $tahunAktif ? $tahunAktif->id : null,
+                    'status'          => 'Aktif',
+                ]
+            );
 
-    return redirect()->back()->with('success', 'Siswa berhasil ditambahkan dengan email: ' . $email);
+            return redirect()->back()->with('success', "Siswa {$request->name} berhasil ditambahkan! Email login: " . $emailFinal);
+        });
     }
     // === 3. IMPORT SISWA ===
     public function importSiswa(Request $request)
@@ -171,7 +194,7 @@ class ManajemenUserController extends Controller
     {
         $user = User::findOrFail($id);
         $user->delete(); // Karena cascade, data siswa/guru ikut terhapus
-        return back()->with('success', 'User berhasil dihapus.');
+        return back()->with('success', 'User berhasil dihapus');
     }
 
     // === 9. FITUR RESET PASSWORD (SOLUSI JIKA SISWA LUPA/AKUN DIBAJAK) ===

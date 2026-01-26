@@ -8,29 +8,25 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
-            {{-- ALERT MESSAGES --}}
+            {{-- ALERT SUCCESS --}}
             @if(session('success'))
-                <div x-data="{ show: true }" x-show="show" class="mb-4 flex items-center justify-between bg-green-100 border border-green-200 text-green-700 px-4 py-3 rounded shadow-sm">
-                    <span class="flex items-center gap-2 text-sm font-medium">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        {{ session('success') }}
-                    </span>
-                    <button @click="show = false" class="text-green-500 hover:text-green-700">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
+                <x-alert-success>
+                    {{ session('success') }}
+                </x-alert-success>
             @endif
-
+            {{-- Tampilkan Alert Gagal (Misal dari Session Error) --}}
             @if(session('error'))
-                <div x-data="{ show: true }" x-show="show" class="mb-4 flex items-center justify-between bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded shadow-sm">
-                    <span class="flex items-center gap-2 text-sm font-medium">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        {{ session('error') }}
-                    </span>
-                    <button @click="show = false" class="text-red-500 hover:text-red-700">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
+                <x-alert-danger>
+                    {{ session('error') }}
+                </x-alert-danger>
+            @endif
+            
+            @if ($errors->any())
+                @foreach ($errors->all() as $error)
+                    <x-alert-danger timeout="8000"> {{-- Waktu 8 detik agar sempat dibaca --}}
+                        {{ $error }}
+                    </x-alert-danger>
+                @endforeach
             @endif
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -59,8 +55,8 @@
                     </div>
 
                     {{-- 2. TABEL DATA --}}
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <table class="min-w-full divide-y divide-gray-200">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden overflow-x-auto bg-white rounded shadow">
+                        <table class="min-w-full divide-y divide-gray-200 ">
                             <thead class="bg-[#3B3E42]">
                                 <tr>
                                     <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase w-12">No</th>
@@ -105,7 +101,8 @@
                                         @if(!$ta->is_active)
                                             <form action="{{ route('admin.tahun-ajaran.destroy', $ta->id) }}" method="POST" class="inline" onsubmit="return confirm('Hapus Tahun Ajaran {{ $ta->tahun }}? Data terkait mungkin ikut terhapus!');">
                                                 @csrf @method('DELETE')
-                                                    x-danger-button>Hapus</x-danger-button>
+                                                {{-- PERBAIKAN TYPO DISINI: Menambahkan < sebelum x-danger --}}
+                                                <x-danger-button>Hapus</x-danger-button>
                                             </form>
                                         @endif
 
@@ -143,17 +140,16 @@
                                 @endforelse
                             </tbody>
                         </table>
-                        
-                        {{-- 🔥 BAGIAN NOTE RATA TENGAH (FOOTER TABEL) 🔥 --}}
-                        <div class="bg-gray-50 border-t border-gray-200 p-4 text-center">
+                    </div>
+                    
+                        {{-- FOOTER TABEL --}}
+                        <div class="divide-y divide-gray-100 rounded-xl bg-white p-2 text-center">
                             <p class="text-sm text-red-500 font-medium inline-block">
-                                *Pastikan Tahun Ajaran terbaru sudah di-set <strong>AKTIF</strong>                           
+                                *Tahun ajaran baru otomatis menjadi <strong>Aktif</strong> setelah disimpan*
+                                {{-- <br>*Pastikan Tahun Ajaran terbaru sudah di-set <strong>AKTIF</strong>                                  --}}
                             </p>
                         </div>
-
-                    </div>
-                </div>
-
+            </div>
                 {{-- KOLOM KANAN: FITUR KELULUSAN --}}
                 <div class="lg:col-span-1">
                     <div class="bg-orange-50 border border-orange-200 rounded-xl p-6 shadow-sm sticky top-6">
@@ -173,12 +169,18 @@
                             
                             <div class="mb-5">
                                 <label class="block text-xs font-bold text-orange-800 uppercase mb-2">Pilih Tingkat Akhir</label>
-                                <select name="tingkat_akhir" class="w-full border-orange-300 focus:border-orange-500 focus:ring-orange-500 rounded-md text-sm shadow-sm" required>
+                                {{-- <select name="tingkat_akhir" class="w-full border-orange-300 focus:border-orange-500 focus:ring-orange-500 rounded-md text-sm shadow-sm" required>
                                     <option value="">-- Pilih Tingkat --</option>
                                     @foreach($tingkatKelas as $t)
                                         <option value="{{ $t }}">Tingkat {{ $t }} (Kelas {{ $t }})</option>
                                     @endforeach
-                                </select>
+                                </select> --}}
+                                {{-- Ganti bagian select di kolom kanan menjadi seperti ini --}}
+<select name="tingkat_akhir" class="w-full border-orange-300 focus:border-orange-500 focus:ring-orange-500 rounded-md text-sm shadow-sm" required>
+    <option value="">-- Pilih Tingkat --</option>
+    {{-- Langsung tembak ke 9 jika ini sekolah SMP --}}
+    <option value="9">Tingkat 9 (Kelas Akhir)</option>
+</select>
                             </div>
 
                             <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg shadow transition text-sm flex justify-center items-center gap-2 group">
