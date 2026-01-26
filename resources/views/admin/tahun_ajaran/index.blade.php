@@ -62,7 +62,7 @@
                                     <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase w-12">No</th>
                                     <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase">Tahun</th>
                                     <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase">Status</th>
-                                    <th class="px-6 py-4 text-right text-xs font-bold text-white uppercase">Aksi</th>
+                                    <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-100 bg-white">
@@ -99,11 +99,12 @@
 
                                         {{-- Tombol Hapus --}}
                                         @if(!$ta->is_active)
-                                            <form action="{{ route('admin.tahun-ajaran.destroy', $ta->id) }}" method="POST" class="inline" onsubmit="return confirm('Hapus Tahun Ajaran {{ $ta->tahun }}? Data terkait mungkin ikut terhapus!');">
-                                                @csrf @method('DELETE')
-                                                {{-- PERBAIKAN TYPO DISINI: Menambahkan < sebelum x-danger --}}
-                                                <x-danger-button>Hapus</x-danger-button>
-                                            </form>
+                                            {{-- GANTI FORM LAMA DENGAN KOMPONEN INI --}}
+                                            <x-modal-delete-global 
+                                                :trigger="'delete-ta-' . $ta->id" 
+                                                :action="route('admin.tahun-ajaran.destroy', $ta->id)" 
+                                                :message="'Tahun Ajaran ' . $ta->tahun" 
+                                            />
                                         @endif
 
                                         {{-- === MODAL EDIT === --}}
@@ -160,34 +161,23 @@
                             <h3 class="text-lg font-bold text-orange-900">Proses Kelulusan</h3>
                         </div>
                         
-                        <p class="text-sm text-orange-800 mb-5 leading-relaxed bg-orange-100/50 p-3 rounded-md border border-orange-100">
+                        <p class="text-sm text-orange-800 mb-5 leading-relaxed bg-orange-100/50 p-3 rounded-md border border-orange-100 text-center">
                             Gunakan fitur ini di akhir tahun ajaran untuk meluluskan siswa tingkat akhir (Misal: Kelas 9).
                         </p>
 
-                        <form action="{{ route('admin.tahun-ajaran.graduation') }}" method="POST" onsubmit="return confirm('Yakin ingin meluluskan siswa tingkat ini? Status mereka akan berubah jadi Lulus.');">
-                            @csrf
-                            
-                            <div class="mb-5">
-                                <label class="block text-xs font-bold text-orange-800 uppercase mb-2">Pilih Tingkat Akhir</label>
-                                {{-- <select name="tingkat_akhir" class="w-full border-orange-300 focus:border-orange-500 focus:ring-orange-500 rounded-md text-sm shadow-sm" required>
-                                    <option value="">-- Pilih Tingkat --</option>
-                                    @foreach($tingkatKelas as $t)
-                                        <option value="{{ $t }}">Tingkat {{ $t }} (Kelas {{ $t }})</option>
-                                    @endforeach
-                                </select> --}}
-                                {{-- Ganti bagian select di kolom kanan menjadi seperti ini --}}
-<select name="tingkat_akhir" class="w-full border-orange-300 focus:border-orange-500 focus:ring-orange-500 rounded-md text-sm shadow-sm" required>
-    <option value="">-- Pilih Tingkat --</option>
-    {{-- Langsung tembak ke 9 jika ini sekolah SMP --}}
-    <option value="9">Tingkat 9 (Kelas Akhir)</option>
-</select>
-                            </div>
-
-                            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg shadow transition text-sm flex justify-center items-center gap-2 group">
-                                <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                LULUSKAN ANGKATAN INI
-                            </button>
-                        </form>
+                <x-modal-delete-global 
+                    class="inline-flex w-full justify-center px-10 gap-3 p-6  py-2 transition shadow-sm whitespace-nowrap capitalize " 
+                    trigger="confirm-graduation" 
+                    :action="route('admin.tahun-ajaran.graduation')" 
+                    message="Kelulusan Siswa Tingkat Akhir"
+                    title="Proses Kelulusan Massal"
+                >
+                    <x-input-label value="Pilih Tingkat Akhir" class="mt-2" />
+                    <select name="tingkat_akhir" class="w-full mt-1 border-gray-300 rounded-md shadow-sm" required>
+                        <option value="">-- Pilih --</option>
+                        <option value="9">Kelas 9</option>
+                    </select>
+                </x-modal-delete-global>
                     </div>
                 </div>
 

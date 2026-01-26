@@ -28,6 +28,7 @@
                     </x-alert-danger>
                 @endforeach
             @endif
+            
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
@@ -81,42 +82,48 @@
                                     <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase w-12">No</th>
                                     <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase">Tingkat</th>
                                     <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase">Nama Kelas</th>
-                                    <th class="px-6 py-4 text-right text-xs font-bold text-white uppercase">Aksi</th>
+                                    <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-100">
                                 @forelse($kelas as $k)
                                 <tr class="hover:bg-indigo-50/50 transition even:bg-gray-50">
-                                    {{-- Penomoran Loop dengan Pagination --}}
+                                    {{-- Penomoran --}}
                                     <td class="px-6 py-4 text-center text-sm font-medium text-gray-500">
                                         {{ $loop->iteration + ($kelas->currentPage() - 1) * $kelas->perPage() }}
                                     </td>
 
+                                    {{-- Tingkat --}}
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
                                         <span class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full font-bold border border-gray-200">
                                             Kelas {{ $k->tingkat }}
                                         </span>
                                     </td>
                                     
+                                    {{-- Nama Kelas --}}
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-bold text-[#3B3E42] text-lg">
                                             {{ $k->tingkat }} {{ $k->nama_kelas }}
                                         </div>
                                     </td>
                                     
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        {{-- Tombol Edit --}}
-                                        <button x-data x-on:click="$dispatch('open-modal', 'edit-kelas-{{ $k->id }}')"
-                                            class="text-indigo-600 hover:text-indigo-900 mr-3 font-semibold transition">
-                                            Edit
-                                        </button>
+                                    {{-- Aksi --}}
+                                    <div class="text-center">
+                                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium flex justify-end items-center">
+                                            {{-- Tombol Edit --}}
+                                            <button x-data x-on:click="$dispatch('open-modal', 'edit-kelas-{{ $k->id }}')"
+                                                class="text-indigo-600 hover:text-indigo-900 mr-4 font-semibold transition">
+                                                Edit
+                                            </button>
 
-                                        {{-- Tombol Hapus --}}
-                                        <form action="{{ route('admin.kelas.destroy', $k->id) }}" method="POST" class="inline" onsubmit="return confirm('Hapus kelas {{ $k->tingkat }} {{ $k->nama_kelas }}?');">
-                                            @csrf @method('DELETE')
-                                            <x-danger-button>Hapus</x-danger-button>
-                                        </form>
-                                    </td>
+                                            {{-- Komponen Hapus Global --}}
+                                            <x-modal-delete-global 
+                                                :trigger="'delete-kelas-' . $k->id" 
+                                                :action="route('admin.kelas.destroy', $k->id)" 
+                                                :message="'Kelas ' . $k->tingkat . ' ' . $k->nama_kelas" 
+                                            />
+                                        </td>
+                                    </div>
                                 </tr>
 
                                 {{-- MODAL EDIT --}}
