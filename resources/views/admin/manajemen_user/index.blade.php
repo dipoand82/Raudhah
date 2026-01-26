@@ -209,7 +209,7 @@
                                                         {{ $u->dataSiswa->kelas->tingkat }} {{ $u->dataSiswa->kelas->nama_kelas }}
                                                     </span>
                                                 @else
-                                                    <span class="text-xs text-red-400 italic">Belum Masuk Kelas</span>
+                                                    <span class="text-xs text-red-400 font font-semibold">No Class</span>
                                                 @endif
                                             </td>
 

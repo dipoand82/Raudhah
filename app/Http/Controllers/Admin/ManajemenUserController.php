@@ -21,7 +21,7 @@ class ManajemenUserController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
-
+        $perPage = $request->input('per_page', 10);
         // A. Ambil Data User Role SISWA
         $userSiswa = User::where('role', 'siswa')
             ->when($search, function($q) use ($search) {
@@ -31,7 +31,7 @@ class ManajemenUserController extends Controller
             })
             ->with('dataSiswa.kelas') 
             ->latest()
-            ->paginate(10, ['*'], 'siswa_page');
+            ->paginate( $perPage, ['*'], 'siswa_page');
 
         // B. Ambil Data User Role GURU
         $userGuru = User::where('role', 'guru')
