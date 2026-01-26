@@ -387,9 +387,9 @@
             </div>
         </div>
     </div>
-
+    <x-add-student-modal :kelas="$kelas" />
     {{-- MODAL TAMBAH SISWA MANUAL --}}
-    <x-modal name="add-siswa" focusable>
+    {{-- <x-modal name="add-siswa" focusable>
         <form method="POST" action="{{ route('admin.manajemen-user.siswa.store') }}" class="p-6">
             @csrf
             <div class="flex justify-between items-center mb-4 border-b pb-2"><h2 class="text-lg font-bold text-gray-900">Tambah Siswa</h2><button type="button" x-on:click="$dispatch('close')" class="text-gray-400 hover:text-gray-500"><span class="sr-only">Tutup</span><svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
@@ -402,7 +402,7 @@
             </div>
             <div class="mt-6 flex justify-end gap-3"><x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button><x-primary-button>Simpan Siswa</x-primary-button></div>
         </form>
-    </x-modal>
+    </x-modal> --}}
 
     {{-- MODAL TAMBAH GURU MANUAL --}}
     <x-modal name="add-guru" focusable>

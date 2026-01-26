@@ -40,7 +40,7 @@
                             <select name="kelas_id" onchange="this.form.submit()" 
                                 class="w-full rounded-full border-gray-300 py-2 pl-4 pr-8 shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42] cursor-pointer text-gray-700">
                                 <option value="">-- Semua Kelas --</option>
-                                @foreach($kelas_list as $k) 
+                                @foreach($kelas as $k) 
                                     <option value="{{ $k->id }}" {{ request('kelas_id') == $k->id ? 'selected' : '' }}>
                                         Kelas {{ $k->tingkat }} {{ $k->nama_kelas }}
                                     </option>
@@ -71,14 +71,18 @@
                             Export Data Siswa
                         </a>
 
-                        {{-- Tombol Tambah (Sekarang sudah sama persis ukurannya) --}}
-                        <a href="{{ route('admin.manajemen-user.index') }}"
-                        class="inline-flex items-center justify-center gap-2 bg-[#1072B8] hover:bg-[#0d5a91] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                            </svg>
-                            Tambah Siswa
-                        </a>
+                    {{-- 1. TOMBOL TRIGGER (Ubah dari <a> ke <button>) --}}
+                    <button x-data=""
+                            x-on:click.prevent="$dispatch('open-modal', 'add-siswa')"
+                            type="button"
+                            class="inline-flex items-center justify-center gap-2 bg-[#1072B8] hover:bg-[#0d5a91] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Tambah Siswa
+                    </button>
+                    {{-- 2. KOMPONEN MODAL (Letakkan di bawah tombol atau di bagian bawah file) --}}
+                    <x-add-student-modal :kelas="$kelas" />
                     </div>
                     {{-- TOMBOL AKSI --}}
                     {{-- Tombol Aksi Kanan --}}

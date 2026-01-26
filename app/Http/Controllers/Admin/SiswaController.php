@@ -20,8 +20,7 @@ class SiswaController extends Controller
 
     // === 1. HALAMAN UTAMA (FILTER + SEARCH) ===
     public function index(Request $request)
-    {
-        // A. Siapkan Query Dasar
+    {   // A. Siapkan Query Dasar untuk Tabel Siswa
         $query = Siswa::with(['user', 'kelas', 'tahunAjaran']);
 
         // B. Logika Search (Nama / NISN)
@@ -35,36 +34,27 @@ class SiswaController extends Controller
             });
         }
 
-        // C. Logika Filter Kelas (INI YANG BARU)
+        // C. Logika Filter Kelas
         if ($request->filled('kelas_id')) {
             $query->where('kelas_id', $request->kelas_id);
         }
 
-        // [BARU] Logika Filter Status
+        // Logika Filter Status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // D. Eksekusi Query (Pagination)
-        // $siswas = $query->latest()->paginate(10);
-        // ==========================================================
-        // D. Eksekusi Query (PAGINATION DINAMIS) - [BAGIAN INI DIUBAH]
-        // ==========================================================
-        
-        // 1. Ambil input 'per_page' dari user. 
-        //    Jika user tidak memilih (kosong), default-nya adalah 10.
+        // D. Eksekusi Query (Pagination Dinamis)
         $limit = $request->input('per_page', 10);
-
-        // 2. Masukkan variabel $limit ke dalam fungsi paginate()
-        //    Ini akan otomatis mengikuti pilihan user (10, 20, 30, atau 50)
         $siswas = $query->latest()->paginate($limit);
 
-
-        // E. Ambil Daftar Kelas untuk Dropdown (SOLUSI ERROR KELAS_LIST)
-        $kelas_list = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
+        // E. Ambil Daftar Kelas (SATU KALI SAJA)
+        // Kita namakan variabelnya '$kelas' supaya COCOK dengan Modal Component
+        $kelas = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
 
         // F. Kirim ke View
-        return view('admin.data_siswa.index', compact('siswas', 'kelas_list'));
+        // Perhatikan: Kita kirim 'kelas' (bukan kelas_list)
+        return view('admin.data_siswa.index', compact('siswas', 'kelas'));
     }
 
     // === 2. EXPORT DATA (FITUR BARU UNTUK ROUND-TRIP EXCEL) ===
