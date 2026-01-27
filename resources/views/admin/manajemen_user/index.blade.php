@@ -150,12 +150,23 @@
                                     <div><h3 class="text-sm font-bold text-blue-800 mb-1">Langkah 1: Siapkan File</h3><p class="text-xs text-blue-600">Gunakan template resmi.</p></div>
                                     <a href="{{ route('admin.manajemen-user.siswa.template')}}" class="bg-white text-blue-700 hover:bg-blue-100 border border-blue-300 px-3 py-2 rounded text-sm font-bold shadow-sm transition flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>Template</a>
                                 </div>
-                                <div class="mb-6">
-                                    <h3 class="text-sm font-bold text-gray-700 mb-2">Langkah 2: Upload File</h3>
-                                    <div class="relative border-2 border-dashed border-gray-300 rounded-lg p-8 hover:border-[#3B3E42] transition bg-gray-50 text-center group">
-                                        <input type="file" name="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" required accept=".xlsx, .xls, .csv" @change="fileName = $event.target.files[0].name">
+                                <div class="mb-6" x-data="{ fileName: '' }"> <h3 class="text-sm font-bold text-gray-700 mb-2">Langkah 2: Upload File</h3>
+                                    
+                                    <div class="relative border-2 border-dashed rounded-lg p-8 hover:border-[#3B3E42] transition text-center group"
+                                        :class="fileName ? 'border-[#3B3E42] bg-gray-100' : 'border-gray-300 bg-gray-50'">
+                                        
+                                        <input type="file" 
+                                            name="file" 
+                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+                                            required 
+                                            accept=".xlsx, .xls, .csv" 
+                                            @change="fileName = $event.target.files[0].name">
+                                            
                                         <div class="pointer-events-none space-y-2">
-                                            <p class="text-sm text-gray-600 font-medium" x-text="fileName ? 'File: ' + fileName : 'Klik untuk pilih file'"></p>
+                                            <p class="text-sm font-medium" 
+                                            :class="fileName ? 'text-[#3B3E42] font-bold' : 'text-gray-600'"
+                                            x-text="fileName ? 'File: ' + fileName : 'Klik untuk pilih file'">
+                                            </p>
                                         </div>
                                     </div>
                                 </div>

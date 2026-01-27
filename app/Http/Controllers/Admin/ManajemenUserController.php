@@ -22,48 +22,71 @@ class ManajemenUserController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $perPage = $request->input('per_page', 10);
+        // Menggunakan default 10 jika tidak ada input per_page
+        $perPage = $request->input('per_page', 10); 
 
-        // A. Ambil Data User Role SISWA (Tetap sama)
+        // ==========================================================
+        // A. Ambil Data User Role SISWA (LOGIKA BARU - JOIN & SORT)
+        // ==========================================================
         $userSiswa = User::where('role', 'siswa')
+            // 1. Join ke tabel siswas untuk akses NISN
+            ->join('siswas', 'users.id', '=', 'siswas.user_id')
+            // 2. Left Join ke kelas untuk sorting berdasarkan tingkat/nama kelas
+            ->leftJoin('kelas', 'siswas.kelas_id', '=', 'kelas.id')
+            // 3. Select users.* agar output tetap berupa model User, bukan data gabungan
+            ->select('users.*')
+            
+            // Logika Pencarian
             ->when($search, function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%")
-                ->orWhereHas('dataSiswa', fn($s) => $s->where('nisn', 'like', "%{$search}%"));
+                // Penting: Membungkus query "OR" dalam grup agar tidak merusak filter 'role'
+                $q->where(function($query) use ($search) {
+                    $query->where('users.name', 'like', "%{$search}%")
+                        ->orWhere('users.email', 'like', "%{$search}%")
+                        ->orWhere('siswas.nisn', 'like', "%{$search}%");
+                });
             })
+            
+            // Logika Pengurutan (Prioritas: Tingkat -> Nama Kelas -> Nama Siswa)
+            ->orderBy('kelas.tingkat', 'asc')
+            ->orderBy('kelas.nama_kelas', 'asc')
+            ->orderBy('users.name', 'asc')
+            
+            // Eager Load relasi untuk keperluan view
             ->with('dataSiswa.kelas') 
-            ->latest()
             ->paginate($perPage, ['*'], 'siswa_page');
 
-        // B. Ambil Data User Role GURU (Tetap sama)
+        // ==========================================================
+        // B. Ambil Data User Role GURU (TETAP SAMA / LOGIKA LAMA)
+        // ==========================================================
         $userGuru = User::where('role', 'guru')
             ->when($search, function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%");
+                $q->where(function($query) use ($search) {
+                    $query->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
             })
             ->latest()
             ->paginate(10, ['*'], 'guru_page');
 
-        // C. Data Pendukung Modal
+        // ==========================================================
+        // C. Data Pendukung Modal (TETAP SAMA / LOGIKA LAMA)
+        // ==========================================================
         $kelas = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get(); 
         
-        // --- PENAMBAHAN DI SINI ---
-        // Kita butuh 'first()' untuk modal TAMBAH (logic lama kamu)
+        // Untuk modal TAMBAH (ambil satu yg aktif)
         $tahunAjaran = TahunAjaran::where('is_active', true)->first();
         
-        // Kita butuh 'get()' (koleksi) untuk modal EDIT (agar dropdown tahun bisa muncul semua)
+        // Untuk modal EDIT (ambil semua untuk dropdown)
         $tahunAjaranList = TahunAjaran::orderBy('tahun', 'desc')->get(); 
-        // --------------------------
 
         return view('admin.manajemen_user.index', compact(
             'userSiswa', 
             'userGuru', 
             'kelas', 
             'tahunAjaran', 
-            'tahunAjaranList' // Tambahkan ini ke compact
+            'tahunAjaranList'
         ));
     }
-
     public function storeSiswa(Request $request)
     {
         // 1. Validasi

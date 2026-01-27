@@ -3,7 +3,8 @@
 namespace App\Exports;
 
 use App\Models\Siswa;
-use Maatwebsite\Excel\Concerns\FromCollection;
+// Ubah FromCollection menjadi FromQuery
+use Maatwebsite\Excel\Concerns\FromQuery; 
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -12,11 +13,11 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
-class SiswaExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithStyles
+class SiswaExport implements FromQuery, WithHeadings, WithMapping, ShouldAutoSize, WithStyles
 {
     protected $kelas_id;
     protected $status;
-    private $rowNumber = 0; // 1. TAMBAHKAN INI: Untuk menghitung nomor urut
+    private $rowNumber = 0; // Tetap dipertahankan untuk penomoran
 
     public function __construct($kelas_id = null, $status = null)
     {
@@ -24,24 +25,40 @@ class SiswaExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
         $this->status = $status;
     }
 
-    public function collection()
+    /**
+     * MENGGANTI function collection() MENJADI query()
+     * Agar kita bisa menggunakan JOIN dan ORDER BY relasi
+     */
+    public function query()
     {
-        $query = Siswa::with(['user', 'kelas']);
+        $query = Siswa::query()
+            // 1. JOIN (Agar bisa urutkan berdasarkan Nama User & Tingkat Kelas)
+            ->join('users', 'siswas.user_id', '=', 'users.id')
+            ->leftJoin('kelas', 'siswas.kelas_id', '=', 'kelas.id')
+            
+            // 2. SELECT (Penting! Agar data ID siswa tidak tertimpa ID user/kelas)
+            ->select('siswas.*');
 
+        // Filter Kelas (Gunakan 'siswas.kelas_id' karena ada join)
         if ($this->kelas_id) {
-            $query->where('kelas_id', $this->kelas_id);
+            $query->where('siswas.kelas_id', $this->kelas_id);
         }
 
+        // Filter Status
         if ($this->status) {
-            $query->where('status', $this->status);
+            $query->where('siswas.status', $this->status);
         }
 
-        return $query->get();
+        // 3. ORDER BY (Logika Pengurutan: Tingkat -> Kelas -> Nama)
+        return $query
+            ->orderBy('kelas.tingkat', 'asc')     // Urutkan Tingkat (7, 8, 9)
+            ->orderBy('kelas.nama_kelas', 'asc')  // Urutkan Kelas (A, B, C)
+            ->orderBy('users.name', 'asc')        // Urutkan Nama Siswa (A-Z)
+            
+            // Tetap load relasi agar hemat query saat mapping
+            ->with(['user', 'kelas']);
     }
 
-    /**
-     * 2. TAMBAHKAN 'NO' DI HEADINGS
-     */
     public function headings(): array
     {
         return [
@@ -53,15 +70,12 @@ class SiswaExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
         ];
     }
 
-    /**
-     * 3. TAMBAHKAN LOGIKA NOMOR DI MAPPING
-     */
     public function map($siswa): array
     {
-        $this->rowNumber++; // Tambah angka 1 setiap baris baru
+        $this->rowNumber++; // Counter nomor urut
 
         return [
-            $this->rowNumber, // Masukkan nomor ke kolom pertama
+            $this->rowNumber, 
             $siswa->user->name ?? '-',
             $siswa->nisn ?? '-',
             $siswa->kelas ? $siswa->kelas->nama_lengkap : '-', 
@@ -71,9 +85,9 @@ class SiswaExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
 
     public function styles(Worksheet $sheet)
     {
+        // Style tetap sama persis dengan yang lama
         $lastRow = $sheet->getHighestRow();
-        // Karena kolom nambah (NO), jangkauan border jadi A1 sampai E
-        $rangeTabel = 'A1:E' . $lastRow;
+        $rangeTabel = 'A1:E' . $lastRow; // A sampai E
 
         $sheet->getStyle($rangeTabel)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 

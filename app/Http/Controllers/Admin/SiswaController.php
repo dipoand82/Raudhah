@@ -21,43 +21,69 @@ class SiswaController extends Controller
     use HandlesExcelImports; 
 
     // === 1. HALAMAN UTAMA (FILTER + SEARCH) ===
-    public function index(Request $request)
-    {   // A. Siapkan Query Dasar untuk Tabel Siswa
-        $query = Siswa::with(['user', 'kelas', 'tahunAjaran']);
+public function index(Request $request)
+{
+    // Dapatkan limit pagination
+    $limit = $request->input('per_page', 10);
 
-        // B. Logika Search (Nama / NISN)
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('nisn', 'like', "%{$search}%")
-                  ->orWhereHas('user', function($u) use ($search) {
-                      $u->where('name', 'like', "%{$search}%");
-                  });
-            });
-        }
+    // ==========================================================
+    // A. Query Dasar dengan JOIN (Agar bisa sorting Tingkat & Nama)
+    // ==========================================================
+    $query = Siswa::query()
+        // 1. Join ke Users (untuk sorting berdasarkan Nama)
+        ->join('users', 'siswas.user_id', '=', 'users.id')
+        // 2. Left Join ke Kelas (untuk sorting berdasarkan Tingkat & Nama Kelas)
+        ->leftJoin('kelas', 'siswas.kelas_id', '=', 'kelas.id')
+        // 3. Select siswas.* agar output tetap berupa model Siswa
+        ->select('siswas.*');
 
-        // C. Logika Filter Kelas
-        if ($request->filled('kelas_id')) {
-            $query->where('kelas_id', $request->kelas_id);
-        }
-
-        // Logika Filter Status
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        // D. Eksekusi Query (Pagination Dinamis)
-        $limit = $request->input('per_page', 10);
-        $siswas = $query->latest()->paginate($limit);
-
-        // E. Ambil Daftar Kelas (SATU KALI SAJA)
-        // Kita namakan variabelnya '$kelas' supaya COCOK dengan Modal Component
-        $kelas = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
-
-        // F. Kirim ke View
-        // Perhatikan: Kita kirim 'kelas' (bukan kelas_list)
-        return view('admin.data_siswa.index', compact('siswas', 'kelas'));
+    // ==========================================================
+    // B. Logika Search (Nama / NISN)
+    // ==========================================================
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('siswas.nisn', 'like', "%{$search}%")
+              // Karena sudah di-JOIN di atas, kita bisa langsung cek users.name
+              ->orWhere('users.name', 'like', "%{$search}%");
+        });
     }
+
+    // ==========================================================
+    // C. Logika Filter Tambahan
+    // ==========================================================
+    
+    // Filter Kelas
+    if ($request->filled('kelas_id')) {
+        $query->where('siswas.kelas_id', $request->kelas_id);
+    }
+
+    // Filter Status
+    if ($request->filled('status')) {
+        $query->where('siswas.status', $request->status);
+    }
+
+    // ==========================================================
+    // D. Logika Pengurutan (Tingkat -> Kelas -> Nama)
+    // ==========================================================
+    // Gantikan latest() dengan logika ini:
+    $siswas = $query
+        ->orderBy('kelas.tingkat', 'asc')     // 1. Kelas 7, 8, 9
+        ->orderBy('kelas.nama_kelas', 'asc')  // 2. Kelas A, B, C
+        ->orderBy('users.name', 'asc')        // 3. Nama Ahmad, Budi, dst
+        
+        // Load relasi agar bisa dipanggil di View ($siswa->user->name, dst)
+        ->with(['user', 'kelas', 'tahunAjaran']) 
+        ->paginate($limit);
+
+    // ==========================================================
+    // E. Data Pendukung (Modal)
+    // ==========================================================
+    $kelas = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
+
+    // F. Kirim ke View
+    return view('admin.data_siswa.index', compact('siswas', 'kelas'));
+}
 
     // === 2. EXPORT DATA (FITUR BARU UNTUK ROUND-TRIP EXCEL) ===
      public function export(Request $request) 
