@@ -77,7 +77,7 @@
                         </div>
 
                         <div class="flex items-center justify-end mt-6 pt-4 border-t">
-                            <x-primary-button clas>
+                            <x-primary-button>
                                 {{ __('Simpan Perubahan') }}
                             </x-primary-button>
                         </div>

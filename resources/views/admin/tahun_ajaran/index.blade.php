@@ -99,11 +99,14 @@
 
                                         {{-- Tombol Hapus --}}
                                         @if(!$ta->is_active)
-                                            {{-- GANTI FORM LAMA DENGAN KOMPONEN INI --}}
                                             <x-modal-delete-global 
-                                                :trigger="'delete-ta-' . $ta->id" 
+                                                trigger="delete-ta-{{ $ta->id }}" 
                                                 :action="route('admin.tahun-ajaran.destroy', $ta->id)" 
-                                                :message="'Tahun Ajaran ' . $ta->tahun" 
+                                                title="Hapus Tahun Ajaran"
+                                                :message="'Tahun Ajaran ' . $ta->tahun"
+                                                buttonText="Hapus"            {{-- Teks tombol yang muncul di tabel --}}
+                                                submitText="Hapus"        {{-- Teks tombol konfirmasi di dalam modal --}}
+                                                class=""
                                             />
                                         @endif
 
@@ -154,30 +157,41 @@
                 {{-- KOLOM KANAN: FITUR KELULUSAN --}}
                 <div class="lg:col-span-1">
                     <div class="bg-orange-50 border border-orange-200 rounded-xl p-6 shadow-sm sticky top-6">
+                        
+                        {{-- 1. HEADER: IKON & JUDUL --}}
                         <div class="flex items-center gap-3 mb-4">
                             <div class="p-2 bg-orange-200 rounded-lg text-orange-700">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                                {{-- Ikon --}}
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
                             </div>
                             <h3 class="text-lg font-bold text-orange-900">Proses Kelulusan</h3>
                         </div>
                         
-                        <p class="text-sm text-orange-800 mb-5 leading-relaxed bg-orange-100/50 p-3 rounded-md border border-orange-100 text-center">
-                            Gunakan fitur ini di akhir tahun ajaran untuk meluluskan siswa tingkat akhir (Misal: Kelas 9).
+                        {{-- 2. BODY: PENJELASAN --}}
+                        <p class="text-sm text-orange-800 mb-5 leading-relaxed bg-orange-100/50 p-3 rounded-md border border-orange-300 text-center">
+                            Gunakan fitur ini di akhir tahun ajaran untuk meluluskan siswa tingkat akhir (Kelas 9).
                         </p>
 
-                <x-modal-delete-global 
-                    class="inline-flex w-full justify-center px-10 gap-3 p-6  py-2 transition shadow-sm whitespace-nowrap capitalize " 
-                    trigger="confirm-graduation" 
-                    :action="route('admin.tahun-ajaran.graduation')" 
-                    message="Kelulusan Siswa Tingkat Akhir"
-                    title="Proses Kelulusan Massal"
-                >
-                    <x-input-label value="Pilih Tingkat Akhir" class="mt-2" />
-                    <select name="tingkat_akhir" class="w-full mt-1 border-gray-300 rounded-md shadow-sm" required>
-                        <option value="">-- Pilih --</option>
-                        <option value="9">Kelas 9</option>
-                    </select>
-                </x-modal-delete-global>
+                        {{-- 3. FOOTER: TOMBOL MODAL (TRIGGER) --}}
+                        <x-modal-delete-global 
+                            trigger="confirm-graduation" 
+                            :action="route('admin.tahun-ajaran.graduation')" 
+                            message="Kelulusan Siswa Tingkat Akhir"
+                            title="Proses Kelulusan Massal"
+                            buttonText="Proses Kelulusan"          {{-- Teks tombol awal --}}
+                            submitText="Luluskan" {{-- Teks tombol konfirmasi --}}
+                            class="inline-flex w-full justify-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold shadow-sm transition capitalize"
+                        >
+                            {{-- Isi Slot Modal (Formulir Tambahan) --}}
+                            <x-input-label value="Pilih Tingkat Akhir" class="mt-2" />
+                            <select name="tingkat_akhir" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                                <option value="">-- Pilih --</option>
+                                <option value="9">Kelas 9</option>
+                            </select>
+                        </x-modal-delete-global>
+
                     </div>
                 </div>
 

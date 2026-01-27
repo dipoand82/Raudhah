@@ -147,7 +147,7 @@ class TahunAjaranController extends Controller
 
             // 3. Cek jika kosong
             if ($jumlah == 0) {
-                return back()->with('error', "Tidak ada siswa aktif di kelas tingkat {$request->tingkat_akhir}.");
+                return back()->with('error', "Tidak ada siswa aktif di kelas {$request->tingkat_akhir}.");
             }
 
             // 4. (GABUNGAN) Lakukan Mass Update
