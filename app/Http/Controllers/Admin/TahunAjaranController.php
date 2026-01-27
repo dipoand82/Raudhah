@@ -115,16 +115,31 @@ class TahunAjaranController extends Controller
     }
 
     public function destroy($id)
-    {
+{
         try {
             $ta = TahunAjaran::findOrFail($id);
+
+            // 1. CEK STATUS AKTIF (Kodingan Lama - Dipertahankan)
             if ($ta->is_active) {
                 return back()->with('error', 'Tidak bisa menghapus Tahun Ajaran yang sedang AKTIF.');
             }
+
+            // 2. CEK RELASI SISWA (TAMBAHAN BARU - PENTING!)
+            // Agar data siswa tidak kehilangan tahun ajarannya (menjadi NULL)
+            $jumlahSiswa = \App\Models\Siswa::where('tahun_ajaran_id', $ta->id)->count();
+
+            if ($jumlahSiswa > 0) {
+                return back()->with('error', "Gagal Hapus! Masih ada $jumlahSiswa siswa yang terdaftar di tahun ajaran ini. Silakan pindahkan mereka atau luluskan dulu.");
+            }
+
+            // 3. EKSEKUSI HAPUS (Kodingan Lama - Dipertahankan)
             $ta->delete();
+            
             return back()->with('success', 'Data berhasil dihapus.');
+
         } catch (\Exception $e) {
-            Log::error("Gagal hapus TA: " . $e->getMessage());
+            // Error Handling (Kodingan Lama - Dipertahankan)
+            \Illuminate\Support\Facades\Log::error("Gagal hapus Tahun Ajaran: " . $e->getMessage());
             return back()->with('error', 'Gagal menghapus data.');
         }
     }

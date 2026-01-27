@@ -29,16 +29,15 @@ class ManajemenUserController extends Controller
         // A. Ambil Data User Role SISWA (LOGIKA BARU - JOIN & SORT)
         // ==========================================================
         $userSiswa = User::where('role', 'siswa')
-            // 1. Join ke tabel siswas untuk akses NISN
+            // 1. Join ke tabel siswas untuk akses NISN & STATUS
             ->join('siswas', 'users.id', '=', 'siswas.user_id')
             // 2. Left Join ke kelas untuk sorting berdasarkan tingkat/nama kelas
             ->leftJoin('kelas', 'siswas.kelas_id', '=', 'kelas.id')
-            // 3. Select users.* agar output tetap berupa model User, bukan data gabungan
+            // 3. Select users.* agar output tetap berupa model User
             ->select('users.*')
             
-            // Logika Pencarian
+            // Logika Pencarian (TETAP)
             ->when($search, function($q) use ($search) {
-                // Penting: Membungkus query "OR" dalam grup agar tidak merusak filter 'role'
                 $q->where(function($query) use ($search) {
                     $query->where('users.name', 'like', "%{$search}%")
                         ->orWhere('users.email', 'like', "%{$search}%")
@@ -46,7 +45,12 @@ class ManajemenUserController extends Controller
                 });
             })
             
-            // Logika Pengurutan (Prioritas: Tingkat -> Nama Kelas -> Nama Siswa)
+            // --- CUSTOM SORTING START ---
+            // Logika: Urutkan status (Aktif -> Cuti -> Keluar) terlebih dahulu
+            ->orderByRaw("FIELD(siswas.status, 'Aktif', 'Cuti', 'Keluar') ASC")
+            // --- CUSTOM SORTING END ---
+            
+            // Logika Pengurutan Lama (Tingkat -> Nama Kelas -> Nama Siswa)
             ->orderBy('kelas.tingkat', 'asc')
             ->orderBy('kelas.nama_kelas', 'asc')
             ->orderBy('users.name', 'asc')
@@ -56,7 +60,7 @@ class ManajemenUserController extends Controller
             ->paginate($perPage, ['*'], 'siswa_page');
 
         // ==========================================================
-        // B. Ambil Data User Role GURU (TETAP SAMA / LOGIKA LAMA)
+        // B. Ambil Data User Role GURU (TETAP SAMA)
         // ==========================================================
         $userGuru = User::where('role', 'guru')
             ->when($search, function($q) use ($search) {
@@ -69,7 +73,7 @@ class ManajemenUserController extends Controller
             ->paginate(10, ['*'], 'guru_page');
 
         // ==========================================================
-        // C. Data Pendukung Modal (TETAP SAMA / LOGIKA LAMA)
+        // C. Data Pendukung Modal (TETAP SAMA)
         // ==========================================================
         $kelas = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get(); 
         

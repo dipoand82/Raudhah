@@ -66,10 +66,11 @@
     <div class="md:col-span-2">
         <x-input-label for="status" :value="__('Status Siswa')" />
         <select name="status" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 bg-gray-50">
-            <option value="Aktif" {{ $siswa->status == 'Aktif' ? 'selected' : '' }}>✅ Aktif</option>
-            <option value="Lulus" {{ $siswa->status == 'Lulus' ? 'selected' : '' }}>🎓 Lulus</option>
-            <option value="Pindah" {{ $siswa->status == 'Pindah' ? 'selected' : '' }}>🚚 Pindah</option>
-            <option value="Keluar" {{ $siswa->status == 'Keluar' ? 'selected' : '' }}>❌ Keluar (DO)</option>
+            <option value="Aktif" {{ $siswa->status == 'Aktif' ? 'selected' : '' }}> Aktif</option>
+            <option value="Cuti" {{ $siswa->status == 'Cuti' ? 'selected' : '' }}> Cuti</option>
+            <option value="Lulus" {{ $siswa->status == 'Lulus' ? 'selected' : '' }}> Lulus</option>
+            <option value="Pindah" {{ $siswa->status == 'Pindah' ? 'selected' : '' }}> Pindah</option>
+            <option value="Keluar" {{ $siswa->status == 'Keluar' ? 'selected' : '' }}> Keluar (DO)</option>
         </select>
         <p class="text-xs text-red-500 font-semibold mt-1">*Hati-hati mengubah status menjadi Lulus/Keluar.</p>
     </div>
