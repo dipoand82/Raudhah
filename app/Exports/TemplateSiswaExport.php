@@ -9,28 +9,30 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class TemplateSiswaExport implements FromArray, WithHeadings, ShouldAutoSize, WithStyles
 {
     /**
      * 1. Contoh Data (Dummy)
-     * Membantu Admin memahami format pengisian data siswa.
+     * Menambahkan angka di index pertama tiap array.
      */
     public function array(): array
     {
         return [
-            ['Budi Santoso', '00123456', '7A', 'L'],
-            ['Siti Aminah', '00123457', '8B', 'P'],
+            ['1', 'Budi Santoso', '00123456', '7A', 'L'],
+            ['2', 'Siti Aminah', '00123457', '8B', 'P'],
         ];
     }
 
     /**
      * 2. Judul Kolom (HEADER)
-     * Nama kolom harus sesuai dengan yang dibaca oleh SiswaImport.
+     * Menambahkan kolom 'No' di posisi awal.
      */
     public function headings(): array
     {
         return [
+            'No', // Tambahan kolom penomoran
             'nama_lengkap',
             'nisn',
             'kelas',
@@ -40,7 +42,6 @@ class TemplateSiswaExport implements FromArray, WithHeadings, ShouldAutoSize, Wi
 
     /**
      * 3. Styling Header & Konten
-     * Memberikan warna biru #0A78BD pada header agar senada dengan sistem.
      */
     public function styles(Worksheet $sheet)
     {
@@ -49,25 +50,28 @@ class TemplateSiswaExport implements FromArray, WithHeadings, ShouldAutoSize, Wi
             1 => [
                 'font' => [
                     'bold' => true, 
-                    'color' => ['rgb' => 'FFFFFF'] // Teks Putih
+                    'color' => ['rgb' => 'FFFFFF'] 
                 ],
                 'fill' => [
                     'fillType' => Fill::FILL_SOLID,
-                    'startColor' => ['rgb' => '0A78BD'] // Biru Identitas SMP IT Raudhah
+                    'startColor' => ['rgb' => '0A78BD'] 
                 ],
                 'alignment' => [
                     'horizontal' => Alignment::HORIZONTAL_CENTER,
                 ],
             ],
-            // Memberikan border tipis pada data dummy (Baris 2 dan 3)
-            'A1:D3' => [
+            // Border diperluas ke kolom E (A1:E3) karena ada kolom tambahan
+            'A1:E3' => [
                 'borders' => [
                     'allBorders' => [
-                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                        'borderStyle' => Border::BORDER_THIN,
                         'color' => ['rgb' => '000000'],
                     ],
                 ],
             ],
+            // Opsional: Mengetengahkan kolom "No" dan "Jenis Kelamin" agar lebih rapi
+            'A2:A3' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER]],
+            'E2:E3' => ['alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER]],
         ];
     }
 }

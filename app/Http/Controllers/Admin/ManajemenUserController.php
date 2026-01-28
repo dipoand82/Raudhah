@@ -20,11 +20,14 @@ class ManajemenUserController extends Controller
 {
     // === 1. HALAMAN UTAMA (TABS) ===
     public function index(Request $request)
-    {
+    {  
         $search = $request->input('search');
         // Menggunakan default 10 jika tidak ada input per_page
-        $perPage = $request->input('per_page', 10); 
+        $perPage = $request->input('per_page', 30); 
 
+        // 1. TAMBAHKAN INI: Ambil input dari filter dropdown di Blade
+        $statusFilter = $request->input('status'); // TAMBAHKAN INI
+        $kelasFilter = $request->input('kelas_id'); // TAMBAHKAN INI
         // ==========================================================
         // A. Ambil Data User Role SISWA (LOGIKA BARU - JOIN & SORT)
         // ==========================================================
@@ -44,10 +47,19 @@ class ManajemenUserController extends Controller
                         ->orWhere('siswas.nisn', 'like', "%{$search}%");
                 });
             })
+            // 2. TAMBAHKAN INI: Filter berdasarkan Status jika dipilih
+            ->when($statusFilter, function($q) use ($statusFilter) { // TAMBAHKAN INI
+                return $q->where('siswas.status', $statusFilter);    // TAMBAHKAN INI
+            })                                                      // TAMBAHKAN INI
+
+            // 3. TAMBAHKAN INI: Filter berdasarkan Kelas jika dipilih
+            ->when($kelasFilter, function($q) use ($kelasFilter) {   // TAMBAHKAN INI
+                return $q->where('siswas.kelas_id', $kelasFilter);   // TAMBAHKAN INI
+            })
             
             // --- CUSTOM SORTING START ---
             // Logika: Urutkan status (Aktif -> Cuti -> Keluar) terlebih dahulu
-            ->orderByRaw("FIELD(siswas.status, 'Aktif', 'Cuti', 'Keluar') ASC")
+            ->orderByRaw("FIELD(siswas.status, 'Aktif', 'Cuti','Lulus','Pindah', 'Keluar') ASC")
             // --- CUSTOM SORTING END ---
             
             // Logika Pengurutan Lama (Tingkat -> Nama Kelas -> Nama Siswa)
@@ -70,7 +82,7 @@ class ManajemenUserController extends Controller
                 });
             })
             ->latest()
-            ->paginate(10, ['*'], 'guru_page');
+            ->paginate(30, ['*'], 'guru_page');
 
         // ==========================================================
         // C. Data Pendukung Modal (TETAP SAMA)
@@ -169,7 +181,7 @@ class ManajemenUserController extends Controller
     // === 4. DOWNLOAD TEMPLATE ===
     public function downloadTemplate()
     {
-        return Excel::download(new TemplateSiswaExport, 'template_siswa.xlsx');
+        return Excel::download(new TemplateSiswaExport, 'template_import_siswa.xlsx');
     }
 
     // === 5. SIMPAN GURU ===

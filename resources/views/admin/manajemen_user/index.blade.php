@@ -7,7 +7,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             {{-- ALERT ERROR --}}
-            @if ($errors->any())
+            {{-- @if ($errors->any())
                 <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative shadow-sm">
                     <strong class="font-bold flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -19,7 +19,7 @@
                         @endforeach
                     </ul>
                 </div>
-            @endif
+            @endif --}}
 
             {{-- ALERT SUCCESS --}}
             @if(session('success'))
@@ -93,15 +93,15 @@
                                             'Aktif'  => 'bg-green-100 text-green-800 border-green-200',
                                             'Cuti' => 'bg-gray-100 text-gray-800 border-gray-200',
                                             'Lulus'  => 'bg-blue-100 text-blue-800 border-blue-200',
-                                            'Keluar' => 'bg-red-100 text-red-800 border-red-200',
                                             'Pindah' => 'bg-yellow-100 text-yellow-800 border-yellow-200',
+                                            'Keluar' => 'bg-red-100 text-red-800 border-red-200',
                                             default  => 'bg-white text-gray-700 border-gray-300',
                                         };
                                     @endphp
                                     <select name="status" onchange="this.form.submit()" 
-                                        class="w-full rounded-full py-2 pl-4 pr-8 shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42] cursor-pointer text-sm border {{ $filterStatusClass }}">
+                                         class="w-full rounded-full py-2 pl-4 pr-8 shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42] cursor-pointer text-sm border"> {{--{{ $filterStatusClass }}"> --}}
                                         <option value="" class="bg-white text-gray-700">-- Status --</option>
-                                        @foreach(['Aktif', 'Lulus', 'Pindah', 'Keluar'] as $st)
+                                        @foreach(['Aktif','Cuti', 'Lulus', 'Pindah', 'Keluar'] as $st)
                                             <option value="{{ $st }}" {{ $selectedStatus == $st ? 'selected' : '' }} class="bg-white text-gray-700">
                                                 {{ $st }}
                                             </option>
@@ -142,7 +142,7 @@
                                             <ul class="mt-1 list-disc list-inside text-xs text-red-700 font-medium">
                                                 <li>Pastikan <strong>Tahun Ajaran Aktif</strong> sudah diset.</li>
                                                 <li>Pastikan data <strong>Kelas</strong> sudah tersedia.</li>
-                                                <li>Penulisan nama kelas harus <strong>SAMA PERSIS</strong>.</li>
+                                                <li><strong>Periksa</strong> kesesuaian data sebelum melakukan import </li>
                                             </ul>
                                         </div>
                                     </div>
@@ -153,21 +153,27 @@
                                 </div>
                                 <div class="mb-6" x-data="{ fileName: '' }"> <h3 class="text-sm font-bold text-gray-700 mb-2">Langkah 2: Upload File</h3>
                                     
-                                    <div class="relative border-2 border-dashed rounded-lg p-8 hover:border-[#3B3E42] transition text-center group"
-                                        :class="fileName ? 'border-[#3B3E42] bg-gray-100' : 'border-gray-300 bg-gray-50'">
-                                        
+                                    <div class="relative border-2 border-dashed rounded-lg p-8 transition text-center group"
+                                        :class="fileName 
+                                            ? 'border-green-500 bg-green-50' 
+                                            : 'border-gray-300 bg-gray-50 hover:border-[#3B3E42]'">
+
                                         <input type="file" 
                                             name="file" 
                                             class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
                                             required 
                                             accept=".xlsx, .xls, .csv" 
-                                            @change="fileName = $event.target.files[0].name">
+                                            @change="fileName = $event.target.files[0] ? $event.target.files[0].name : ''">
                                             
                                         <div class="pointer-events-none space-y-2">
                                             <p class="text-sm font-medium" 
-                                            :class="fileName ? 'text-[#3B3E42] font-bold' : 'text-gray-600'"
+                                            :class="fileName ? 'text-green-700 font-bold' : 'text-gray-600'"
                                             x-text="fileName ? 'File: ' + fileName : 'Klik untuk pilih file'">
                                             </p>
+                                            
+                                            <template x-if="fileName">
+                                                <p class="text-xs text-green-600">File siap diunggah!</p>
+                                            </template>
                                         </div>
                                     </div>
                                 </div>
@@ -248,8 +254,8 @@
                                                             'Aktif'  => 'bg-green-100 text-green-800 border-green-200',
                                                             'Cuti' => 'bg-gray-100 text-gray-800 border-gray-200',
                                                             'Lulus'  => 'bg-blue-100 text-blue-800 border-blue-200',
-                                                            'Keluar' => 'bg-red-100 text-red-800 border-red-200',
                                                             'Pindah' => 'bg-yellow-100 text-yellow-800 border-yellow-200',
+                                                            'Keluar' => 'bg-red-100 text-red-800 border-red-200',
                                                             default  => 'bg-gray-100 text-gray-800 border-gray-200',
                                                         };
                                                     @endphp
@@ -337,10 +343,9 @@
                                 <div class="flex items-center gap-2">
                                     <span class="text-sm text-gray-500">Show:</span>
                                     <select name="per_page" onchange="this.form.submit()" class="text-sm border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-1 pl-2 pr-8">
-                                        <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
-                                        <option value="20" {{ request('per_page') == 20 ? 'selected' : '' }}>20</option>
                                         <option value="30" {{ request('per_page') == 30 ? 'selected' : '' }}>30</option>
                                         <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                                        <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
                                     </select>
                                 </div>
                             </form>

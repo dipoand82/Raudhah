@@ -48,7 +48,7 @@
                             </div>
 
                             <div class="space-y-4">
-                                <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Branding & Tujuan</h3>
+                                {{-- <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Branding & Tujuan</h3> --}}
 
                                 <div>
                                     {{-- <x-input-label for="logo" :value="__('Logo Sekolah')" /> --}}
@@ -58,9 +58,10 @@
                                             <img src="{{ asset('storage/' . $profil->logo_path) }}" alt="Logo" class="h-20 w-auto object-contain border p-1 rounded">
                                         </div> --}}
                                     @endif
-                                    
-                                    <input type="file" name="logo" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
-                                    <p class="text-xs text-gray-500 mt-1">Format: JPG, PNG. Maks: 2MB.</p>
+                                    <br>
+                                    <br>
+                                    {{-- <input type="file" name="logo" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+                                    <p class="text-xs text-gray-500 mt-1">Format: JPG, PNG. Maks: 2MB.</p> --}}
                                 </div>
 
                                 <div>

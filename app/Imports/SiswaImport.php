@@ -45,6 +45,21 @@ class SiswaImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFai
         $nisn = trim($row['nisn']);
         $namaLengkap = trim($row['nama_lengkap']);
 
+        // =========================================================================
+        // [BARU DITAMBAHKAN] LOGIKA PENCEGAH (GUARD CLAUSE)
+        // =========================================================================
+        // Cek apakah siswa ini sudah ada di database berdasarkan NISN
+        $siswaLama = Siswa::where('nisn', $nisn)->first();
+
+        // Jika siswa ada DAN statusnya 'Lulus', 'Keluar', atau 'Pindah'
+        if ($siswaLama && in_array($siswaLama->status, ['Lulus', 'Keluar', 'Pindah'])) {
+            // STOP PROSES DISINI. 
+            // Return null artinya baris Excel ini dilewati/diabaikan.
+            // Data tidak akan di-update jadi 'Aktif', Akun User tidak akan disentuh.
+            return null; 
+        }
+        // =========================================================================
+
         // LOGIKA EMAIL: namadepan.nisn@student.sekolah.id
         // explode memecah nama, strtolower mengecilkan huruf
         $namaDepan = strtolower(explode(' ', $namaLengkap)[0]);
@@ -90,7 +105,7 @@ class SiswaImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFai
                 'kelas_id'        => $kelas_id,
                 'tingkat'         => $tingkat, 
                 'tahun_ajaran_id' => $this->tahunAktif ? $this->tahunAktif->id : null,
-                'status'          => 'Aktif',
+                'status'          => 'Aktif', // Ini hanya akan tereksekusi jika lolos dari pengecekan di atas
             ]
         );
     }

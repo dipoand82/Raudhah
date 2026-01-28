@@ -22,7 +22,7 @@
                     
                     {{-- FORM PENCARIAN & FILTER --}}
                     <form method="GET" action="{{ route('admin.siswas.index') }}" class="w-full lg:w-2/3 flex flex-col md:flex-row gap-3">
-                        <input type="hidden" name="per_page" value="{{ request('per_page', 10) }}">
+                        <input type="hidden" name="per_page" value="{{ request('per_page', 30) }}">
 
                         <div class="relative w-full md:w-1/3">
                             <input type="text" name="search" value="{{ request('search') }}"
@@ -47,7 +47,7 @@
                             <select name="status" onchange="this.form.submit()" 
                                 class="w-full rounded-full border-gray-300 py-2 pl-4 pr-8 shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42] cursor-pointer text-gray-700">
                                 <option value="">-- Semua Status --</option>
-                                @foreach(['Aktif', 'Lulus', 'Pindah', 'Keluar'] as $st)
+                                @foreach(['Aktif','Cuti', 'Lulus', 'Pindah', 'Keluar'] as $st)
                                     <option value="{{ $st }}" {{ request('status') == $st ? 'selected' : '' }}>
                                         {{ $st }}
                                     </option>
@@ -168,8 +168,8 @@
                                                 'Aktif' => 'bg-green-100 text-green-800 border-green-200',
                                                 'Cuti' => 'bg-gray-100 text-gray-800 border-gray-200',
                                                 'Lulus' => 'bg-blue-100 text-blue-800 border-blue-200',
-                                                'Keluar' => 'bg-red-100 text-red-800 border-red-200',
                                                 'Pindah' => 'bg-yellow-100 text-yellow-800 border-yellow-200',
+                                                'Keluar' => 'bg-red-100 text-red-800 border-red-200',
                                                 default => 'bg-gray-100 text-gray-800 border-gray-200',
                                             };
                                         @endphp
@@ -178,16 +178,56 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 text-right text-sm font-medium flex justify-end items-center gap-2">
+    
+                                    {{-- 1. TOMBOL PEMICU MODAL --}}
+                                    <button type="button" 
+                                            x-data 
+                                            x-on:click="$dispatch('open-modal', 'edit-siswa-{{ $siswa->id }}')" 
+                                            class="text-indigo-600 hover:text-indigo-900 font-semibold transition">
+                                        Edit
+                                    </button>
+
+                                    {{-- 2. STRUKTUR MODAL EDIT --}}
+                                    <x-modal name="edit-siswa-{{ $siswa->id }}" focusable>
+                                        {{-- Pastikan ada pembungkus div dengan p-6 agar tidak mepet ke pinggir --}}
+                                        <div class="p-6 text-left">
+                                            <h2 class="text-lg font-bold mb-4 border-b pb-2 text-gray-900">
+                                                Edit Data Siswa: {{ $siswa->user->name ?? $siswa->nama_lengkap }}
+                                            </h2>
+
+                                            <form method="POST" action="{{ route('admin.siswas.update', $siswa->id) }}">
+                                                @csrf 
+                                                @method('PUT')
+                                                
+                                                {{-- Memanggil Komponen Form --}}
+                                                <x-siswa.edit-form :siswa="$siswa" :kelas="$kelas" :tahunAjaran="$tahunAjaranList" />
+
+                                                <div class="mt-6 flex justify-end gap-3 border-t pt-4">
+                                                    <x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button>
+                                                    <x-primary-button class="bg-[#3B3E42]">Simpan Perubahan</x-primary-button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </x-modal>
+
+                                    {{-- 3. TOMBOL HAPUS (Tetap) --}}
+                                    <x-siswa.delete-modal 
+                                        trigger="delete-siswa-{{ $siswa->id }}" 
+                                        action="{{ route('admin.siswas.destroy', $siswa->id) }}"
+                                        message="{{ $siswa->user->name ?? $siswa->nama_lengkap }}"
+                                    />
+                                </td>
+                                    {{-- <td class="px-6 py-4 text-right text-sm font-medium flex justify-end items-center gap-2">
                                         <a href="{{ route('admin.siswas.edit', $siswa->id) }}"
                                         class="text-indigo-600 hover:text-indigo-900 font-semibold">Edit</a>
-                                        
+                                         --}}
                                         {{-- TOMBOL HAPUS SATUAN (Menggunakan Component) --}}
-                                        <x-siswa.delete-modal 
+                                        {{-- <x-siswa.delete-modal 
                                             trigger="delete-siswa-{{ $siswa->id }}" 
                                             action="{{ route('admin.siswas.destroy', $siswa->id) }}"
                                             message="{{ $siswa->user->name ?? $siswa->nama_lengkap }}"
-                                        />
-                                    </td>
+                                        /> --}}
+                                    {{-- </td> --}}
                                 </tr>
                             @empty
                                 <tr>
@@ -211,10 +251,9 @@
                             <span class="text-sm text-gray-500">Show:</span>
                             <select name="per_page" onchange="this.form.submit()" 
                                 class="text-sm border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-1 pl-2 pr-8">
-                                <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
-                                <option value="20" {{ request('per_page') == 20 ? 'selected' : '' }}>20</option>
                                 <option value="30" {{ request('per_page') == 30 ? 'selected' : '' }}>30</option>
                                 <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                                <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
                             </select>
                         </div>
                     </form>

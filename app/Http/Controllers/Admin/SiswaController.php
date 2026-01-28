@@ -24,7 +24,7 @@ class SiswaController extends Controller
     public function index(Request $request)
     {
         // Dapatkan limit pagination (Kode Lama)
-        $limit = $request->input('per_page', 10);
+        $limit = $request->input('per_page', 30);
 
         // ==========================================================
         // A. Query Dasar dengan JOIN
@@ -68,7 +68,7 @@ class SiswaController extends Controller
         $siswas = $query
             // --- [BARU DITAMBAHKAN] ---
             // Logika: Urutkan status dulu (Aktif -> Cuti -> Lulus -> Keluar -> Pindah)
-            ->orderByRaw("FIELD(siswas.status, 'Aktif', 'Cuti', 'Lulus', 'Keluar', 'Pindah') ASC") 
+            ->orderByRaw("FIELD(siswas.status, 'Aktif', 'Cuti', 'Lulus', 'Pindah', 'Keluar') ASC") 
             // --------------------------
 
             // --- [LOGIKA LAMA DIPERTAHANKAN SEBAGAI CADANGAN] ---
@@ -85,8 +85,13 @@ class SiswaController extends Controller
         // ==========================================================
         $kelas = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
 
+        // Untuk modal EDIT (ambil semua untuk dropdown)
+
+        $tahunAjaranList = TahunAjaran::orderBy('tahun', 'desc')->get(); 
+
+
         // F. Kirim ke View - (DIPERTAHANKAN)
-        return view('admin.data_siswa.index', compact('siswas', 'kelas'));
+        return view('admin.data_siswa.index', compact('siswas', 'kelas', 'tahunAjaranList'));
     }
 
     // === 2. EXPORT DATA (FITUR BARU UNTUK ROUND-TRIP EXCEL) ===
@@ -94,7 +99,8 @@ class SiswaController extends Controller
     {
     // Ambil nilai asli dari request (bisa null jika tidak dipilih)
     $kelasId = $request->get('kelas_id');
-    $status = $request->get('status'); 
+    $status = $request->get('status');
+    $search = $request->get('search'); // Tambahkan search jika ingin filter kata kunci juga 
 
     // Logika untuk LABEL Nama File saja
     $labelStatus = $status ?: 'Semua-Status';
@@ -108,10 +114,10 @@ class SiswaController extends Controller
     }
 
     // Susun nama file
-    $fileName = "Data-Siswa-{$labelKelas}-{$labelStatus} " . ".xlsx";
+    $fileName = "Data-Siswa-{$labelKelas} & Status-{$labelStatus} " . ".xlsx";
 
     // Kirim $status yang asli (null/isi) agar query database di SiswaExport benar
-    return Excel::download(new \App\Exports\SiswaExport($kelasId, $status), $fileName);
+    return Excel::download(new \App\Exports\SiswaExport($kelasId, $status, $search), $fileName);
     }
 
     // === 3. HALAMAN EDIT DETAIL ===
@@ -129,34 +135,58 @@ class SiswaController extends Controller
     {
         $siswa = Siswa::findOrFail($id);
 
-        // Validasi email agar tidak bentrok dengan email orang lain (kecuali email dia sendiri)
+        // 1. VALIDASI: Menambahkan aturan status/kelas dan pesan error kustom
         $request->validate([
             'email' => 'required|email|unique:users,email,' . $siswa->user_id,
             'nisn' => 'required|numeric|unique:siswas,nisn,' . $siswa->id,
-            'name' => 'required|string|max:255', // Nama dari form
+            'name' => 'required|string|max:255',
+            'status' => 'required|in:Aktif,Cuti,Lulus,Keluar,Pindah',
+            'kelas_id' => [
+                'nullable',
+                'required_if:status,Aktif', // Jika status Aktif, kelas WAJIB diisi
+                'exists:kelas,id'
+            ],
+        ], [
+            // --- BARU: Pesan Error Kustom agar Admin tidak bingung ---
+            'kelas_id.required_if' => 'Siswa dengan status Aktif wajib memiliki kelas!',
+            'email.unique' => 'Email ini sudah digunakan oleh pengguna lain.',
+            'nisn.unique' => 'NISN sudah terdaftar.',
         ]);
-        return DB::transaction(function () use ($request, $siswa) {
+
+    return DB::transaction(function () use ($request, $siswa) {
     
-        // 1. TAMBAHKAN INI: Update data User agar Nama & Email sinkron
-            if ($siswa->user) {
-                $siswa->user->update([
-                    'name' => $request->name,
-                    'email' => $request->email,
-                ]);
-            }
+    // 2. LOGIKA KONSISTENSI
+    $kelasId = $request->kelas_id;
+    $tahunAjaranId = $request->tahun_ajaran_id;
 
-        // Update data Siswa (Akademik)
-        $siswa->update([
-            'nisn' => $request->nisn,
-            'nama_lengkap' => $request->name, // <--- BARU: Sinkronkan nama di tabel siswa
-            'kelas_id' => $request->kelas_id,
-            'jenis_kelamin' => $request->jenis_kelamin,
-            'tahun_ajaran_id' => $request->tahun_ajaran_id, 
-            'status' => $request->status,
+    // Jika status TIDAK Aktif, maka Kelas dan Tahun Ajaran dipaksa NULL
+    if ($request->status !== 'Aktif') {
+        $kelasId = null;
+        // Optional: Biasanya siswa lulus/pindah tahun ajarannya tetap disimpan 
+        // untuk arsip, tapi jika ingin null juga, aktifkan baris bawah ini:
+        // $tahunAjaranId = null; 
+    }
+
+    // 3. Update data User
+    if ($siswa->user) {
+        $siswa->user->update([
+            'name' => $request->name,
+            'email' => $request->email,
         ]);
+    }
 
-        return redirect()->route('admin.siswas.index')->with('success', 'Data siswa diperbarui!');
-    });
+    // 4. Update data Siswa
+    $siswa->update([
+        'nisn' => $request->nisn,
+        'nama_lengkap' => $request->name,
+        'kelas_id' => $kelasId, // Menggunakan variabel yang sudah difilter IF di atas
+        'jenis_kelamin' => $request->jenis_kelamin,
+        'tahun_ajaran_id' => $tahunAjaranId, 
+        'status' => $request->status,
+    ]);
+
+    return redirect()->route('admin.manajemen-user.index')->with('success', 'Data siswa berhasil diperbarui!');
+        });
     }
 
     // === 5. HAPUS SISWA ===
@@ -205,6 +235,7 @@ class SiswaController extends Controller
         $tahunAjaran = TahunAjaran::where('is_active', true)->get();
         return view('admin.data_siswa.create', compact('kelas', 'tahunAjaran'));
     }
+
     
     // === 7. PROSES STORE (MANUAL) ===
 public function store(Request $request)
