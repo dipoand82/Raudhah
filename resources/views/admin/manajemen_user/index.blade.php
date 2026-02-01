@@ -61,7 +61,11 @@
                         {{-- 1. TOOLBAR FILTER & SEARCH --}}
                         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
                             {{-- Form Filter --}}
-                            <form method="GET" action="{{ route('admin.manajemen-user.index') }}" class="w-full lg:w-3/4 flex flex-col md:flex-row gap-2">
+                            <form method="GET" action="{{ route('admin.manajemen-user.index') }}" class="w-full lg:w-3/4 flex flex-col md:flex-row gap-2"
+                                 x-data="{ 
+                                    status: '{{ request('status', '') }}', 
+                                    kelas: '{{ request('kelas_id', '') }}' 
+                                }"   >
                                 <input type="hidden" name="tab" value="siswa"> 
                                 <input type="hidden" name="per_page" value="{{ request('per_page', 10) }}">
 
@@ -75,7 +79,13 @@
 
                                 {{-- Filter Kelas --}}
                                 <div class="w-full md:w-1/4">
-                                    <select name="kelas_id" onchange="this.form.submit()" class="w-full rounded-full border-gray-300 py-2 pl-4 pr-8 shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42] cursor-pointer text-gray-700 text-sm">
+                                    <select name="kelas_id" x-model="kelas" onchange="this.form.submit()" 
+                                    {{-- LOGIKA: Jika milih kelas spesifik, status otomatis jadi Aktif --}}
+                                    @change="if(kelas !== '') { status = 'Aktif' }; $nextTick(() => $el.form.submit())"
+                                    {{-- Dropdown terkunci jika status dipilih dan bukan Aktif --}}
+                                    :disabled="status !== '' && status !== 'Aktif'"
+                                    :class="status !== '' && status !== 'Aktif' ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''"
+                                    class="w-full rounded-full border-gray-300 py-2 pl-4 pr-8 shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42] cursor-pointer text-gray-700 text-sm">
                                         <option value="">-- Semua Kelas --</option>
                                         @foreach($kelas as $k) 
                                             <option value="{{ $k->id }}" {{ request('kelas_id') == $k->id ? 'selected' : '' }}>
@@ -86,7 +96,7 @@
                                 </div>
 
                                 {{-- Filter Status --}}
-                                <div class="w-full md:w-1/5">
+                                <div class="w-full md:w-1/4">
                                     @php
                                         $selectedStatus = request('status');
                                         $filterStatusClass = match($selectedStatus) {
@@ -98,9 +108,11 @@
                                             default  => 'bg-white text-gray-700 border-gray-300',
                                         };
                                     @endphp
-                                    <select name="status" onchange="this.form.submit()" 
-                                         class="w-full rounded-full py-2 pl-4 pr-8 shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42] cursor-pointer text-sm border"> {{--{{ $filterStatusClass }}"> --}}
-                                        <option value="" class="bg-white text-gray-700">-- Status --</option>
+                                    <select name="status" x-model="status" onchange="this.form.submit()" 
+                                        {{-- LOGIKA GABUNGAN: Reset kelas jika milih default (kosong) ATAU status selain Aktif --}}
+                                     @change="if(status === '' || status !== 'Aktif') { kelas = '' }; $nextTick(() => $el.form.submit())"
+                                     class="w-full rounded-full py-2 pl-4 pr-8 shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42] cursor-pointer text-sm border"> {{--{{ $filterStatusClass }}"> --}}
+                                        <option value="" class="bg-white text-gray-700">-- Semua Status --</option>
                                         @foreach(['Aktif','Cuti', 'Lulus', 'Pindah', 'Keluar'] as $st)
                                             <option value="{{ $st }}" {{ $selectedStatus == $st ? 'selected' : '' }} class="bg-white text-gray-700">
                                                 {{ $st }}

@@ -1,4 +1,4 @@
-<x-app-layout>
+{{-- <x-app-layout>
     <x-slot name="header">
         <div class="bg-gradient-to-r from-blue-600 to-blue-400 rounded-lg shadow-lg">
             <h2 class="font-bold text-2xl text-white leading-tight py-4 px-6">
@@ -87,4 +87,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-app-layout> --}}

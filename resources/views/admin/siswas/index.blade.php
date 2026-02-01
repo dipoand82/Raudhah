@@ -1,4 +1,4 @@
-<x-app-layout>
+{{-- <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Manajemen Siswa') }}
@@ -36,7 +36,7 @@
                 </div>
 
                 <div class="mb-6 bg-blue-50 p-4 rounded-lg border border-blue-100 flex items-center justify-between">
-                    <span class="text-sm text-blue-800 font-medium">💡 Mau upload data cepat?</span>
+                    <span class="text-sm text-blue-800 font-medium"> Mau upload data cepat?</span>
                     <form action="{{ route('admin.siswas.import') }}" method="POST" enctype="multipart/form-data" class="flex gap-2 items-center">
                         @csrf
                         <input type="file" name="file" class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200" required>
@@ -74,7 +74,7 @@
                                 </td>
 
                                 <td class="py-3 px-4 text-gray-700">
-                                    {{-- Mengambil dari relasi tahun_ajaran, jika null tampilkan default --}}
+                                    Mengambil dari relasi tahun_ajaran, jika null tampilkan default
                                     {{ $siswa->tahun_ajaran->tahun ?? '2024/2025' }}
                                 </td>
 
@@ -98,7 +98,7 @@
                                     <a href="#" class="text-blue-600 hover:underline text-sm font-medium">Edit</a>
                                     <form action="#" method="POST" onsubmit="return confirm('Hapus siswa ini?');" class="inline">
                                         @csrf 
-                                        {{-- @method('DELETE') --}}
+                                        @method('DELETE')
                                         <button type="button" class="text-red-600 hover:underline text-sm font-medium">Hapus</button>
                                     </form>
                                 </td>
@@ -121,4 +121,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</x-app-layout> --}}

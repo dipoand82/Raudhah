@@ -58,9 +58,10 @@ class SiswaController extends Controller
         }
 
         // Filter Status
-        if ($request->filled('status')) {
+        if ($request->filled('status') ) {
             $query->where('siswas.status', $request->status);
         }
+        
 
         // ==========================================================
         // D. Logika Pengurutan

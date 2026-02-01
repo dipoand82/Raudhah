@@ -130,7 +130,7 @@
 
                                                     <div class="flex justify-end gap-3 pt-4 border-t">
                                                         <x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button>
-                                                        <x-primary-button class="!bg-[#3B3E42] hover:!bg-[#2f3235]">Simpan Perubahan</x-primary-button>
+                                                        <x-primary-button >Simpan Perubahan</x-primary-button>
                                                     </div>
                                                 </form>
                                             </div>

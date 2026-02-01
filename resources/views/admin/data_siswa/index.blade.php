@@ -21,9 +21,13 @@
                 <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
                     
                     {{-- FORM PENCARIAN & FILTER --}}
-                    <form method="GET" action="{{ route('admin.siswas.index') }}" class="w-full lg:w-2/3 flex flex-col md:flex-row gap-3">
-                        <input type="hidden" name="per_page" value="{{ request('per_page', 30) }}">
-
+                    <form method="GET" action="{{ route('admin.siswas.index') }}" 
+                        class="w-full lg:w-2/3 flex flex-col md:flex-row gap-3"
+                        x-data="{ 
+                            status: '{{ request('status', '') }}', 
+                            kelas: '{{ request('kelas_id', '') }}' 
+                        }">
+                            <input type="hidden" name="per_page" value="{{ request('per_page', 30) }}">
                         <div class="relative w-full md:w-1/3">
                             <input type="text" name="search" value="{{ request('search') }}"
                                 placeholder="Cari Nama / NISN"
@@ -33,7 +37,13 @@
                             </button>
                         </div>
                         <div class="w-full md:w-1/4">
-                            <select name="kelas_id" onchange="this.form.submit()" 
+                            <select name="kelas_id" x-model="kelas" onchange="this.form.submit()" 
+                            {{-- LOGIKA 1: Jika pilih kelas (bukan kosong), otomatis status jadi Aktif --}}
+                            @change="if(kelas !== '') { status = 'Aktif' }; $nextTick(() => $el.form.submit())" 
+                            {{-- LOGIKA 2: Mati jika status dipilih DAN status itu bukan Aktif --}}
+                            :disabled="status !== '' && status !== 'Aktif'"
+                            {{-- LOGIKA 3: Beri warna abu-abu jika mati --}}
+                            :class="status !== '' && status !== 'Aktif' ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''"
                                 class="w-full rounded-full border-gray-300 py-2 pl-4 pr-8 shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42] cursor-pointer text-gray-700">
                                 <option value="">-- Semua Kelas --</option>
                                 @foreach($kelas as $k) 
@@ -44,7 +54,11 @@
                             </select>
                         </div>
                         <div class="w-full md:w-1/4">
-                            <select name="status" onchange="this.form.submit()" 
+                            <select name="status" x-model="status" onchange="this.form.submit()" 
+                                {{-- LOGIKA: Jika status diubah ke selain Aktif/Kosong, reset dropdown Kelas ke Semua Kelas --}}
+                                {{-- @change="if(status !== '' && status !== 'Aktif') { kelas = '' }; $nextTick(() => $el.form.submit())" --}}
+                                {{-- LOGIKA GABUNGAN: Reset kelas jika milih 'Semua Status' ATAU status selain 'Aktif' --}}
+                                @change="if(status === '' || status !== 'Aktif') { kelas = '' }; $nextTick(() => $el.form.submit())"
                                 class="w-full rounded-full border-gray-300 py-2 pl-4 pr-8 shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42] cursor-pointer text-gray-700">
                                 <option value="">-- Semua Status --</option>
                                 @foreach(['Aktif','Cuti', 'Lulus', 'Pindah', 'Keluar'] as $st)
@@ -204,7 +218,7 @@
 
                                                 <div class="mt-6 flex justify-end gap-3 border-t pt-4">
                                                     <x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button>
-                                                    <x-primary-button class="bg-[#3B3E42]">Simpan Perubahan</x-primary-button>
+                                                    <x-primary-button >Simpan Perubahan</x-primary-button>
                                                 </div>
                                             </form>
                                         </div>
