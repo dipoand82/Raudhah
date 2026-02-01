@@ -11,14 +11,18 @@
     <nav class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center gap-3">
-                    @if($profil_sekolah && $profil_sekolah->logo_path)
-                        {{-- <img src="{{ asset('storage/' . $profil_sekolah->logo_path) }}" alt="Logo" class="h-10 w-10 object-contain"> --}}
-                    @else
-                        {{-- <div class="h-10 w-10 bg-gray-300 rounded-full flex items-center justify-center text-xs font-bold">LOGO</div> --}}
-                    @endif
-                    <span class="font-bold text-xl text-blue-900">{{ $profil_sekolah->nama_sekolah ?? 'SMP IT Raudhah' }}</span>
-                </div>
+            <div class="flex items-center gap-3">
+                {{-- BARIS DIBAWAH INI DIGANTI --}}
+                @if(file_exists(public_path('storage/logos/logo_smp_raudhah.PNG')))
+                    <img src="{{ asset('storage/logos/logo_smp_raudhah.PNG') }}" alt="Logo" class="h-10 w-10 object-contain">
+                @elseif($profil_sekolah && $profil_sekolah->logo_path)
+                    <img src="{{ asset('storage/' . $profil_sekolah->logo_path) }}" alt="Logo" class="h-10 w-10 object-contain">
+                @else
+                    <div class="h-10 w-10 bg-gray-300 rounded-full flex items-center justify-center text-xs font-bold">LOGO</div>
+                @endif
+                
+                <span class="font-bold text-xl text-blue-900">{{ $profil_sekolah->nama_sekolah ?? 'SMP IT Raudhah' }}</span>
+            </div>
 
                 <div class="flex items-center gap-4">
                     @if (Route::has('login'))
@@ -33,20 +37,31 @@
         </div>
     </nav>
 
-    <div class="relative bg-gray-200 h-64 md:h-96 flex items-center justify-center overflow-hidden">
-        @if($profil_sekolah && $profil_sekolah->banner_path)
-            <img src="{{ asset('storage/' . $profil_sekolah->banner_path) }}" alt="Banner" class="absolute w-full h-full object-cover opacity-80">
-        @else
-            <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-400 opacity-90"></div>
-        @endif
-        
-        <div class="relative z-10 text-center px-4">
-            <h1 class="text-3xl md:text-5xl font-bold text-white drop-shadow-md mb-2">
-                {{ $profil_sekolah->nama_sekolah ?? 'Selamat Datang' }}
-            </h1>
-            <p class="text-white text-lg md:text-xl drop-shadow-sm">Mewujudkan Generasi Cerdas & Berakhlak Mulia</p>
-        </div>
+<div class="relative bg-gray-200 h-64 md:h-96 flex items-center justify-center overflow-hidden">
+    @if($profil_sekolah && $profil_sekolah->banner_path)
+        {{-- Foto dari database --}}
+        <img src="{{ asset('storage/' . $profil_sekolah->banner_path) }}" alt="Banner" class="absolute w-full h-full object-cover">
+        {{-- TARO DI SINI: Lapisan biru di atas foto database --}}
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-600/60 to-cyan-500/60"></div>
+
+    @elseif(file_exists(public_path('storage/logos/profil_smp_raudhah.png'))) 
+        {{-- Foto statis --}}
+        <img src="{{ asset('storage/logos/profil_smp_raudhah.png') }}" alt="Banner Default" class="absolute w-full h-full object-cover">
+        {{-- TARO DI SINI: Lapisan biru di atas foto statis --}}
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-600/60 to-cyan-500/60"></div>
+
+    @else
+        {{-- Tampilan jika sama sekali tidak ada foto (hanya warna saja) --}}
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-400 opacity-90"></div>
+    @endif
+    
+    <div class="relative z-10 text-center px-4">
+        <h1 class="text-3xl md:text-5xl font-bold text-white drop-shadow-md mb-2">
+            {{ $profil_sekolah->nama_sekolah ?? 'Selamat Datang' }}
+        </h1>
+        <p class="text-white text-lg md:text-xl drop-shadow-sm font-semibold">Mewujudkan Generasi Cerdas & Berakhlak Mulia</p>
     </div>
+</div>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
 

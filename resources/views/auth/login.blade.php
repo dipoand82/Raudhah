@@ -11,11 +11,11 @@
             </div>
         </div>
         <h1 class="text-2xl font-extrabold text-gray-900 leading-tight mb-1">SMP IT Raudhah</h1>
-        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">Sistem Pembayaran SPP</p>
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">Masuk Ke Sistem Pembayaran SPP</p>
     </div>
 
     {{-- TABEL LOGIN --}}
-    <div class="w-full max-w-sm bg-white rounded-[2rem] shadow-xl border border-gray-100 p-8">
+    <div class="w-full max-w-sm bg-white rounded-[2rem] shadow-xl border border-gray-100 p-6">
         <x-auth-session-status class="mb-4" :status="session('status')" />
 
         <form method="POST" action="{{ route('login') }}" class="space-y-5">

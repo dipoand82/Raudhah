@@ -1,18 +1,16 @@
 <aside 
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-    class="w-64 bg-white border-r border-gray-200 flex flex-col h-screen fixed left-0 top-0 z-50 transition-transform duration-300 ease-in-out md:translate-x-0">
+    class="w-64 bg-white border-r border-gray-200 flex flex-col h-screen fixed left-0 top-0 z-50 transition-transform duration-300 ease-in-out md:translate-x-0 ">
     
 {{-- HEADER SIDEBAR --}}
+{{-- HEADER SIDEBAR --}}
 <div class="h-20 border-b border-gray-200 flex items-center px-4 relative">
-    <div class="flex items-center gap-3">
-        {{-- <div class="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50 p-1 border border-gray-100">
-            <img src="{{ asset('images/logo_smp_raudhah.png') }}" alt="Logo Raudhah" class="w-full h-full object-contain">
-        </div> --}}
-        <div class="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-white flex items-center justify-center border border-blue-100 p-1 shadow-sm">
-        {{-- Ganti bagian nama file dengan salah satu nama file acak yang ada di folder logos Anda --}}
-        <img src="{{ asset('storage/logos/logo_smp_raudhah.png') }}" 
-             alt="Logo SMP IT Raudhah" 
-             class="w-full h-full object-contain">
+    {{-- Tambahkan tag <a> di sini --}}
+    <a href="{{ url('/') }}" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+        <div class="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-white flex items-center justify-center border-[#1072B8] p-1 shadow-sm">
+            <img src="{{ asset('storage/logos/logo_smp_raudhah.png') }}" 
+                 alt="Logo SMP IT Raudhah" 
+                 class="w-full h-full object-contain">
         </div>
 
         <div class="overflow-hidden">
@@ -26,9 +24,9 @@
                 Sistem Pembayaran SPP
             </p>
         </div>
-    </div>
+    </a> {{-- Penutup tag <a> --}}
 
-    {{-- Tombol Tutup Sidebar (Mobile Only) --}}
+    {{-- Tombol Tutup Sidebar (Mobile Only) Tetap di luar <a> agar tidak ikut terklik --}}
     <button @click="sidebarOpen = false" class="md:hidden absolute right-2 top-2 text-gray-400 hover:text-red-500 transition">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>

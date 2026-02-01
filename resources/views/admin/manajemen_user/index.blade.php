@@ -4,7 +4,7 @@
     </x-slot>
 
     <div class="py-12" x-data="{ activeTab: 'siswa' }">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
 
             {{-- ALERT ERROR --}}
             {{-- @if ($errors->any())
@@ -47,9 +47,9 @@
                 {{-- TAB NAVIGATION --}}
                 <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
                     <div class="flex space-x-6">
-                        <button @click="activeTab = 'siswa'" :class="{ 'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'siswa' }" class="pb-2 text-[#1072B8] hover:text-[#45a4df] transition duration-150 font-medium">Siswa</button>
-                        <button @click="activeTab = 'guru'" :class="{ 'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'guru' }" class="pb-2 text-[#1072B8] hover:text-[#45a4df] transition duration-150 font-medium">Guru</button>
-                        <button @click="activeTab = 'password'" :class="{ 'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'password' }" class="pb-2 text-[#1072B8] hover:text-[#45a4df] transition duration-150 font-medium">Pengaturan & Panduan</button>
+                        <button @click="activeTab = 'siswa'" :class="{ 'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'siswa' }" class="pb-2 text-[#1072B8] hover:text-[#0b5A91] transition duration-150 font-medium">Siswa</button>
+                        <button @click="activeTab = 'guru'" :class="{ 'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'guru' }" class="pb-2 text-[#1072B8] hover:text-[#0b3149] transition duration-150 font-medium">Guru</button>
+                        <button @click="activeTab = 'panduan'" :class="{ 'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'panduan' }" class="pb-2 text-[#1072B8] hover:text-[#0b3149] transition duration-150 font-medium">Panduan</button>
                     </div>
                 </div>
 
@@ -171,57 +171,57 @@
                                     <div><h3 class="text-sm font-bold text-blue-800 mb-1">Langkah 1: Siapkan File</h3><p class="text-xs text-blue-600">Gunakan template resmi.</p></div>
                                     <a href="{{ route('admin.manajemen-user.siswa.template')}}" class="bg-white text-blue-700 hover:bg-blue-100 border border-blue-300 px-3 py-2 rounded text-sm font-bold shadow-sm transition flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>Template</a>
                                 </div>
-<div class="mb-6" x-data="{ fileName: '', fileInput: null }"> 
-    <h3 class="text-sm font-bold text-gray-700 mb-2">Langkah 2: Upload File</h3>
-    
-    <div class="relative border-2 border-dashed rounded-lg p-8 transition text-center group"
-        :class="fileName 
-            ? 'border-green-500 bg-green-50' 
-            : 'border-gray-300 bg-gray-50 hover:border-[#3B3E42]'">
+                                <div class="mb-6" x-data="{ fileName: '', fileInput: null }"> 
+                                    <h3 class="text-sm font-bold text-gray-700 mb-2">Langkah 2: Upload File</h3>
+                                    
+                                    <div class="relative border-2 border-dashed rounded-lg p-8 transition text-center group"
+                                        :class="fileName 
+                                            ? 'border-green-500 bg-green-50' 
+                                            : 'border-gray-300 bg-gray-50 hover:border-[#3B3E42]'">
 
-        {{-- Input File Utama --}}
-        <input type="file" 
-            name="file" 
-            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
-            required 
-            accept=".xlsx, .xls, .csv" 
-            @change="fileName = $event.target.files[0] ? $event.target.files[0].name : ''"
-            x-ref="fileInput">
-            
-        {{-- Tombol Silang (X) di Pojok Kanan Atas --}}
-        <template x-if="fileName">
-            <button type="button" 
-                @click="fileName = ''; $refs.fileInput.value = ''" 
-                class="absolute top-2 right-2 z-20 p-1 rounded-full bg-white shadow-sm border border-green-200 text-green-600 hover:bg-green-100 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </template>
+                                        {{-- Input File Utama --}}
+                                        <input type="file" 
+                                            name="file" 
+                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+                                            required 
+                                            accept=".xlsx, .xls, .csv" 
+                                            @change="fileName = $event.target.files[0] ? $event.target.files[0].name : ''"
+                                            x-ref="fileInput">
+                                            
+                                        {{-- Tombol Silang (X) di Pojok Kanan Atas --}}
+                                        <template x-if="fileName">
+                                            <button type="button" 
+                                                @click="fileName = ''; $refs.fileInput.value = ''" 
+                                                class="absolute top-2 right-2 z-20 p-1 rounded-full bg-white shadow-sm border border-green-200 text-green-600 hover:bg-green-100 transition-colors">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </template>
 
-        <div class="pointer-events-none space-y-2 flex flex-col items-center justify-center">
-            <div class="mb-2">
-                {{-- Logo Awan Panah Bawah (Cloud Download) --}}
-                <svg class="w-12 h-12 transition-colors duration-300" 
-                    :class="fileName ? 'text-green-500' : 'text-gray-400'"
-                    fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10">
-                    </path>
-                </svg>
-            </div>
+                                        <div class="pointer-events-none space-y-2 flex flex-col items-center justify-center">
+                                            <div class="mb-2">
+                                                {{-- Logo Awan Panah Bawah (Cloud Download) --}}
+                                                <svg class="w-12 h-12 transition-colors duration-300" 
+                                                    :class="fileName ? 'text-green-500' : 'text-gray-400'"
+                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10">
+                                                    </path>
+                                                </svg>
+                                            </div>
 
-            <p class="text-sm font-medium text-center transition-colors duration-300" 
-                :class="fileName ? 'text-green-700 font-bold' : 'text-gray-600'"
-                x-text="fileName ? 'File: ' + fileName : 'Klik untuk pilih file'">
-            </p>
-            
-            <template x-if="fileName">
-                <p class="text-xs text-green-600">File siap diunggah!</p>
-            </template>
-        </div>
-    </div>
-</div>
+                                            <p class="text-sm font-medium text-center transition-colors duration-300" 
+                                                :class="fileName ? 'text-green-700 font-bold' : 'text-gray-600'"
+                                                x-text="fileName ? 'File: ' + fileName : 'Klik untuk pilih file'">
+                                            </p>
+                                            
+                                            <template x-if="fileName">
+                                                <p class="text-xs text-green-600">File siap diunggah!</p>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="flex justify-end gap-3 pt-4 border-t">
                                     <x-secondary-button x-on:click="$dispatch('close')" type="button">Batal</x-secondary-button>
                                     <x-primary-button ::disabled="isLoading"><span x-text="isLoading ? 'Memproses...' : 'Proses Import'"></span></x-primary-button>
@@ -229,42 +229,42 @@
                             </form>
                         </x-modal>
 
-              {{-- Notifikasi Informasi Fallback Kelas --}}
-{{-- NOTIFIKASI MERAH (Error Database/Format) --}}
-@if (session()->has('import_errors'))
-    <div x-data="{ open: true }" x-show="open" class="relative mb-4 p-4 bg-red-50  border-red-500 rounded shadow-sm border-2 border-red-500 p-4 rounded-lg mb-4">
-        <p class="text-red-800 font-bold mb-2 ">Data Tidak Lengkap / Salah Format:</p>
-        <ul class="list-disc list-inside text-xs text-red-700">
-            @foreach (session()->get('import_errors') as $failure)
-                <li>Baris {{ $failure->row() }}: {{ $failure->errors()[0] }}</li>
-            @endforeach
-        </ul>
-        {{-- Tombol Silang --}}
-        <button @click="open = false" class="absolute top-2 right-2 text-red-400 hover:text-red-600 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-        </button>
-    </div>
-@endif
+                    {{-- Notifikasi Informasi Fallback Kelas --}}
+                        {{-- NOTIFIKASI MERAH (Error Database/Format) --}}
+                        @if (session()->has('import_errors'))
+                            <div x-data="{ open: true }" x-show="open" class="relative mb-4 p-4 bg-red-50  border-red-500 rounded shadow-sm border-2 border-red-500 p-4 rounded-lg mb-4">
+                                <p class="text-red-800 font-bold mb-2 ">Data Tidak Lengkap / Salah Format:</p>
+                                <ul class="list-disc list-inside text-xs text-red-700">
+                                    @foreach (session()->get('import_errors') as $failure)
+                                        <li>Baris {{ $failure->row() }}: {{ $failure->errors()[0] }}</li>
+                                    @endforeach
+                                </ul>
+                                {{-- Tombol Silang --}}
+                                <button @click="open = false" class="absolute top-2 right-2 text-red-400 hover:text-red-600 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        @endif
 
-{{-- NOTIFIKASI BIRU (Informasi Update Kelas) --}}
-@if (session()->has('fallback_info'))
-    <div x-data="{ open: true }" x-show="open" class="relative mb-4 p-4 bg-blue-50 border-blue-500 rounded shadow-sm border-2 border-blue-500 p-4 rounded-lg mb-4">
-        <p class="text-blue-800 font-bold mb-2">Informasi Penyesuaian Kelas:</p>
-        <ul class="list-disc list-inside text-xs text-blue-700">
-            @foreach (session()->get('fallback_info') as $info)
-                <li>Siswa <strong>{{ $info['nama'] }}</strong>: Kelas "{{ $info['input'] }}" tidak terdaftar, sistem tetap menggunakan <strong>{{ $info['tetap'] }}</strong>.</li>
-            @endforeach
-        </ul>
-        {{-- Tombol Silang --}}
-        <button @click="open = false" class="absolute top-2 right-2 text-blue-400 hover:text-blue-600 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-        </button>
-    </div>
-@endif
+                        {{-- NOTIFIKASI BIRU (Informasi Update Kelas) --}}
+                        @if (session()->has('fallback_info'))
+                            <div x-data="{ open: true }" x-show="open" class="relative mb-4 p-4 bg-blue-50 border-blue-500 rounded shadow-sm border-2 border-blue-500 p-4 rounded-lg mb-4">
+                                <p class="text-blue-800 font-bold mb-2">Informasi Penyesuaian Kelas:</p>
+                                <ul class="list-disc list-inside text-xs text-blue-700">
+                                    @foreach (session()->get('fallback_info') as $info)
+                                        <li>Siswa <strong>{{ $info['nama'] }}</strong>: Kelas "{{ $info['input'] }}" tidak terdaftar, sistem tetap menggunakan <strong>{{ $info['tetap'] }}</strong>.</li>
+                                    @endforeach
+                                </ul>
+                                {{-- Tombol Silang --}}
+                                <button @click="open = false" class="absolute top-2 right-2 text-blue-400 hover:text-blue-600 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        @endif
 
                         {{-- 2. TABEL SISWA --}}
                         
@@ -537,86 +537,83 @@
                             </table>
                         </div>
                     </div>
-
-                    {{-- ================= KONTEN TAB PASSWORD ================= --}}
-<div x-show="activeTab === 'password'" x-transition>
-    {{-- Container utama menggunakan items-stretch agar tinggi kiri dan kanan dipaksa sama --}}
-    <div class="max-w-6xl mx-auto flex flex-col md:flex-row gap-6 mt-6 items-stretch">
-        
-        {{-- FORM UBAH PASSWORD (Kiri) --}}
-        {{-- Hapus h-fit agar kotak putih ini juga bisa memanjang jika konten kanan lebih panjang --}}
-        <div class="w-full md:w-1/2 bg-white p-8 rounded-lg shadow-sm border border-gray-200 flex flex-col">
-            <h3 class="font-bold text-lg mb-6 text-[#1072B8] flex items-center gap-2 border-b pb-4">
-                Ubah Password Admin
-            </h3>
-            
-            <form action="{{ route('admin.manajemen-user.password.update') }}" method="POST" autocomplete="off" class="flex-grow">
-                @csrf @method('PUT')
+{{-- TAMBAHKAN PEMBUNGKUS INI DI BARIS 241 --}}
+<div x-show="activeTab === 'panduan'" x-transition>
+        <div class="p-2 md:p-2">
+            {{-- Wrapper Utama: Menumpuk di HP (flex-col), Berdampingan di Desktop (md:flex-row) --}}
+            {{-- Gap-6 memberikan jarak antar kotak saat mode HP --}}
+            <div class="flex flex-col md:flex-row gap-6 items-stretch">
                 
-                <input type="text" style="display:none;" aria-hidden="true">
-                <input type="password" style="display:none;" aria-hidden="true">
+                {{-- KOTAK INFORMASI ALUR (Kiri - Kuning/Amber) --}}
+                <div class="w-full md:w-1/2 bg-amber-50 border border-amber-200 rounded-lg p-6 md:p-8 flex flex-col">
+                    <div class="flex items-start gap-3 mb-6">
+                        <div class="text-amber-600 flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                            </svg>
+                        </div>
+                        <h3 class="font-bold text-amber-900 text-lg leading-tight">Inisialisasi Sistem & Update Data</h3>
+                    </div>
 
-                <div class="mb-4">
-                    <x-input-label :value="__('Password Saat Ini')" />
-                    <x-text-input type="password" name="current_password" class="w-full mt-1 focus:border-[#3B3E42]" required readonly onfocus="this.removeAttribute('readonly');" />
+                    <ul class="text-sm text-amber-800 space-y-5 flex-grow">
+                        <li class="flex gap-3">
+                            <span class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">1</span>
+                            <p><strong>Aktivasi Periode:</strong> Pertama kali di sistem, buka menu Tahun Ajaran dan set status menjadi <span class="font-bold text-amber-900">"Aktif"</span>.</p>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">2</span>
+                            <p><strong>Persiapan Kelas:</strong> Masuk ke fitur Kelas dan buat daftar kelas baru yang diperlukan untuk periode ini.</p>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">3</span>
+                            <p><strong>Import Data (Update-or-Create):</strong> Saat import Excel, sistem otomatis memperbarui tahun ajaran siswa ke tahun aktif. Data lama tercatat sebagai riwayat kelulusan.</p>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">4</span>
+                            <p><strong>Verifikasi Akhir:</strong> Periksa kembali data di Excel dan bandingkan dengan hasil sistem menggunakan <strong>filter per kelas</strong>.</p>
+                        </li>
+                    </ul>
+                    
+                    <div class="mt-8 pt-4 border-t border-amber-200 italic text-[11px] text-amber-600">
+                        *Sistem secara otomatis mendeteksi tahun ajaran aktif berdasarkan pengaturan global.
+                    </div>
                 </div>
 
-                <div class="mb-4">
-                    <x-input-label :value="__('Password Baru')" />
-                    <x-text-input type="password" name="password" class="w-full mt-1 focus:border-[#3B3E42]" required readonly onfocus="this.removeAttribute('readonly');" />
+                {{-- KOTAK INFORMASI ALUR (Kanan - Biru) --}}
+                <div class="w-full md:w-1/2 bg-blue-50 border border-blue-200 rounded-lg p-6 md:p-8 flex flex-col">
+                    <div class="flex items-start gap-3 mb-6">
+                        <div class="text-blue-600 flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h3 class="font-bold text-blue-900 text-lg leading-tight">Panduan Alur Update Data Siswa</h3>
+                    </div>
+
+                    <ul class="text-sm text-blue-800 space-y-5 flex-grow">
+                        <li class="flex gap-3">
+                            <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">1</span>
+                            <p><strong>Luluskan Kelas 9:</strong> Siswa kelas 9 diproses lulus (kelas jadi null), riwayat Tahun Ajaran tetap tersimpan.</p>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">2</span>
+                            <p><strong>Buka Tahun Ajaran:</strong> Atur status Tahun Ajaran baru menjadi <span class="font-bold">"Aktif"</span> pada menu pengaturan.</p>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">3</span>
+                            <p><strong>Import Excel:</strong> Unggah file Excel untuk update kelas siswa menggunakan fungsi <em>Update-or-Create</em>.</p>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">4</span>
+                            <p><strong>Otomatisasi:</strong> Tahun ajaran siswa akan otomatis diperbarui ke tahun aktif saat ini berdasarkan data import.</p>
+                        </li>
+                    </ul>
+                    
+                    <div class="mt-8 pt-4 border-t border-blue-200 italic text-[11px] text-blue-600">
+                        *Pastikan format file Excel sesuai dengan template yang disediakan.
+                    </div>
                 </div>
 
-                <div class="mb-8">
-                    <x-input-label :value="__('Konfirmasi Password Baru')" />
-                    <x-text-input type="password" name="password_confirmation" class="w-full mt-1 focus:border-[#3B3E42]" required readonly onfocus="this.removeAttribute('readonly');" />
-                </div>
-
-                <x-primary-button class="w-full py-3 justify-center">Simpan Password Baru</x-primary-button>
-            </form>
-        </div>
-
-        {{-- KOTAK INFORMASI ALUR (Kanan) --}}
-        {{-- Gunakan h-full dan flex-col agar footer nempel ke bawah --}}
-        <div class="w-full md:w-1/2 bg-blue-50 border border-blue-200 rounded-lg p-8 flex flex-col min-h-full">
-            <div class="flex items-start gap-3 mb-6">
-                <div class="text-blue-600">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <h3 class="font-bold text-blue-900 text-lg">Panduan Alur Update Data Siswa</h3>
-            </div>
-
-            {{-- Bagian List dengan flex-grow agar mendorong footer ke bawah --}}
-            <ul class="text-sm text-blue-800 space-y-5 flex-grow">
-                <li class="flex gap-3">
-                    <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">1</span>
-                    <p><strong>Luluskan Kelas 9:</strong> Siswa kelas 9 diproses lulus (kelas jadi null), namun riwayat Tahun Ajaran tetap tersimpan sebagai tahun kelulusan.</p>
-                </li>
-                <li class="flex gap-3">
-                    <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">2</span>
-                    <p><strong>Buka Tahun Ajaran:</strong> Atur status Tahun Ajaran baru menjadi <strong>"Aktif"</strong> pada menu pengaturan tahun ajaran.</p>
-                </li>
-                <li class="flex gap-3">
-                    <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">3</span>
-                    <p><strong>Import Excel:</strong> Unggah file Excel untuk update kelas siswa. Sistem menggunakan fungsi <em>Update-or-Create</em>.</p>
-                </li>
-                <li class="flex gap-3">
-                    <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">4</span>
-                    <p><strong>Otomatisasi:</strong> Tahun ajaran siswa akan otomatis diperbarui ke tahun aktif saat ini berdasarkan data yang di-import.</p>
-                </li>
-            </ul>
-            
-            {{-- Footer nempel di bawah --}}
-            <div class="mt-8 pt-4 border-t border-blue-200 italic text-xs text-blue-600">
-                *Pastikan format file Excel sesuai dengan template yang disediakan.
-            </div>
-        </div>
-
-    </div>
-</div>
-
-                </div>
             </div>
         </div>
     </div>

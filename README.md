@@ -69,7 +69,7 @@ scroll tabel
 <div class="overflow-x-auto bg-white rounded shadow">
 
 Warna #1072B8
-#256f9e
+#0b3149
 
 sec #313F4B
 
@@ -139,3 +139,9 @@ dropdown
                                         class="hover:!bg-red-800 hover:!text-white">
 {{ __('Log Out') }}
 </x-dropdown-link>
+
+layar hape pading good
+max-w-7xl mx-auto px-4 sm:px-6
+
+dihapus
+lg:px-8
