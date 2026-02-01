@@ -151,7 +151,7 @@ class SiswaController extends Controller
             // --- BARU: Pesan Error Kustom agar Admin tidak bingung ---
             'kelas_id.required_if' => 'Siswa dengan status Aktif wajib memiliki kelas!',
             'email.unique' => 'Email ini sudah digunakan oleh pengguna lain.',
-            'nisn.unique' => 'NISN sudah terdaftar.',
+            // 'nisn.unique' => 'NISN sudah terdaftar.',
         ]);
 
     return DB::transaction(function () use ($request, $siswa) {
@@ -245,7 +245,7 @@ public function store(Request $request)
     if (!$request->filled('email')) {
         // Ganti spasi jadi titik dan kecilkan semua huruf
         $cleanName = strtolower(str_replace(' ', '.', $request->name));
-        $generatedEmail = $cleanName . '.' . $request->nisn . '@sekolah.id';
+        $generatedEmail = $cleanName . '.' . $request->nisn . '@raudhah.com';
         $request->merge(['email' => $generatedEmail]);
     }
     // 1. Validasi Input

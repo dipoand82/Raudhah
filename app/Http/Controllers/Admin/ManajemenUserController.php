@@ -124,12 +124,12 @@ class ManajemenUserController extends Controller
             // Ambil kata pertama & ubah ke lowercase
             $namaDepan = Str::lower(explode(' ', trim($request->name))[0]);
             
-            // Format: namadepan.nisn@student.sekolah.id
-            $emailFinal = $namaDepan . '.' . $request->nisn . '@student.sekolah.id';
+            // Format: namadepan.nisn@raudhah.com
+            $emailFinal = $namaDepan . '.' . $request->nisn . '@raudhah.com';
             
             // Cek duplikasi email hasil generate
             if (User::where('email', $emailFinal)->exists()) {
-                $emailFinal = $namaDepan . $request->nisn . rand(1, 9) . '@student.sekolah.id';
+                $emailFinal = $namaDepan . $request->nisn . rand(1, 9) . '@raudhah.com';
             }
         }
 
@@ -166,29 +166,31 @@ class ManajemenUserController extends Controller
         });
     }
     // === 3. IMPORT SISWA ===
-    public function importSiswa(Request $request)
-    {
-        $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
-        
-        try {
-            $import = new \App\Imports\SiswaImport;
-            
-            // Sekarang ini akan berfungsi karena sudah ada 'use Importable'
-            $import->import($request->file('file'));
+ // === 3. IMPORT SISWA ===
+public function importSiswa(Request $request)
+{
+    $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
+    
+    try {
+        $import = new \App\Imports\SiswaImport;
+        $import->import($request->file('file'));
 
-            // Jika ada baris yang gagal (Zonk / Validasi Salah)
-            if ($import->failures()->isNotEmpty()) {
-                // Kita kirim data failures ke session 'import_errors'
-                return back()->with('import_errors', $import->failures());
-            }
-
-            return back()->with('success', 'Import Siswa Berhasil!
-            Cek kembali kesesuaian data siswa berdasarkan filter per kelas.');
-        } catch (\Exception $e) {
-            // Ini menangkap error fatal (seperti file rusak atau koneksi DB putus)
-            return back()->with('error', 'Gagal Import: ' . $e->getMessage());
+        // Simpan info fallback ke session (info biru)
+        if (!empty($import->fallbackClasses)) {
+            session()->flash('fallback_info', $import->fallbackClasses);
         }
+
+        // Cek jika ada kegagalan validasi (info merah)
+        if ($import->failures()->isNotEmpty()) {
+            // Kita gunakan flash agar bisa digabung dengan info biru di atas
+            return back()->with('import_errors', $import->failures());
+        }
+
+        return back()->with('success', 'Import Berhasil Selesai!');
+    } catch (\Exception $e) {
+        return back()->with('error', 'Gagal Total: ' . $e->getMessage());
     }
+}
 
     // === 4. DOWNLOAD TEMPLATE ===
     public function downloadTemplate()
@@ -263,7 +265,7 @@ class ManajemenUserController extends Controller
                 'must_change_password' => true,         // Paksa ganti password saat login nanti
             ]);
 
-            return back()->with('success', "Password siswa a.n {$siswa->nama_lengkap} berhasil di-reset kembali ke NISN ({$siswa->nisn}).");
+            return back()->with('success', "Password siswa {$siswa->nama_lengkap} berhasil di-reset kembali ke NISN ({$siswa->nisn}).");
         }
 
         return back()->with('error', 'Akun user tidak ditemukan untuk siswa ini.');

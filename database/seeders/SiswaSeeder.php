@@ -36,7 +36,7 @@ class SiswaSeeder extends Seeder
         // A. Buat Akun Login
         $userEman = User::create([
             'name' => 'Eman Santoso',
-            'email' => '0032190551@student.sekolah.id', // Pakai format email dummy sekolah
+            'email' => '0032190551@raudhah.com', // Pakai format email dummy sekolah
             'password' => Hash::make('123456'),
             'role' => 'siswa',
             'must_change_password' => true,
@@ -63,7 +63,7 @@ class SiswaSeeder extends Seeder
         // A. Buat Akun Login
         $userAni = User::create([
             'name' => 'Ani Suryani',
-            'email' => '0087654321@student.sekolah.id',
+            'email' => '0087654321@raudhah.com',
             'password' => Hash::make('123456'),
             'role' => 'siswa',
             'must_change_password' => true,

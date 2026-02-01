@@ -36,16 +36,16 @@
                     
                     {{-- 1. FORM TAMBAH TAHUN BARU --}}
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-[#3B3E42]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        <h3 class="text-lg font-bold text-[#1072B8] mb-4 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-[#1072B8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                             Tambah Tahun Ajaran Baru
                         </h3>
                         
                         <form action="{{ route('admin.tahun-ajaran.store') }}" method="POST" class="flex flex-col sm:flex-row gap-4 items-end">
                             @csrf
                             <div class="flex-grow w-full">
-                                <x-input-label value="Tahun (Cth: 2024/2025)" class="mb-1" />
-                                <input type="text" name="tahun" class="w-full rounded-md border-gray-300 shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42]" placeholder="2024/2025" required>
+                                <x-input-label value="Tahun (Cth: 2026/2027)" class="mb-1" />
+                                <input type="text" name="tahun" class="w-full rounded-md border-gray-300 shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42]" placeholder="2026/2027" required>
                             </div>
                             
                             <x-primary-button class="w-full sm:w-auto justify-center h-[42px]">

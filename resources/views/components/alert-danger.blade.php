@@ -21,7 +21,7 @@
 
     {{-- Tombol Silang Besar --}}
     <button @click="show = false" 
-            class="text-red-800 hover:text-red-950 transition duration-150 flex items-center justify-center">
+            class="text-red-500 hover:text-red-850 transition duration-150 flex items-center justify-center">
         <span class="text-3xl leading-none">&times;</span>
     </button>
 </div>

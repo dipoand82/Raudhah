@@ -47,13 +47,14 @@
                 {{-- TAB NAVIGATION --}}
                 <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
                     <div class="flex space-x-6">
-                        <button @click="activeTab = 'siswa'" :class="{ 'border-b-2 border-[#3B3E42] text-[#3B3E42] font-bold': activeTab === 'siswa' }" class="pb-2 text-gray-500 hover:text-[#3B3E42] transition duration-150 font-medium">Siswa</button>
-                        <button @click="activeTab = 'guru'" :class="{ 'border-b-2 border-[#3B3E42] text-[#3B3E42] font-bold': activeTab === 'guru' }" class="pb-2 text-gray-500 hover:text-[#3B3E42] transition duration-150 font-medium">Guru</button>
-                        <button @click="activeTab = 'password'" :class="{ 'border-b-2 border-[#3B3E42] text-[#3B3E42] font-bold': activeTab === 'password' }" class="pb-2 text-gray-500 hover:text-[#3B3E42] transition duration-150 font-medium">Ubah Password</button>
+                        <button @click="activeTab = 'siswa'" :class="{ 'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'siswa' }" class="pb-2 text-[#1072B8] hover:text-[#45a4df] transition duration-150 font-medium">Siswa</button>
+                        <button @click="activeTab = 'guru'" :class="{ 'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'guru' }" class="pb-2 text-[#1072B8] hover:text-[#45a4df] transition duration-150 font-medium">Guru</button>
+                        <button @click="activeTab = 'password'" :class="{ 'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'password' }" class="pb-2 text-[#1072B8] hover:text-[#45a4df] transition duration-150 font-medium">Pengaturan & Panduan</button>
                     </div>
                 </div>
 
                 <div class="min-h-[400px]">
+                    
 
                     {{-- ================= KONTEN TAB SISWA ================= --}}
                     <div x-show="activeTab === 'siswa'" x-transition>
@@ -170,32 +171,57 @@
                                     <div><h3 class="text-sm font-bold text-blue-800 mb-1">Langkah 1: Siapkan File</h3><p class="text-xs text-blue-600">Gunakan template resmi.</p></div>
                                     <a href="{{ route('admin.manajemen-user.siswa.template')}}" class="bg-white text-blue-700 hover:bg-blue-100 border border-blue-300 px-3 py-2 rounded text-sm font-bold shadow-sm transition flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>Template</a>
                                 </div>
-                                <div class="mb-6" x-data="{ fileName: '' }"> <h3 class="text-sm font-bold text-gray-700 mb-2">Langkah 2: Upload File</h3>
-                                    
-                                    <div class="relative border-2 border-dashed rounded-lg p-8 transition text-center group"
-                                        :class="fileName 
-                                            ? 'border-green-500 bg-green-50' 
-                                            : 'border-gray-300 bg-gray-50 hover:border-[#3B3E42]'">
+<div class="mb-6" x-data="{ fileName: '', fileInput: null }"> 
+    <h3 class="text-sm font-bold text-gray-700 mb-2">Langkah 2: Upload File</h3>
+    
+    <div class="relative border-2 border-dashed rounded-lg p-8 transition text-center group"
+        :class="fileName 
+            ? 'border-green-500 bg-green-50' 
+            : 'border-gray-300 bg-gray-50 hover:border-[#3B3E42]'">
 
-                                        <input type="file" 
-                                            name="file" 
-                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
-                                            required 
-                                            accept=".xlsx, .xls, .csv" 
-                                            @change="fileName = $event.target.files[0] ? $event.target.files[0].name : ''">
-                                            
-                                        <div class="pointer-events-none space-y-2">
-                                            <p class="text-sm font-medium" 
-                                            :class="fileName ? 'text-green-700 font-bold' : 'text-gray-600'"
-                                            x-text="fileName ? 'File: ' + fileName : 'Klik untuk pilih file'">
-                                            </p>
-                                            
-                                            <template x-if="fileName">
-                                                <p class="text-xs text-green-600">File siap diunggah!</p>
-                                            </template>
-                                        </div>
-                                    </div>
-                                </div>
+        {{-- Input File Utama --}}
+        <input type="file" 
+            name="file" 
+            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+            required 
+            accept=".xlsx, .xls, .csv" 
+            @change="fileName = $event.target.files[0] ? $event.target.files[0].name : ''"
+            x-ref="fileInput">
+            
+        {{-- Tombol Silang (X) di Pojok Kanan Atas --}}
+        <template x-if="fileName">
+            <button type="button" 
+                @click="fileName = ''; $refs.fileInput.value = ''" 
+                class="absolute top-2 right-2 z-20 p-1 rounded-full bg-white shadow-sm border border-green-200 text-green-600 hover:bg-green-100 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </template>
+
+        <div class="pointer-events-none space-y-2 flex flex-col items-center justify-center">
+            <div class="mb-2">
+                {{-- Logo Awan Panah Bawah (Cloud Download) --}}
+                <svg class="w-12 h-12 transition-colors duration-300" 
+                    :class="fileName ? 'text-green-500' : 'text-gray-400'"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10">
+                    </path>
+                </svg>
+            </div>
+
+            <p class="text-sm font-medium text-center transition-colors duration-300" 
+                :class="fileName ? 'text-green-700 font-bold' : 'text-gray-600'"
+                x-text="fileName ? 'File: ' + fileName : 'Klik untuk pilih file'">
+            </p>
+            
+            <template x-if="fileName">
+                <p class="text-xs text-green-600">File siap diunggah!</p>
+            </template>
+        </div>
+    </div>
+</div>
                                 <div class="flex justify-end gap-3 pt-4 border-t">
                                     <x-secondary-button x-on:click="$dispatch('close')" type="button">Batal</x-secondary-button>
                                     <x-primary-button ::disabled="isLoading"><span x-text="isLoading ? 'Memproses...' : 'Proses Import'"></span></x-primary-button>
@@ -203,26 +229,42 @@
                             </form>
                         </x-modal>
 
-                        @if (session()->has('import_errors'))
-                            <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg shadow-sm">
-                                <div class="flex items-center mb-2">
-                                    <svg class="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                                    </svg>
-                                    <span class="font-bold text-red-800">Beberapa data gagal diimport:</span>
-                                </div>
-                                <ul class="list-disc list-inside text-sm text-red-700 space-y-1">
-                                    @foreach (session()->get('import_errors') as $failure)
-                                        <li>
-                                            <strong>Baris {{ $failure->row() }}:</strong> 
-                                            {{ $failure->errors()[0] }} 
-                                            <span class="text-gray-500 italic">(Data: {{ $failure->values()['nama_lengkap'] ?? 'N/A' }})</span>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                                <p class="mt-3 text-xs text-red-600 italic">* Baris lainnya yang tidak disebutkan berhasil diimport/update.</p>
-                            </div>
-                        @endif
+              {{-- Notifikasi Informasi Fallback Kelas --}}
+{{-- NOTIFIKASI MERAH (Error Database/Format) --}}
+@if (session()->has('import_errors'))
+    <div x-data="{ open: true }" x-show="open" class="relative mb-4 p-4 bg-red-50  border-red-500 rounded shadow-sm border-2 border-red-500 p-4 rounded-lg mb-4">
+        <p class="text-red-800 font-bold mb-2 ">Data Tidak Lengkap / Salah Format:</p>
+        <ul class="list-disc list-inside text-xs text-red-700">
+            @foreach (session()->get('import_errors') as $failure)
+                <li>Baris {{ $failure->row() }}: {{ $failure->errors()[0] }}</li>
+            @endforeach
+        </ul>
+        {{-- Tombol Silang --}}
+        <button @click="open = false" class="absolute top-2 right-2 text-red-400 hover:text-red-600 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+@endif
+
+{{-- NOTIFIKASI BIRU (Informasi Update Kelas) --}}
+@if (session()->has('fallback_info'))
+    <div x-data="{ open: true }" x-show="open" class="relative mb-4 p-4 bg-blue-50 border-blue-500 rounded shadow-sm border-2 border-blue-500 p-4 rounded-lg mb-4">
+        <p class="text-blue-800 font-bold mb-2">Informasi Penyesuaian Kelas:</p>
+        <ul class="list-disc list-inside text-xs text-blue-700">
+            @foreach (session()->get('fallback_info') as $info)
+                <li>Siswa <strong>{{ $info['nama'] }}</strong>: Kelas "{{ $info['input'] }}" tidak terdaftar, sistem tetap menggunakan <strong>{{ $info['tetap'] }}</strong>.</li>
+            @endforeach
+        </ul>
+        {{-- Tombol Silang --}}
+        <button @click="open = false" class="absolute top-2 right-2 text-blue-400 hover:text-blue-600 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+@endif
 
                         {{-- 2. TABEL SISWA --}}
                         
@@ -254,6 +296,7 @@
                                         <th class="px-4 py-4 text-center text-xs font-bold text-white uppercase w-12">No</th>
                                         <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase">Nama Siswa</th>
                                         <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase">NISN</th>
+                                        <th class="px-6 py-3 text-center text-xs font-bold text-white uppercase">Role</th>
                                         <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase">Kelas</th>
                                         <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase">Status</th>
                                         <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase">Aksi</th>
@@ -269,14 +312,19 @@
                                                     <span class="text-gray-300">-</span>
                                                 @endif
                                             </td>
-                                            <td class="px-4 py-4 text-center text-sm font-medium text-gray-500">{{ $userSiswa->firstItem() + $loop->index }}</td>
+                                            <td class="px-4 py-4 text-center text-sm font-medium text-black-300">{{ $userSiswa->firstItem() + $loop->index }}</td>
                                             <td class="px-6 py-4">
                                                 <div class="text-sm font-bold text-gray-900">{{ $u->name }}</div>
                                                 <div class="text-xs text-gray-400">{{ $u->email }}</div>
                                             </td>
-                                            <td class="px-6 py-4 text-sm font-mono text-gray-600">
+                                            </td>
+                                                    <td class="px-6 py-4 text-sm font-mono text-gray-600">
                                                 {{ $u->dataSiswa->nisn ?? 'Unlinked' }}
                                             </td>
+                                            <td class="text-left px-6 py-4 whitespace-nowrap">
+                                                <span class="text-left px-2.5 py-1 inline-flex text-sm font-semibold rounded-full bg-blue-50 text-blue-700 border border-blue-100 capitalize">
+                                                    {{ $u->role ?? 'Siswa' }}
+                                                </span>
                                             <td class="px-6 py-4 text-center">
                                                 @if($u->dataSiswa && $u->dataSiswa->kelas)
                                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 whitespace-nowrap">
@@ -308,20 +356,41 @@
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end items-center gap-3">
                                                 @if($u->dataSiswa)
-                                                    <form action="{{ route('admin.manajemen-user.siswa.reset', $u->dataSiswa->id) }}" method="POST" onsubmit="return confirm('Yakin reset password?');" class="inline-flex">
+                                                    {{-- <form action="{{ route('admin.manajemen-user.siswa.reset', $u->dataSiswa->id) }}" method="POST" onsubmit="return confirm('Yakin reset password?');" class="inline-flex">
                                                         @csrf
                                                         <button type="submit" class="text-yellow-600 hover:text-yellow-700 p-1" title="Reset Password">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
                                                         </button>
-                                                    </form>
-                                                    
+                                                    </form> --}}
+                                                    {{-- MODAL RESET PASSWORD (MENGGUNAKAN GLOBAL MODAL) --}}
+                                                    <x-modal-delete-global 
+                                                        trigger="reset-pw-{{ $u->id }}" 
+                                                        :action="route('admin.manajemen-user.siswa.reset', $u->dataSiswa->id)" 
+                                                        :message="$u->name"
+                                                        title="Reset Password"
+                                                        submitText="Ya, Reset Sekarang"
+                                                        {{-- Styling tombol ikon kuning agar pas di dalam tabel --}}
+                                                        class="!bg-transparent !border-none !shadow-none !p-1 text-yellow-600 hover:text-yellow-700 hover:!bg-yellow-50 active:!bg-yellow-100 focus:!ring-yellow-500"                                                    >
+                                                        {{-- Slot buttonText untuk menampilkan ICON saja di tabel --}}
+                                                        <x-slot name="buttonText" class="!p-1 !bg-transparent !shadow-none !border-none text-yellow-600 hover:text-yellow-700 hover:!bg-yellow-50 transition">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                                                            </svg>
+                                                        </x-slot>
+
+                                                        {{-- Slot default (Isi Modal) - Ini membuat method otomatis jadi POST --}}
+                                                        <div class=" border-yellow-400 text-yellow-800 text-xs">
+                                                            Password akan dikembalikan ke <strong>NISN Siswa</strong>.<br>
+                                                        </div>
+                                                    </x-modal-delete-global>
+                                                    {{-- Pisah tombol edit & delete agar rapi --}}  
                                                     {{-- MODAL EDIT DI BAGIAN KEYWORD EDIT --}}
                                                     <button type="button" x-data x-on:click="$dispatch('open-modal', 'edit-siswa-{{ $u->id }}')" class="text-indigo-600 hover:text-indigo-900 font-semibold">Edit</button>
 
                                                     <x-modal name="edit-siswa-{{ $u->id }}" focusable>
                                                         <form method="POST" action="{{ route('admin.siswas.update', $u->dataSiswa->id) }}" class="p-6 text-left">
                                                             @csrf @method('PUT')
-                                                            <h2 class="text-lg font-bold mb-4 border-b pb-2 text-gray-900">Edit Data Siswa: {{ $u->name }}</h2>
+                                                            <h2 class="text-lg font-bold mb-4 border-b pb-2 text-[#1072B8]">Edit Data Siswa: {{ $u->name }}</h2>
                                                             <x-siswa.edit-form :siswa="$u->dataSiswa" :kelas="$kelas" :tahunAjaran="$tahunAjaranList" />
                                                             <div class="mt-6 flex justify-end gap-3 border-t pt-4">
                                                                 <x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button>
@@ -359,7 +428,7 @@
                                 <p class="mt-1 text-sm text-gray-600">
                                     Apakah Anda yakin ingin menghapus <strong>semua data siswa yang dipilih</strong>?
                                     <br>
-                                    <span class="text-red-500 font-bold text-xs">Peringatan: Data akun user, nilai, dan tagihan terkait juga akan dihapus permanen.</span>
+                                    <span class="text-red-500 font-bold text-xs">Peringatan: Data akun user, dan tagihan terkait juga akan dihapus permanen.</span>
                                 </p>
                                 <div class="mt-6 flex justify-end gap-3">
                                     <x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button>
@@ -399,13 +468,43 @@
 
                     {{-- ================= KONTEN TAB GURU ================= --}}
                     <div x-show="activeTab === 'guru'" x-transition>
-                        <div class="flex justify-end gap-3 mb-4">
-                            <x-primary-button x-data="" x-on:click="$dispatch('open-modal', 'add-guru')" class="flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                                Tambah Akun Guru
-                            </x-primary-button>
+                        {{-- TOOLBAR GURU (Pencarian & Tombol Aksi) --}}
+                        <div class="flex flex-col lg:flex-row justify-between items-center mb-6 gap-4">
+                            <form method="GET" action="{{ route('admin.manajemen-user.index') }}" class="w-full lg:w-1/2 flex gap-2">
+                                <input type="hidden" name="tab" value="guru">
+                                <div class="relative w-full">
+                                    <input type="text" name="search_guru" value="{{ request('search_guru') }}" 
+                                        placeholder="Cari Nama / Email Guru..." 
+                                        class="w-full rounded-full border-gray-300 pl-5 pr-10 py-2 focus:border-[#3B3E42] shadow-sm text-sm">
+                                    <button type="submit" class="absolute right-3 top-2.5 text-gray-400 hover:text-[#3B3E42]">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </form>
+
+                            <div class="flex gap-3">
+                                {{-- Tombol Import --}}
+                                <button x-on:click="$dispatch('open-modal', 'import-guru')" 
+                                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                    Import Akun Guru
+                                </button>
+                                
+                                {{-- Tombol Tambah --}}
+                                <x-primary-button x-on:click="$dispatch('open-modal', 'add-guru')" class="flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                    Tambah Guru
+                                </x-primary-button>
+                            </div>
                         </div>
-                        
+
+                        {{-- TABEL GURU --}}
                         <div class="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-[#3B3E42]">
@@ -423,7 +522,9 @@
                                         <td class="px-4 py-4 text-center text-sm font-medium text-gray-500">{{ $loop->iteration }}</td>
                                         <td class="px-6 py-4 font-medium text-gray-900">{{ $g->name }}</td>
                                         <td class="px-6 py-4 text-gray-600">{{ $g->email }}</td>
-                                        <td class="px-6 py-4"><span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold">Guru</span></td>
+                                        <td class="px-6 py-4">
+                                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold">Guru</span>
+                                        </td>
                                         <td class="px-6 py-4 text-right">
                                             <form action="{{ route('admin.manajemen-user.destroy', $g->id) }}" method="POST" class="inline" onsubmit="return confirm('Hapus akun Guru ini?');">
                                                 @csrf @method('DELETE')
@@ -438,53 +539,82 @@
                     </div>
 
                     {{-- ================= KONTEN TAB PASSWORD ================= --}}
-                    <div x-show="activeTab === 'password'" x-transition>
-                        <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-sm border border-gray-200 mt-6">
-                            <h3 class="font-bold text-lg mb-6 text-[#3B3E42] flex items-center gap-2 border-b pb-4">Ubah Password Admin</h3>
-                            
-                            <form action="{{ route('admin.manajemen-user.password.update') }}" method="POST" autocomplete="off">
-                                @csrf @method('PUT')
-                                
-                                <input type="text" style="display:none;" aria-hidden="true">
-                                <input type="password" style="display:none;" aria-hidden="true">
+<div x-show="activeTab === 'password'" x-transition>
+    {{-- Container utama menggunakan items-stretch agar tinggi kiri dan kanan dipaksa sama --}}
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row gap-6 mt-6 items-stretch">
+        
+        {{-- FORM UBAH PASSWORD (Kiri) --}}
+        {{-- Hapus h-fit agar kotak putih ini juga bisa memanjang jika konten kanan lebih panjang --}}
+        <div class="w-full md:w-1/2 bg-white p-8 rounded-lg shadow-sm border border-gray-200 flex flex-col">
+            <h3 class="font-bold text-lg mb-6 text-[#1072B8] flex items-center gap-2 border-b pb-4">
+                Ubah Password Admin
+            </h3>
+            
+            <form action="{{ route('admin.manajemen-user.password.update') }}" method="POST" autocomplete="off" class="flex-grow">
+                @csrf @method('PUT')
+                
+                <input type="text" style="display:none;" aria-hidden="true">
+                <input type="password" style="display:none;" aria-hidden="true">
 
-                                <div class="mb-4">
-                                    <x-input-label :value="__('Password Saat Ini')" />
-                                    <x-text-input type="password" 
-                                                name="current_password" 
-                                                class="w-full mt-1 focus:border-[#3B3E42]" 
-                                                required 
-                                                readonly 
-                                                onfocus="this.removeAttribute('readonly');"
-                                                autocomplete="one-time-code" />
-                                </div>
+                <div class="mb-4">
+                    <x-input-label :value="__('Password Saat Ini')" />
+                    <x-text-input type="password" name="current_password" class="w-full mt-1 focus:border-[#3B3E42]" required readonly onfocus="this.removeAttribute('readonly');" />
+                </div>
 
-                                <div class="mb-4">
-                                    <x-input-label :value="__('Password Baru')" />
-                                    <x-text-input type="password" 
-                                                name="password" 
-                                                class="w-full mt-1 focus:border-[#3B3E42]" 
-                                                required 
-                                                readonly
-                                                onfocus="this.removeAttribute('readonly');"
-                                                autocomplete="new-password" />
-                                </div>
+                <div class="mb-4">
+                    <x-input-label :value="__('Password Baru')" />
+                    <x-text-input type="password" name="password" class="w-full mt-1 focus:border-[#3B3E42]" required readonly onfocus="this.removeAttribute('readonly');" />
+                </div>
 
-                                <div class="mb-6">
-                                    <x-input-label :value="__('Konfirmasi Password Baru')" />
-                                    <x-text-input type="password" 
-                                                name="password_confirmation" 
-                                                class="w-full mt-1 focus:border-[#3B3E42]" 
-                                                required 
-                                                readonly
-                                                onfocus="this.removeAttribute('readonly');"
-                                                autocomplete="new-password" />
-                                </div>
+                <div class="mb-8">
+                    <x-input-label :value="__('Konfirmasi Password Baru')" />
+                    <x-text-input type="password" name="password_confirmation" class="w-full mt-1 focus:border-[#3B3E42]" required readonly onfocus="this.removeAttribute('readonly');" />
+                </div>
 
-                                <x-primary-button class="w-full py-3 justify-center">Simpan Password Baru</x-primary-button>
-                            </form>
-                        </div>
-                    </div>
+                <x-primary-button class="w-full py-3 justify-center">Simpan Password Baru</x-primary-button>
+            </form>
+        </div>
+
+        {{-- KOTAK INFORMASI ALUR (Kanan) --}}
+        {{-- Gunakan h-full dan flex-col agar footer nempel ke bawah --}}
+        <div class="w-full md:w-1/2 bg-blue-50 border border-blue-200 rounded-lg p-8 flex flex-col min-h-full">
+            <div class="flex items-start gap-3 mb-6">
+                <div class="text-blue-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h3 class="font-bold text-blue-900 text-lg">Panduan Alur Update Data Siswa</h3>
+            </div>
+
+            {{-- Bagian List dengan flex-grow agar mendorong footer ke bawah --}}
+            <ul class="text-sm text-blue-800 space-y-5 flex-grow">
+                <li class="flex gap-3">
+                    <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">1</span>
+                    <p><strong>Luluskan Kelas 9:</strong> Siswa kelas 9 diproses lulus (kelas jadi null), namun riwayat Tahun Ajaran tetap tersimpan sebagai tahun kelulusan.</p>
+                </li>
+                <li class="flex gap-3">
+                    <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">2</span>
+                    <p><strong>Buka Tahun Ajaran:</strong> Atur status Tahun Ajaran baru menjadi <strong>"Aktif"</strong> pada menu pengaturan tahun ajaran.</p>
+                </li>
+                <li class="flex gap-3">
+                    <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">3</span>
+                    <p><strong>Import Excel:</strong> Unggah file Excel untuk update kelas siswa. Sistem menggunakan fungsi <em>Update-or-Create</em>.</p>
+                </li>
+                <li class="flex gap-3">
+                    <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">4</span>
+                    <p><strong>Otomatisasi:</strong> Tahun ajaran siswa akan otomatis diperbarui ke tahun aktif saat ini berdasarkan data yang di-import.</p>
+                </li>
+            </ul>
+            
+            {{-- Footer nempel di bawah --}}
+            <div class="mt-8 pt-4 border-t border-blue-200 italic text-xs text-blue-600">
+                *Pastikan format file Excel sesuai dengan template yang disediakan.
+            </div>
+        </div>
+
+    </div>
+</div>
 
                 </div>
             </div>
@@ -498,7 +628,7 @@
             <div class="flex justify-between items-center mb-4 border-b pb-2"><h2 class="text-lg font-bold text-gray-900">Tambah Siswa</h2><button type="button" x-on:click="$dispatch('close')" class="text-gray-400 hover:text-gray-500"><span class="sr-only">Tutup</span><svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="col-span-2"><x-input-label value="Nama Lengkap" /><x-text-input name="name" class="w-full mt-1 focus:border-[#3B3E42] focus:ring-[#3B3E42]" required placeholder="Contoh: Budi Santoso" /></div>
-                <div class="col-span-2"><x-input-label value="Email Login (Opsional)" /><x-text-input name="email" type="email" class="w-full mt-1 focus:border-[#3B3E42] focus:ring-[#3B3E42]" placeholder="Jika kosong, akan pakai nama.nisn@sekolah.id" /></div>
+                <div class="col-span-2"><x-input-label value="Email Login (Opsional)" /><x-text-input name="email" type="email" class="w-full mt-1 focus:border-[#3B3E42] focus:ring-[#3B3E42]" placeholder="Jika kosong, akan pakai nama.nisn@raudhah.com" /></div>
                 <div><x-input-label value="NISN (Wajib)" /><x-text-input name="nisn" type="number" class="w-full mt-1 focus:border-[#3B3E42] focus:ring-[#3B3E42]" required placeholder="00123456" min="0" oninput="validity.valid||(value='');"/></div>
                 <div><x-input-label value="Jenis Kelamin" /><select name="jenis_kelamin" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42]"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div>
                 <div class="col-span-2"><x-input-label value="Masuk Kelas" /><select name="kelas_id" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42]"><option value="">-- Belum Ada Kelas --</option>@foreach($kelas as $k)<option value="{{ $k->id }}">Kelas {{ $k->tingkat }} {{ $k->nama_kelas }}</option>@endforeach</select></div>

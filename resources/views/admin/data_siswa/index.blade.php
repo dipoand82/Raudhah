@@ -117,7 +117,7 @@
                         <p class="mt-1 text-sm text-gray-600">
                             Apakah Anda yakin ingin menghapus <strong>semua data siswa yang dipilih</strong>?
                             <br>
-                            <span class="text-red-500 font-bold text-xs">Peringatan: Data akun user, nilai, dan tagihan terkait juga akan dihapus permanen.</span>
+                            <span class="text-red-500 font-bold text-xs">Peringatan: Data akun user, dan tagihan terkait juga akan dihapus permanen.</span>
                         </p>
                         <div class="mt-6 flex justify-end gap-3">
                             <x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button>
@@ -154,7 +154,7 @@
                                         {{-- Checkbox terhubung ke form bulk delete --}}
                                         <input type="checkbox" name="ids[]" form="bulkDeleteForm" value="{{ $siswa->id }}" class="select-item rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 cursor-pointer">
                                     </td>
-                                    <td class="px-4 py-4 text-center text-sm text-gray-500 font-medium">
+                                    <td class="px-4 py-4 text-center text-sm text-balck-300 font-medium">
                                         {{ $siswas->firstItem() + $loop->index }}
                                     </td>
                                     <td class="px-6 py-4 text-sm text-left font-mono text-gray-600">
@@ -205,7 +205,7 @@
                                     <x-modal name="edit-siswa-{{ $siswa->id }}" focusable>
                                         {{-- Pastikan ada pembungkus div dengan p-6 agar tidak mepet ke pinggir --}}
                                         <div class="p-6 text-left">
-                                            <h2 class="text-lg font-bold mb-4 border-b pb-2 text-gray-900">
+                                            <h2 class="text-lg font-bold mb-4 border-b pb-2 text-[#1072B8]">
                                                 Edit Data Siswa: {{ $siswa->user->name ?? $siswa->nama_lengkap }}
                                             </h2>
 

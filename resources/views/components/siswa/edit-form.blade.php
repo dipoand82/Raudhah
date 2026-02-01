@@ -8,7 +8,7 @@
      }">
     
     <div class="md:col-span-2">
-        <h4 class="font-bold text-indigo-600 mb-3 uppercase text-xs tracking-wider">Informasi Akun</h4>
+        <h4 class="font-bold text-[#1072B8] mb-3 uppercase text-xs tracking-wider">Informasi Akun</h4>
     </div>
 
     {{-- Nama Lengkap --}}
@@ -24,7 +24,7 @@
     </div>
 
     <div class="md:col-span-2 mt-4">
-        <h4 class="font-bold text-indigo-600 mb-3 uppercase text-xs tracking-wider">Data Akademik</h4>
+        <h4 class="font-bold text-[#1072B8] mb-3 uppercase text-xs tracking-wider">Data Akademik</h4>
     </div>
 
     {{-- NISN --}}
@@ -59,7 +59,7 @@
             @endforeach
         </select>
         {{-- // PERUBAHAN: Menambahkan teks peringatan kecil yang muncul hanya saat tidak aktif --}}
-        <p x-show="statusSiswa !== 'Aktif'" class="text-[10px] text-red-600 mt-1 italic font-medium">
+        <p x-show="statusSiswa !== 'Aktif'" class="text-[12px] text-red-600 mt-1 italic font-medium">
             *Kelas otomatis dinonaktifkan untuk status selain Aktif.
         </p>
     </div>
@@ -90,6 +90,6 @@
             <option value="Pindah"> Pindah</option>
             <option value="Keluar"> Keluar </option>
         </select>
-        <p class="text-[10px] text-red-600 mt-1 italic font-medium">*Hati-hati mengubah status menjadi Lulus/Keluar.</p>
+        <p class="text-[12px] text-red-600 mt-1 italic font-medium">*Hati-hati mengubah status menjadi Lulus/Keluar.</p>
     </div>
 </div>

@@ -1,11 +1,18 @@
 <section>
+    {{-- Pindahkan Notifikasi ke Sini (Di atas tombol) --}}
+    @if (session('status') === 'profile-updated')
+        <x-alert-success timeout="3000">
+            {{ __('Profil Berhasil Diperbarui!') }}
+        </x-alert-success>
+    @endif
+    
     <header>
         <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Profile Information') }}
+            {{ __('Informasi Profil') }}
         </h2>
 
         <p class="mt-1 text-sm text-gray-600">
-            {{ __("Update your account's profile information and email address.") }}
+            {{ __("Perbarui akun dan email.") }}
         </p>
     </header>
 
@@ -47,18 +54,12 @@
             @endif
         </div>
 
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+       <div class="flex items-center gap-4">
+    {{-- Tombol Simpan --}}
+    <x-primary-button>{{ __('Simpan') }}</x-primary-button>
 
-            @if (session('status') === 'profile-updated')
-                <p
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
-                >{{ __('Saved.') }}</p>
-            @endif
-        </div>
+    {{-- Notifikasi Sukses --}}
+
+</div>
     </form>
 </section>

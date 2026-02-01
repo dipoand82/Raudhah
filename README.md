@@ -69,7 +69,7 @@ scroll tabel
 <div class="overflow-x-auto bg-white rounded shadow">
 
 Warna #1072B8
-#45a4df
+#256f9e
 
 sec #313F4B
 
@@ -132,3 +132,10 @@ select 1
 
 Pass scrol,tabel ga kebawah
 class="whitespace-nowrap"
+
+dropdown
+ <x-dropdown-link :href="route('logout')"
+                                        onclick="event.preventDefault(); this.closest('form').submit();"
+                                        class="hover:!bg-red-800 hover:!text-white">
+{{ __('Log Out') }}
+</x-dropdown-link>
