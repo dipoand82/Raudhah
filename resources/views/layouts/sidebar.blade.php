@@ -2,21 +2,39 @@
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
     class="w-64 bg-white border-r border-gray-200 flex flex-col h-screen fixed left-0 top-0 z-50 transition-transform duration-300 ease-in-out md:translate-x-0">
     
-    {{-- HEADER SIDEBAR --}}
-    <div class="h-16 border-b border-gray-200 flex items-center justify-between px-6 relative">
-        <h1 class="text-xl font-bold text-[#0A78BD] flex items-center gap-2">
-            <span>
+{{-- HEADER SIDEBAR --}}
+<div class="h-20 border-b border-gray-200 flex items-center px-4 relative">
+    <div class="flex items-center gap-3">
+        {{-- <div class="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50 p-1 border border-gray-100">
+            <img src="{{ asset('images/logo_smp_raudhah.png') }}" alt="Logo Raudhah" class="w-full h-full object-contain">
+        </div> --}}
+        <div class="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-white flex items-center justify-center border border-blue-100 p-1 shadow-sm">
+        {{-- Ganti bagian nama file dengan salah satu nama file acak yang ada di folder logos Anda --}}
+        <img src="{{ asset('storage/logos/logo_smp_raudhah.png') }}" 
+             alt="Logo SMP IT Raudhah" 
+             class="w-full h-full object-contain">
+        </div>
+
+        <div class="overflow-hidden">
+            <h1 class="text-sm font-bold text-[#1072B8] leading-tight truncate">
                 @if(Auth::user()->role == 'admin') SMP IT RAUDHAH
-                @elseif(Auth::user()->role == 'guru') Portal Guru
-                @else Area Siswa
+                @elseif(Auth::user()->role == 'guru') PORTAL GURU
+                @else AREA SISWA
                 @endif
-            </span>
-        </h1>
-        {{-- Tombol Tutup Sidebar (Mobile Only) --}}
-        <button @click="sidebarOpen = false" class="md:hidden text-gray-500 hover:text-red-500 transition">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        </button>
+            </h1>
+            <p class="text-[10px] text-gray-500 font-medium uppercase tracking-tighter">
+                Sistem Pembayaran SPP
+            </p>
+        </div>
     </div>
+
+    {{-- Tombol Tutup Sidebar (Mobile Only) --}}
+    <button @click="sidebarOpen = false" class="md:hidden absolute right-2 top-2 text-gray-400 hover:text-red-500 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+    </button>
+</div>
 
     {{-- MENU NAVIGASI --}}
     <nav class="flex-1 p-4 space-y-1 overflow-y-auto">

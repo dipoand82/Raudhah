@@ -14,11 +14,13 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased" x-data="{ sidebarOpen: false }"> <div class="min-h-screen bg-gray-100">
+    <body class="font-sans antialiased" x-data="{ sidebarOpen: false }">
+    <div class="min-h-screen bg-gray-100 flex flex-col"> {{-- Tambahkan flex flex-col saja di sini --}}
         
         @include('layouts.sidebar')
 
-        <div class="md:ml-64 transition-all duration-300">
+        <div class="md:ml-64 transition-all duration-300 flex-1 flex flex-col">
+            {{-- Navbar Sekarang Tidak Akan Berantakan Lagi --}}
             @include('layouts.navigation')
 
             @isset($header)
@@ -30,12 +32,13 @@
                     </div>
                 </header>
             @endisset
-            <main>
+
+            <main class="flex-1"> {{-- Menambah flex-1 agar konten mengisi sisa layar --}}
                 {{ $slot }}
             </main>
-
         </div>
-    </body>
+    </div>
+</body>
     {{-- <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
             
