@@ -7,7 +7,7 @@
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0"
      {{-- Desain: Background merah muda, Border merah pekat, Shadow halus --}}
-     class="mb-4 flex items-center justify-between bg-red-100 border-2 border-red-700 text-red-800 px-4 py-2.5 rounded-lg shadow-md relative">
+     class="mb-4 flex items-center justify-between bg-red-100 border-2 border-red-500 text-red-800 px-4 py-2.5 rounded-lg shadow-md relative">
     
     <div class="flex items-center gap-3">
         {{-- Ikon Tanda Seru dalam Lingkaran --}}

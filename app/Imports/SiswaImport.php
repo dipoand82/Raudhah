@@ -12,11 +12,12 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\SkipsFailures;
+use Maatwebsite\Excel\Concerns\Importable;
 
 class SiswaImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFailure
 {
     use SkipsFailures;
-
+    use Importable, SkipsFailures;
     // Tambahkan properti untuk menyimpan tahun aktif agar tidak query berulang kali
     protected $tahunAktif;
 
@@ -32,10 +33,22 @@ class SiswaImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFai
     public function rules(): array
     {
         return [
-            'nisn' => 'required|numeric',
+            'nisn' => 'required|numeric|digits_between:8,12',            
             'nama_lengkap' => 'required|string|max:255',
             'jenis_kelamin' => 'required|in:L,P,l,p',
             'kelas' => 'required',
+        ];
+    }
+
+    public function customValidationMessages()
+    {
+        return [
+            'nisn.required' => 'NISN wajib diisi.',
+            'nisn.numeric' => 'NISN harus berupa angka.',
+            'nisn.digits_between' => 'NISN harus berjumlah 8-12 karakter.',
+            'nama_lengkap.required' => 'Nama lengkap tidak boleh kosong.',
+            'jenis_kelamin.in' => 'Jenis kelamin harus L atau P.',
+            'kelas.required' => 'Kolom Kelas wajib diisi (Contoh: 7A).',
         ];
     }
 
@@ -79,10 +92,24 @@ class SiswaImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFai
                               ->where('nama_kelas', $namaKelas)
                               ->first();
             
-            if ($dataKelas) {
-                $kelas_id = $dataKelas->id;
+                              // =========================================================================
+            // [MODIFIKASI NOMOR 3]: Cek apakah data kelas ada di database
+            // =========================================================================
+            if (!$dataKelas) {
+                // Jika Kelas Zonk (Tidak ada di DB), kembalikan null agar baris ini dilewati.
+                // Ini mencegah pembuatan akun User tanpa kelas yang valid.
+                return null; 
             }
-        }
+
+            // Jika ada, baru ambil ID-nya
+            $kelas_id = $dataKelas->id;
+        } else {
+            // Jika kolom kelas di Excel kosong sama sekali, lewati baris ini.
+            return null;
+        }                    
+            // if ($dataKelas) {
+            //     $kelas_id = $dataKelas->id;
+            // }
 
         // 3. BUAT/UPDATE USER (AKUN LOGIN)
         $user = User::updateOrCreate(

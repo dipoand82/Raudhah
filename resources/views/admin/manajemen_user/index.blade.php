@@ -146,20 +146,27 @@
                                     </button>
                                 </div>
                                 {{-- Alert Syarat Import --}}
-                                <div class="mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-md">
+                                
+                                <div class="bg-red-50 border-2 border-red-500 p-4 rounded-lg mb-4">
                                     <div class="flex">
-                                        <div class="flex-shrink-0"><svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg></div>
+                                        <div class="flex-shrink-0">
+                                            <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
                                         <div class="ml-3">
                                             <h3 class="text-sm font-bold text-red-800">Syarat Wajib Import:</h3>
                                             <ul class="mt-1 list-disc list-inside text-xs text-red-700 font-medium">
-                                                <li>Pastikan <strong>Tahun Ajaran Aktif</strong> sudah diset.</li>
-                                                <li>Pastikan data <strong>Kelas</strong> sudah tersedia.</li>
-                                                <li><strong>Periksa</strong> kesesuaian data sebelum melakukan import </li>
+                                                <li>Pastikan <strong>Tahun Ajaran Aktif</strong> sudah diset di sistem.</li>
+                                                <li>Pastikan <strong>Data Kelas Tersedia</strong> di sistem.</li>
+                                                <li>Pastikan <strong>Kesesuaian Data</strong> di Excel sebelum melakukan import.</li>
                                             </ul>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex justify-between items-center">
+
+            
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 flex justify-between items-center">
                                     <div><h3 class="text-sm font-bold text-blue-800 mb-1">Langkah 1: Siapkan File</h3><p class="text-xs text-blue-600">Gunakan template resmi.</p></div>
                                     <a href="{{ route('admin.manajemen-user.siswa.template')}}" class="bg-white text-blue-700 hover:bg-blue-100 border border-blue-300 px-3 py-2 rounded text-sm font-bold shadow-sm transition flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>Template</a>
                                 </div>
@@ -195,6 +202,27 @@
                                 </div>
                             </form>
                         </x-modal>
+
+                        @if (session()->has('import_errors'))
+                            <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg shadow-sm">
+                                <div class="flex items-center mb-2">
+                                    <svg class="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                    </svg>
+                                    <span class="font-bold text-red-800">Beberapa data gagal diimport:</span>
+                                </div>
+                                <ul class="list-disc list-inside text-sm text-red-700 space-y-1">
+                                    @foreach (session()->get('import_errors') as $failure)
+                                        <li>
+                                            <strong>Baris {{ $failure->row() }}:</strong> 
+                                            {{ $failure->errors()[0] }} 
+                                            <span class="text-gray-500 italic">(Data: {{ $failure->values()['nama_lengkap'] ?? 'N/A' }})</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                                <p class="mt-3 text-xs text-red-600 italic">* Baris lainnya yang tidak disebutkan berhasil diimport/update.</p>
+                            </div>
+                        @endif
 
                         {{-- 2. TABEL SISWA --}}
                         

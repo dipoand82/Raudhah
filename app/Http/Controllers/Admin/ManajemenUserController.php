@@ -171,9 +171,21 @@ class ManajemenUserController extends Controller
         $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
         
         try {
-            Excel::import(new SiswaImport, $request->file('file'));
-            return back()->with('success', 'Import Siswa Berhasil!');
+            $import = new \App\Imports\SiswaImport;
+            
+            // Sekarang ini akan berfungsi karena sudah ada 'use Importable'
+            $import->import($request->file('file'));
+
+            // Jika ada baris yang gagal (Zonk / Validasi Salah)
+            if ($import->failures()->isNotEmpty()) {
+                // Kita kirim data failures ke session 'import_errors'
+                return back()->with('import_errors', $import->failures());
+            }
+
+            return back()->with('success', 'Import Siswa Berhasil!
+            Cek kembali kesesuaian data siswa berdasarkan filter per kelas.');
         } catch (\Exception $e) {
+            // Ini menangkap error fatal (seperti file rusak atau koneksi DB putus)
             return back()->with('error', 'Gagal Import: ' . $e->getMessage());
         }
     }
