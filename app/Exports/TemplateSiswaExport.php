@@ -51,10 +51,10 @@ class TemplateSiswaExport implements FromArray, WithHeadings, ShouldAutoSize, Wi
                 'font' => [
                     'bold' => true, 
                     'color' => ['rgb' => 'FFFFFF'] 
-                ],
+            ],
                 'fill' => [
                     'fillType' => Fill::FILL_SOLID,
-                    'startColor' => ['rgb' => '0A78BD'] 
+                    'startColor' => ['rgb' => '1072B8'] 
                 ],
                 'alignment' => [
                     'horizontal' => Alignment::HORIZONTAL_CENTER,

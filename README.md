@@ -145,3 +145,6 @@ max-w-7xl mx-auto px-4 sm:px-6
 
 dihapus
 lg:px-8
+
+gambar galebar kemanamana
+<div class="max-w-[1440px] mx-auto px-4 mt-4">

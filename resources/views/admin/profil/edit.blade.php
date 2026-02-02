@@ -5,86 +5,104 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="py-12" x-data="{ activeTab: 'profil' }">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
-            @if(session('success'))
-                <div class="mb-4 bg-green-100 text-green-700 p-4 rounded shadow-sm">
-                    {{ session('success') }}
+            {{-- TAB NAVIGATION (Clean Style) --}}
+            <div class="bg-white px-6 pt-4 rounded-t-2xl border border-gray-200 border-b-0">
+                <div class="flex space-x-8">
+                    <button @click="activeTab = 'profil'" 
+                            :class="{ 'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'profil', 'text-gray-400 hover:text-gray-600': activeTab !== 'profil' }" 
+                            class="pb-4 transition duration-150 text-sm tracking-wide capitalize">
+                        Profil
+                    </button>
+                    <button @click="activeTab = 'info'" 
+                            :class="{ 'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'info', 'text-gray-400 hover:text-gray-600': activeTab !== 'info' }" 
+                            class="pb-4 transition duration-150 text-sm tracking-wide capitalize">
+                        Info
+                    </button>
+                    <button @click="activeTab = 'Galeri'" 
+                            :class="{ 'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'Galeri', 'text-gray-400 hover:text-gray-600': activeTab !== 'Galeri' }" 
+                            class="pb-4 transition duration-150 text-sm tracking-wide capitalize">
+                        Galeri
+                    </button>
                 </div>
-            @endif
+            </div>
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+            {{-- KOTAK KONTEN --}}
+            <div class="bg-white overflow-hidden shadow-sm rounded-b-2xl border border-gray-200">
+                <div class="p-8 text-gray-900">
+                    {{-- ALERT SUCCESS --}}
+                                @if(session('success'))
+                                    <x-alert-success>
+                                        {{ session('success') }}
+                                    </x-alert-success>
+                                @endif
+                                {{-- Tampilkan Alert Gagal (Misal dari Session Error) --}}
+                                @if(session('error'))
+                                    <x-alert-danger>
+                                        {{ session('error') }}
+                                    </x-alert-danger>
+                                @endif
 
-                    <form method="POST" action="{{ route('admin.profil.update') }}" enctype="multipart/form-data">
-                        @csrf
-                        @method('PATCH')
+                                @if ($errors->any())
+                                    @foreach ($errors->all() as $error)
+                                        <x-alert-danger timeout="8000"> {{-- Waktu 8 detik agar sempat dibaca --}}
+                                            {{ $error }}
+                                        </x-alert-danger>
+                                    @endforeach
+                                @endif
+                    <div x-show="activeTab === 'profil'">
+                        <form method="POST" action="{{ route('admin.profil.update') }}" enctype="multipart/form-data">
+                            @csrf
+                            @method('PATCH')
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            
-                            <div class="space-y-4">
-                                <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Identitas Sekolah</h3>
-                                
-                                <div>
-                                    <x-input-label for="nama_sekolah" :value="__('Nama Sekolah')" />
-                                    <x-text-input id="nama_sekolah" class="block mt-1 w-full" type="text" name="nama_sekolah" :value="old('nama_sekolah', $profil->nama_sekolah)" required />
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+
+                                {{-- KOLOM KIRI: IDENTITAS --}}
+                                <div class="space-y-6">
+                                    <div>
+                                        <x-input-label for="nama_sekolah" :value="__('Nama Sekolah')" class="text-md font-bold text-gray-600 capitalize" />
+                                        <x-text-input id="nama_sekolah" class="block mt-1 w-full rounded-lg border-gray-300 bg-gray-50 focus:bg-white transition" type="text" name="nama_sekolah" :value="old('nama_sekolah', $profil->nama_sekolah)" required />
+                                    </div>
+
+                                    <div>
+                                        <x-input-label for="deskripsi_singkat" :value="__('Deskripsi Singkat')" class="text-md font-bold text-gray-600 capitalize" />
+                                        <textarea id="deskripsi_singkat" name="deskripsi_singkat" class="block mt-1 w-full border-gray-300 rounded-lg bg-gray-50 focus:bg-white transition" rows="3">{{ old('deskripsi_singkat', $profil->deskripsi_singkat) }}</textarea>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <x-input-label for="telepon" :value="__('Telepon')" class="text-md font-bold text-gray-600 capitalize" />
+                                            <x-text-input id="telepon" class="block mt-1 w-full rounded-lg bg-gray-50" type="text" name="telepon" :value="old('telepon', $profil->telepon)" />
+                                        </div>
+                                        <div>
+                                            <x-input-label for="email" :value="__('Email')" class="text-md font-bold text-gray-600 capitalize" />
+                                            <x-text-input id="email" class="block mt-1 w-full rounded-lg bg-gray-50" type="email" name="email" :value="old('email', $profil->email)" />
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <x-input-label for="telepon" :value="__('Nomor Telepon')" />
-                                    <x-text-input id="telepon" class="block mt-1 w-full" type="text" name="telepon" :value="old('telepon', $profil->telepon)" />
-                                </div>
+                                <div class="space-y-6">
+                                    <div>
+                                        <x-input-label for="visi" :value="__('Visi')"  />
+                                        <textarea id="visi" name="visi" class="block mt-1 w-full border-gray-300 rounded-lg bg-gray-50 focus:bg-white transition" rows="3">{{ old('visi', $profil->visi) }}</textarea>
+                                    </div>
 
-                                <div>
-                                    <x-input-label for="email" :value="__('Email Resmi')" />
-                                    <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $profil->email)" />
-                                </div>
-
-                                <div>
-                                    <x-input-label for="alamat" :value="__('Alamat Lengkap')" />
-                                    <textarea id="alamat" name="alamat" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" rows="3">{{ old('alamat', $profil->alamat) }}</textarea>
+                                    <div>
+                                        <x-input-label for="misi" :value="__('Misi')" />
+                                        <textarea id="misi" name="misi" class="block mt-1 w-full border-gray-300 rounded-lg bg-gray-50 focus:bg-white transition" rows="3">{{ old('misi', $profil->misi) }}</textarea>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="space-y-4">
-                                {{-- <h3 class="text-lg font-bold text-gray-700 border-b pb-2">Branding & Tujuan</h3> --}}
-
-                                <div>
-                                    {{-- <x-input-label for="logo" :value="__('Logo Sekolah')" /> --}}
-                                    
-                                    @if($profil->logo_path)
-                                        {{-- <div class="mb-2">
-                                            <img src="{{ asset('storage/' . $profil->logo_path) }}" alt="Logo" class="h-20 w-auto object-contain border p-1 rounded">
-                                        </div> --}}
-                                    @endif
-                                    <br>
-                                    <br>
-                                    {{-- <input type="file" name="logo" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
-                                    <p class="text-xs text-gray-500 mt-1">Format: JPG, PNG. Maks: 2MB.</p> --}}
-                                </div>
-
-                                <div>
-                                    <x-input-label for="visi" :value="__('Visi')" />
-                                    <textarea id="visi" name="visi" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" rows="2">{{ old('visi', $profil->visi) }}</textarea>
-                                </div>
-
-                                <div>
-                                    <x-input-label for="misi" :value="__('Misi')" />
-                                    <textarea id="misi" name="misi" class="block mt-1 w-full border-gray-300 rounded-md shadow-sm" rows="3">{{ old('misi', $profil->misi) }}</textarea>
-                                </div>
+                            <div class="flex items-center justify-end mt-10 pt-6 border-t border-gray-100">
+                                <x-primary-button class="bg-[#1072B8] hover:bg-blue-800 rounded-lg">
+                                    {{ __('Simpan Perubahan') }}
+                                </x-primary-button>
                             </div>
-
-                        </div>
-
-                        <div class="flex items-center justify-end mt-6 pt-4 border-t">
-                            <x-primary-button>
-                                {{ __('Simpan Perubahan') }}
-                            </x-primary-button>
-                        </div>
-
-                    </form>
-
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
