@@ -10,42 +10,6 @@
 </head>
 
 <body class="bg-gray-50 text-gray-800 font-sans antialiased scroll-smooth">
-
-    {{-- <nav class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-
-                <a href="{{ url('/') }}" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                <div class="flex items-center gap-3">
-                    @if(file_exists(public_path('storage/logos/logo_smp_raudhah.PNG')))
-                        <img src="{{ asset('storage/logos/logo_smp_raudhah.PNG') }}" alt="Logo" class="h-10 w-10 object-contain">
-                    @elseif($profil_sekolah && $profil_sekolah->logo_path)
-                        <img src="{{ asset('storage/' . $profil_sekolah->logo_path) }}" alt="Logo" class="h-10 w-10 object-contain">
-                    @else
-                        <div class="h-10 w-10 bg-[#1072B8]rounded-full flex items-center justify-center text-white text-xs font-bold">SMP</div>
-                    @endif
-                    <span class="font-bold text-sm text-[#1072B8] sm:text-xl text-[#1072B8] block">{{ $profil_sekolah->nama_sekolah ?? 'SMP IT Raudhah' }}</span>
-                </div>
-                </a>
-
-                <div class="hidden md:flex items-center gap-12 absolute left-1/2 transform -translate-x-1/2">
-                    <a href="#" class="text-sm font-semibold text-gray-600  uppercase transition-all px-3 py-2 duration-300 hover:text-blue-600 hover:bg-blue-50 hover:rounded-full">Beranda</a>
-                    <a href="#info" class="text-sm font-semibold text-gray-600  uppercase transition-all px-3 py-2 duration-300 hover:text-blue-600 hover:bg-blue-50 hover:rounded-full">Info</a>
-                    <a href="#galeri" class="text-sm font-semibold text-gray-600  uppercase transition-all px-3 py-2 duration-300 hover:text-blue-600 hover:bg-blue-50 hover:rounded-full">Galeri</a>
-                </div>
-
-                <div class="flex items-center">
-                    @if (Route::has('login'))
-                        @auth
-                            <a href="{{ url('/dashboard') }}" class="text-sm font-semibold text-gray-600 hover:text-blue-600">Dashboard</a>
-                        @else
-                            <a href="{{ route('login') }}" class="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 shadow-md transition">Log in</a>
-                        @endauth
-                    @endif
-                </div>
-            </div>
-        </div>
-    </nav> --}}
 <nav x-data="{ open: false }" class="bg-white shadow-sm sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center relative">
