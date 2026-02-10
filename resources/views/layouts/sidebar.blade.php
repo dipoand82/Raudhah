@@ -1,15 +1,15 @@
-<aside 
+<aside
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
     class="w-64 bg-white border-r border-gray-200 flex flex-col h-screen fixed left-0 top-0 z-50 transition-transform duration-300 ease-in-out md:translate-x-0 ">
-    
+
 {{-- HEADER SIDEBAR --}}
 {{-- HEADER SIDEBAR --}}
 <div class="h-20 border-b border-gray-200 flex items-center px-4 relative">
     {{-- Tambahkan tag <a> di sini --}}
     <a href="{{ url('/') }}" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
         <div class="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-white flex items-center justify-center border-[#1072B8] p-1 shadow-sm">
-            <img src="{{ asset('storage/logos/logo_smp_raudhah.png') }}" 
-                 alt="Logo SMP IT Raudhah" 
+            <img src="{{ asset('storage/logos/logo_smp_raudhah.png') }}"
+                 alt="Logo SMP IT Raudhah"
                  class="w-full h-full object-contain">
         </div>
 
@@ -24,8 +24,9 @@
                 Sistem Pembayaran SPP
             </p>
         </div>
-    </a> {{-- Penutup tag <a> --}}
+    </a>
 
+    {{-- Penutup tag <a> --}}
     {{-- Tombol Tutup Sidebar (Mobile Only) Tetap di luar <a> agar tidak ikut terklik --}}
     <button @click="sidebarOpen = false" class="md:hidden absolute right-2 top-2 text-gray-400 hover:text-red-500 transition">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -36,7 +37,7 @@
 
     {{-- MENU NAVIGASI --}}
     <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
-        
+
         {{-- ================= MENU ADMIN ================= --}}
         @if(Auth::user()->role == 'admin')
 
@@ -54,7 +55,7 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                 <span class="font-medium">Kelola Kelas</span>
             </a>
-            
+
             <a href="{{ route('admin.tahun-ajaran.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.tahun-ajaran.*') ? 'bg-[#0A78BD] text-white shadow-md' : 'text-gray-700 hover:bg-gray-100' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 <span class="font-medium">Kelola Tahun Ajaran</span>
@@ -111,12 +112,12 @@
 
         {{-- ================= MENU SISWA ================= --}}
         @elseif(Auth::user()->role == 'siswa')
-            
+
             <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('dashboard') ? 'bg-[#0A78BD] text-white shadow-md' : 'text-gray-700 hover:bg-gray-100' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                 <span class="font-medium">Dashboard</span>
             </a>
-            
+
             <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-700 hover:bg-gray-100">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                 <span class="font-medium">Riwayat Pembayaran</span>

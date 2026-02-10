@@ -1,14 +1,14 @@
 <x-guest-layout>
     {{-- Hapus pembungkus min-h-screen di sini agar tidak double --}}
-    
+
     {{-- HEADER --}}
     <div class="w-full max-w-sm text-center mb-6">
         <div class="flex justify-center mb-4">
-            <div class="p-2 bg-white rounded-2xl shadow-sm border border-gray-100">
-                <img src="{{ asset('storage/logos/logo_smp_raudhah.png') }}" 
-                     alt="Logo Raudhah" 
-                     class="h-16 w-auto object-contain">
-            </div>
+            <a href="{{ url('/') }}"class="p-2 bg-white rounded-2xl shadow-sm border border-gray-100">
+                <img src="{{ asset('storage/logos/logo_smp_raudhah.png') }}"
+                     alt="Logo Raudhah"
+                     class="h-16 w-auto object-contain flex items-center gap-3 z-10 hover:opacity-80 transition-opacity min-w-max">
+            </a>
         </div>
         <h1 class="text-2xl font-extrabold text-gray-900 leading-tight mb-1">SMP IT Raudhah</h1>
         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">Masuk Ke Sistem Pembayaran SPP</p>

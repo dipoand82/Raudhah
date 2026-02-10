@@ -23,5 +23,8 @@ class ProfilSekolah extends Model
         'deskripsi_singkat',
         'alasan_memilih',
         'program_unggulan',
+        'instagram',
+        'tiktok',
+        'info_footer',
     ];
 }

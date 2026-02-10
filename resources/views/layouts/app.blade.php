@@ -11,12 +11,14 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+        <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased" x-data="{ sidebarOpen: false }">
     <div class="min-h-screen bg-gray-100 flex flex-col"> {{-- Tambahkan flex flex-col saja di sini --}}
-        
+
         @include('layouts.sidebar')
 
         <div class="md:ml-64 transition-all duration-300 flex-1 flex flex-col">
@@ -38,10 +40,17 @@
             </main>
         </div>
     </div>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+      AOS.init({
+          once: true,
+          duration: 1000,
+      });
+    </script>
 </body>
     {{-- <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
-            
+
             @include('layouts.sidebar')
 
         <!-- <div class="ml-64 transition-all duration-300"></div> -->

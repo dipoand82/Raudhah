@@ -7,22 +7,22 @@
 
     <div class="py-12" x-data="{ activeTab: 'profil' }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            
+
             {{-- TAB NAVIGATION (Clean Style) --}}
             <div class="bg-white px-6 pt-4 rounded-t-2xl border border-gray-200 border-b-0">
                 <div class="flex space-x-8">
-                    <button @click="activeTab = 'profil'" 
-                            :class="{ 'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'profil', 'text-gray-400 hover:text-gray-600': activeTab !== 'profil' }" 
+                    <button @click="activeTab = 'profil'"
+                            :class="{ 'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'profil', 'text-gray-400 hover:text-gray-600': activeTab !== 'profil' }"
                             class="pb-4 transition duration-150 text-sm tracking-wide capitalize">
                         Profil
                     </button>
-                    <button @click="activeTab = 'info'" 
-                            :class="{ 'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'info', 'text-gray-400 hover:text-gray-600': activeTab !== 'info' }" 
+                    <button @click="activeTab = 'info'"
+                            :class="{ 'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'info', 'text-gray-400 hover:text-gray-600': activeTab !== 'info' }"
                             class="pb-4 transition duration-150 text-sm tracking-wide capitalize">
                         Info
                     </button>
-                    <button @click="activeTab = 'Galeri'" 
-                            :class="{ 'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'Galeri', 'text-gray-400 hover:text-gray-600': activeTab !== 'Galeri' }" 
+                    <button @click="activeTab = 'Galeri'"
+                            :class="{ 'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'Galeri', 'text-gray-400 hover:text-gray-600': activeTab !== 'Galeri' }"
                             class="pb-4 transition duration-150 text-sm tracking-wide capitalize">
                         Galeri
                     </button>
@@ -74,12 +74,26 @@
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
                                             <x-input-label for="telepon" :value="__('Telepon')" class="text-md font-bold text-gray-600 capitalize" />
-                                            <x-text-input id="telepon" class="block mt-1 w-full rounded-lg bg-gray-50" type="text" name="telepon" :value="old('telepon', $profil->telepon)" />
+                                            <x-text-input id="telepon" class="block mt-1 w-full rounded-lg bg-gray-50" type="text" name="telepon" placeholder="Contoh: 081234567890" :value="old('telepon', $profil->telepon)" />
                                         </div>
                                         <div>
                                             <x-input-label for="email" :value="__('Email')" class="text-md font-bold text-gray-600 capitalize" />
                                             <x-text-input id="email" class="block mt-1 w-full rounded-lg bg-gray-50" type="email" name="email" :value="old('email', $profil->email)" />
                                         </div>
+
+                                        <div>
+                                            <x-input-label for="instagram" :value="__('Link Instagram')" class="text-md font-bold text-gray-600 capitalize" />
+                                            <x-text-input id="instagram" class="block mt-1 w-full rounded-lg bg-gray-50" type="text" name="instagram" :value="old('instagram', $profil->instagram)" />
+                                        </div>
+                                        <div>
+                                            <x-input-label for="tiktok" :value="__('Link TikTok')" class="text-md font-bold text-gray-600 capitalize" />
+                                            <x-text-input id="tiktok" class="block mt-1 w-full rounded-lg bg-gray-50" type="text" name="tiktok" :value="old('tiktok', $profil->tiktok)" />
+                                        </div>
+                                        <div>
+                                            <x-input-label for="info_footer" :value="__('Info Tambahan Footer')" class="text-md font-bold text-gray-600 capitalize" />
+                                            <x-text-input id="info_footer" class="block mt-1 w-full rounded-lg bg-gray-50" type="text" name="info_footer" :value="old('info_footer', $profil->info_footer)" />
+                                        </div>
+
                                     </div>
                                 </div>
 
