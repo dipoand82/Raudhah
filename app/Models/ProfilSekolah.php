@@ -21,6 +21,7 @@ class ProfilSekolah extends Model
         'logo_path',
         'banner_path',
         'deskripsi_singkat',
+        'info_penting',
         'alasan_memilih',
         'program_unggulan',
         'instagram',

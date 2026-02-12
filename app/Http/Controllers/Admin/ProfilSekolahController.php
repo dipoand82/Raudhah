@@ -24,12 +24,21 @@ class ProfilSekolahController extends Controller
     {
         // 1. Tambahkan field baru ke dalam validasi
         $request->validate([
-            'nama_sekolah' => 'required|string|max:255',
+            'nama_sekolah' => 'sometimes|string|max:255',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'banner' => 'nullable|image|mimes:jpeg,png,jpg|max:4096',
             'program_unggulan' => 'nullable|string', // Validasi baru
             'alasan_memilih' => 'nullable|string',   // Validasi baru
             'deskripsi_singkat' => 'nullable|string',   // Validasi baru
+            'info_penting' => 'nullable|string',   // Validasi baru
+            'visi' => 'nullable|string',
+            'misi' => 'nullable|string',
+            'alamat' => 'nullable|string',
+            'email' => 'nullable|email|max:255',
+            'telepon' => 'nullable|string|max:20',
+            'instagram' => 'nullable|string|max:255',
+            'tiktok' => 'nullable|string|max:255',
+            'info_footer' => 'nullable|string',
 
         ]);
 

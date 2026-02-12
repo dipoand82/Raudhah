@@ -25,6 +25,7 @@ return new class extends Migration
             // Konten Tambahan
             $table->text('alasan_memilih')->nullable(); // Poin-poin alasan
             $table->text('program_unggulan')->nullable(); // Daftar program
+            $table->text('info_penting')->nullable(); // Untuk info tambahan
 
             // Kontak
             $table->text('alamat')->nullable();
