@@ -27,6 +27,7 @@ class ProfilSekolahController extends Controller
             'nama_sekolah' => 'sometimes|string|max:255',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'banner' => 'nullable|image|mimes:jpeg,png,jpg|max:4096',
+            'brosur_info' => 'nullable|image|mimes:jpeg,png,jpg|max:4096', // Validasi baru
             'program_unggulan' => 'nullable|string', // Validasi baru
             'alasan_memilih' => 'nullable|string',   // Validasi baru
             'deskripsi_singkat' => 'nullable|string',   // Validasi baru
@@ -45,22 +46,34 @@ class ProfilSekolahController extends Controller
         $profil = ProfilSekolah::first();
 
         // 2. Ambil semua input kecuali file
-        $data = $request->except(['logo', 'banner']);
+        $data = $request->except(['logo', 'banner', 'brosur_info']);
 
         // Logic Upload Logo
         if ($request->hasFile('logo')) {
-            if ($profil->logo_path && Storage::exists('public/' . $profil->logo_path)) {
-                Storage::delete('public/' . $profil->logo_path);
+            if ($profil->logo_path && Storage::exists('public/'.$profil->logo_path)) {
+                Storage::delete('public/'.$profil->logo_path);
             }
             $data['logo_path'] = $request->file('logo')->store('logos', 'public');
         }
 
         // Logic Upload Banner
         if ($request->hasFile('banner')) {
-            if ($profil->banner_path && Storage::exists('public/' . $profil->banner_path)) {
-                Storage::delete('public/' . $profil->banner_path);
+            // Hapus file lama
+            if ($profil->banner_path && Storage::disk('public')->exists($profil->banner_path)) {
+                Storage::disk('public')->delete($profil->banner_path);
             }
+            // Simpan yang baru
             $data['banner_path'] = $request->file('banner')->store('banners', 'public');
+        }
+
+        // Logic Upload brosur info
+        if ($request->hasFile('brosur_info')) {
+            // Hapus file lama
+            if ($profil->brosur_info && Storage::disk('public')->exists($profil->brosur_info)) {
+                Storage::disk('public')->delete($profil->brosur_info);
+            }
+            // Simpan yang baru
+            $data['brosur_info'] = $request->file('brosur_info')->store('brosur_info', 'public');
         }
 
         // 3. Update database (Data teks + path gambar akan terupdate di sini)

@@ -8,9 +8,13 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@600&family=Fredoka:wght@500&family=Quicksand:wght@600&family=Comfortaa:wght@700&family=Varela+Round&display=swap"
+        rel="stylesheet">
 </head>
 
-<body class="bg-gray-50 text-gray-800 font-sans antialiased scroll-smooth">
+<body class="bg-white text-gray-800 font-sans antialiased scroll-smooth">
     <nav x-data="{ open: false }" class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center relative">
@@ -134,31 +138,46 @@
         </div>
     </div>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-12">
-        <section class="scroll-mt-40 py-16 bg-gray-50">
+    <main class="max-w-7xl mx-auto px-4 sm:px-2 lg:px-2 py-6 space-y-2">
+        <section class="scroll-mt-40 py-16 bg-white-50">
             <div class="max-w-7xl mx-auto px-4">
                 <div class="text-center mb-3">
                     <h2 data-aos="fade-up"
-                        class="text-4xl font-extrabold text-blue-900 uppercase tracking-wider animate-gradient-x">SMP IT
+                        class="text-4xl font-extrabold text-blue-900 uppercase tracking-wider animate-gradient-x">SMP
+                        IT
                         RAUDHAH</h2>
                     <div class="h-1.5 w-24 bg-blue-600 mx-auto mt-4 rounded-full"></div>
                 </div>
 
                 <div data-aos="fade-up"
-                    class="bg-white p-8 md:p-12 rounded-3xl shadow-xl shadow-blue-100/50 mb-16 border border-gray-100">
-                    <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed text-justify">
+                    class="bg-white p-8 md:p-12 rounded-3xl shadow-xl shadow-blue-100/50 mb-16 border border-gray-100 relative overflow-hidden">
+
+                    {{-- Siluet Bintang Abu-abu di Belakang Teks --}}
+                    <div
+                        class="absolute justtify-center text-center -right-10 -bottom-10 text-gray-100 opacity-50 pointer-events-none select-none z-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" fill="currentColor"
+                            viewBox="0 0 24 24">
+                            <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
+                        </svg>
+                    </div>
+
+                    {{-- Konten Deskripsi --}}
+                    <div class="prose prose-lg max-w-none text-gray-700 leading-loose text-justify relative z-10"
+                        style="font-family: 'Nunito', sans-serif; font-weight: 600;">
+
                         {!! nl2br(e($profil_sekolah->deskripsi_singkat ?? 'Deskripsi sekolah belum diisi.')) !!}
+
                     </div>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-8 mb-16">
                     <div data-aos="flip-right"
-                        class="group bg-white p-8 rounded-3xl border-t-8 border-blue-600 shadow-lg hover:shadow-2xl transition-all duration-300">
+                        class="group bg-white p-8 rounded-3xl border-t-8 border-blue-600 shadow-lg hover:shadow-2xl duration-300">
                         <div class="flex items-center mb-6">
                             <div class="p-3 bg-blue-100 rounded-2xl mr-4 group-hover:bg-blue-600 transition-colors">
                                 {{-- <svg class="w-6 h-6 text-blue-600 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04"></path></svg> --}}
                             </div>
-                            <h3 class="text-2xl font-bold text-gray-800 uppercase tracking-wide">Program Unggulan</h3>
+                            <h3 class="text-2xl font-bold text-blue-800 uppercase tracking-wide">Program Unggulan</h3>
                         </div>
                         <p class="text-gray-600 text-lg leading-relaxed ">
                             @if ($profil_sekolah && $profil_sekolah->program_unggulan)
@@ -166,14 +185,14 @@
                                     @if (trim($program) != '')
                                         <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition">
                                             <span
-                                                class="flex-shrink-0 w-6 h-6 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center text-sm font-bold">★</span>
+                                                class="flex-shrink-0 w-6 h-6 bg-teal-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">★</span>
                                             <span
                                                 class="text-gray-600 font-bold leading-relaxed">{{ $program }}</span>
                                         </div>
                                     @endif
                                 @endforeach
                             @else
-                                <p class="text-gray-400 italic">Data belum diisi.</p>
+                                <p class="text-gray-400 italic text-base px-3 py-2">Data belum diisi.</p>
                             @endif
                         </p>
                     </div>
@@ -184,7 +203,7 @@
                             <div class="p-3 bg-green-100 rounded-2xl mr-4 group-hover:bg-green-500 transition-colors">
                                 {{-- <svg class="w-6 h-6 text-green-600 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> --}}
                             </div>
-                            <h3 class="text-2xl font-bold text-gray-800 uppercase tracking-wide">Alasan Memilih Kami
+                            <h3 class="text-2xl font-bold text-green-800 uppercase tracking-wide">Alasan Memilih Kami
                             </h3>
                         </div>
                         <div class="text-gray-600 text-lg leading-relaxed space-y-2">
@@ -195,22 +214,23 @@
                                             <div
                                                 class="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition">
                                                 <span
-                                                    class="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">✓</span>
+                                                    class="flex-shrink-0 w-6 h-6 bg-blue-100 text-green-600 rounded-full flex items-center justify-center text-sm font-bold">✓</span>
                                                 <span
                                                     class="text-gray-600 font-bold leading-relaxed">{{ $alasan }}</span>
                                             </div>
                                         @endif
                                     @endforeach
                                 @else
-                                    <p class="text-gray-400 italic">Data belum diisi.</p>
+                                    <p class="text-gray-400 italic text-base px-3 py-2">Data belum diisi.</p>
                                 @endif
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="bg-white p-8 rounded-3xl shadow-xl shadow-blue-100/50 border border-gray-100">
-                    <div data-aos="fade-left" class="flex items-center gap-3 mb-4">
-                        <div class="p-3 bg-blue-600 rounded-2xl text-white">
+                <div
+                    class="bg-white p-8  rounded-3xl shadow-xl shadow-blue-100/50 border border-gray-100 relative overflow-hidden">
+                    <div data-aos="fade-left" class="flex items-center gap-3 mb-6 relative z-10">
+                        <div class="p-3 bg-[#1072B8] rounded-2xl text-white shadow-md">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -220,13 +240,30 @@
                         <h2 class="text-2xl font-bold text-gray-800">Visi</h2>
                     </div>
 
-                    <div data-aos="fade-left" class="pl-14">
-                        <div class="text-gray-600 text-lg leading-relaxed">
-                            {!! nl2br(e($profil_sekolah->visi ?? 'Belum tersedia')) !!}
-                        </div>
+                    <div data-aos="fade-left" class="relative"
+                        style="font-family: 'Nunito', sans-serif; font-weight: 600;">
+
+                        @if ($profil_sekolah && $profil_sekolah->visi)
+                            <div class="flex gap-4 items-start">
+                                <div class="flex-shrink-0 text-[#1072B8] px-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                        fill="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
+                                    </svg>
+                                </div>
+
+                                <p class="text-gray-700 text-md leading-relaxed">
+                                    {!! nl2br(e($profil_sekolah->visi)) !!}
+                                </p>
+                            </div>
+                        @else
+                            <div class="flex gap-4 items-center pl-2">
+                                <p class="text-gray-500 italic">Visi belum tersedia</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
-
                 <div
                     class="bg-white p-8 rounded-3xl shadow-xl shadow-green-100/50 border border-gray-100 mt-12 space-x-4">
                     <div data-aos="fade-left" class="flex items-center gap-3 mb-6">
@@ -240,31 +277,37 @@
                         <h2 class="text-2xl font-bold text-gray-800">Misi</h2>
                     </div>
 
-                    <div data-aos="fade-left" class="space-y-4">
-                        @php
-                            $lines = explode("\n", str_replace("\r", '', $profil_sekolah->misi));
-                            $daftar_misi = array_filter(array_map('trim', $lines));
-                        @endphp
+                    <div data-aos="fade-left" class="space-y-4"
+                        style="font-family: 'Nunito', sans-serif; font-weight: 600;">
+                        @if ($profil_sekolah)
+                            @php
+                                // Tambahkan ?? '' untuk jaga-jaga jika property misi kosong
+                                $lines = explode("\n", str_replace("\r", '', $profil_sekolah->misi ?? ''));
+                                $daftar_misi = array_filter(array_map('trim', $lines));
+                            @endphp
 
-                        @forelse ($daftar_misi as $item)
-                            <div class="flex gap-3 items-start">
-                                <span class="font-bold text-teal-600 text-lg leading-tight min-w-[25px]">
-                                    {{ $loop->iteration }}.
-                                </span>
-                                <p class="text-gray-700 leading-relaxed">
-                                    {{ preg_replace('/^\d+\.\s*/', '', $item) }}
-                                </p>
-                            </div>
-                        @empty
-                            <p class="text-gray-500 text-left">Misi belum tersedia</p>
-                        @endforelse
+                            @forelse ($daftar_misi as $item)
+                                <div class="flex gap-3 items-start">
+                                    <span class="font-bold text-teal-600 text-lg leading-tight min-w-[25px] ">
+                                        {{ $loop->iteration }}.
+                                    </span>
+                                    <p class="text-gray-700 leading-relaxed">
+                                        {{ preg_replace('/^\d+\.\s*/', '', $item) }}
+                                    </p>
+                                </div>
+                            @empty
+                                <p class="text-gray-500 text-left text-lg">Misi belum tersedia</p>
+                            @endforelse
+                        @else
+                            <p class="text-gray-500 text-left">Data profil belum tersedia</p>
+                        @endif
                     </div>
                     <div id="info"></div>
                 </div>
 
 
                 <div class="mt-12 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
-                    <div class="p-7 border-b border-gray-50 bg-gray-50/50">
+                    <div class="p-7 border-b border-gray-50 bg-gray-50/90">
 
                         <div class="flex flex-col md:flex-row justify-between items-center gap-4">
 
@@ -282,27 +325,22 @@
                         </div>
 
                     </div>
+                    <div data-aos="fade-up" class="p-4 md:p-8 flex justify-center">
+                        {{-- Ubah ke max-w-2xl agar lebih ramping --}}
+                        <div class="w-full max-w-2xl px-4 group relative">
 
-                    <div data-aos="fade-up" class="p-4 md:p-8">
-                        <div class="relative group">
-                            @if ($profil_sekolah && $profil_sekolah->banner_path)
-                                <img src="{{ asset('storage/' . $profil_sekolah->banner_path) }}"
-                                    alt="Informasi PPDB"
-                                    class="w-full h-auto rounded-2xl shadow-md transition-transform duration-500 group-hover:scale-[1.01]">
+                            @if ($profil_sekolah && $profil_sekolah->brosur_info)
+                                <img src="{{ asset('storage/' . $profil_sekolah->brosur_info) }}"
+                                    alt="Informasi penting"
+                                    class="w-full h-auto rounded-2xl shadow-lg border border-gray-100 transition-all duration-500 group-hover:scale-[1.01]">
                             @else
-                                <img src="{{ asset('storage/logos/brosur.png') }}" alt="Informasi PPDB"
-                                    class="w-full h-auto rounded-2xl shadow-md">
+                                {{-- Pastikan ekstensi file sesuai (di VS Code kamu ada brosur.png dan brosur1.jpeg) --}}
+                                <img src="{{ asset('storage/logos/brosur.png') }}" alt="Informasi penting"
+                                    class="w-full h-auto rounded-2xl shadow-lg border border-gray-100">
                             @endif
 
-                            <div
-                                class="absolute inset-0 rounded-2xl border-2 border-blue-600/5 group-hover:border-blue-600/20 transition-colors pointer-events-none">
-                            </div>
-                        </div>
-
-                        <div class="mt-6 text-center">
-                            <p class="text-gray-500 italic text-sm">
-                                *Klik gambar untuk memperbesar informasi pendaftaran.
-                            </p>
+                            {{-- Overlay halus agar lebih premium --}}
+                            <div class="absolute inset-0 rounded-2xl ring-1 ring-black/5 pointer-events-none"></div>
                         </div>
                     </div>
                 </div>
@@ -374,7 +412,7 @@
                     <a href="https://wa.me/{{ $wa_link }}" target="_blank">
                         <i class="fab fa-whatsapp textgray-500 transition-all hover:text-green-500 fa-lg"></i>
 
-                        {{ $inputan ?? 'No. Telp Belum Diisi' }}
+                        {{ $inputan ?? '' }}
                     </a>
 
                 </p>

@@ -30,12 +30,12 @@ return new class extends Migration
             // Kontak
             $table->text('alamat')->nullable();
             $table->string('email')->nullable();
-            $table->string('telepon',20)->nullable();
+            $table->string('telepon', 20)->nullable();
 
             // Media (Gambar)
             $table->string('logo_path')->nullable(); // Logo
             $table->string('banner_path')->nullable(); // Banner (Ditaruh di bawah logo)
-
+            $table->string('brosur_info')->nullable(); // Banner (Ditaruh di bawah logo)
 
             // Media Sosial
             $table->string('instagram')->nullable();
@@ -43,7 +43,7 @@ return new class extends Migration
             $table->text('info_footer')->nullable(); // Untuk info tambahan
 
             $table->timestamps();
-            });
+        });
     }
 
     /**

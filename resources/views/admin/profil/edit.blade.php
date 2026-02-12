@@ -62,6 +62,19 @@
                                 {{-- KOLOM KIRI: IDENTITAS --}}
                                 <div class="space-y-6">
                                     <div>
+                                        <x-input-label for="banner" :value="__('Gambar Profil Depan Sekolah')"
+                                            class="text-md font-bold text-gray-600 capitalize" />
+
+                                        {{-- Ubah $profil->banner menjadi $profil->banner_path --}}
+                                        @if ($profil->banner_path)
+                                            <img src="{{ asset('storage/' . $profil->banner_path) }}"
+                                                class="w-40 h-auto object-contain mb-3 rounded-lg border p-2 bg-gray-50">
+                                        @endif
+
+                                        <input id="banner" type="file" name="banner"
+                                            class="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-[#1072B8] hover:file:bg-blue-100" />
+                                    </div>
+                                    <div>
                                         <x-input-label for="nama_sekolah" :value="__('Nama Sekolah')"
                                             class="text-md font-bold text-gray-600 capitalize" />
                                         <x-text-input id="nama_sekolah"
@@ -78,12 +91,16 @@
 
                                     <div>
                                         <x-input-label for="program_unggulan" :value="__('Program Unggulan')" />
+                                        <p class="text-xs text-gray-500 mb-1">*Masukkan satu program unggulan per baris (tekan Enter
+                                            untuk baris baru)</p>
                                         <textarea id="program_unggulan" name="program_unggulan"
                                             class="block mt-1 w-full border-gray-300 rounded-lg bg-gray-50 focus:bg-white transition" rows="3">{{ old('program_unggulan', $profil->program_unggulan) }}</textarea>
                                     </div>
 
                                     <div>
                                         <x-input-label for="alasan_memilih" :value="__('Alasan Memilih')" />
+                                        <p class="text-xs text-gray-500 mb-1">*Masukkan satu alasan memilih per baris (tekan Enter
+                                            untuk baris baru)</p>
                                         <textarea id="alasan_memilih" name="alasan_memilih"
                                             class="block mt-1 w-full border-gray-300 rounded-lg bg-gray-50 focus:bg-white transition" rows="3">{{ old('alasan_memilih', $profil->alasan_memilih) }}</textarea>
                                     </div>
@@ -140,8 +157,9 @@
                                         <div>
                                             <x-input-label for="tiktok" :value="__('Link TikTok')"
                                                 class="text-md font-bold text-gray-600 capitalize" />
-                                            <x-text-input id="tiktok" class="block mt-1 w-full rounded-lg bg-gray-50"
-                                                type="text" name="tiktok" :value="old('tiktok', $profil->tiktok)" />
+                                            <x-text-input id="tiktok"
+                                                class="block mt-1 w-full rounded-lg bg-gray-50" type="text"
+                                                name="tiktok" :value="old('tiktok', $profil->tiktok)" />
                                         </div>
                                         <div>
                                             <x-input-label for="info_footer" :value="__('Info Tambahan Footer')"
@@ -174,16 +192,19 @@
                                     <x-text-input id="info_penting" class="block mt-1 w-full rounded-lg bg-gray-50"
                                         type="text" name="info_penting" :value="old('info_penting', $profil->info_penting)" />
                                 </div>
-                                {{-- <div>
-                                    <x-input-label for="logo" :value="__('Logo Sekolah')"
+                                <div>
+                                    <x-input-label for="brosur_info" :value="__('Gambar Brosur Info Penting')"
                                         class="text-md font-bold text-gray-600 capitalize" />
-                                    @if ($profil->logo)
-                                        <img src="{{ asset('storage/' . $profil->logo) }}"
-                                            class="w-24 h-24 object-contain mb-3 rounded-lg border p-2 bg-gray-50">
+
+                                    {{-- Ubah $profil->banner menjadi $profil->banner_path --}}
+                                    @if ($profil->brosur_info)
+                                        <img src="{{ asset('storage/' . $profil->brosur_info) }}"
+                                            class="w-40 h-auto object-contain mb-3 rounded-lg border p-2 bg-gray-50">
                                     @endif
-                                    <input id="logo" type="file" name="logo"
+
+                                    <input id="brosur_info" type="file" name="brosur_info"
                                         class="block mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-[#1072B8] hover:file:bg-blue-100" />
-                                </div> --}}
+                                </div>
 
 
                             </div>

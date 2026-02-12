@@ -20,6 +20,7 @@ class ProfilSekolah extends Model
         'misi',
         'logo_path',
         'banner_path',
+        'brosur_info',
         'deskripsi_singkat',
         'info_penting',
         'alasan_memilih',
