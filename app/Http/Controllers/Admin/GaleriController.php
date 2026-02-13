@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Galeri;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage; // Pastikan ini ada agar tidak error saat hapus file
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth; // Pastikan ini ada agar tidak error saat hapus file
+use Illuminate\Support\Facades\Storage;
 
 class GaleriController extends Controller
 {
@@ -15,6 +15,7 @@ class GaleriController extends Controller
     public function index()
     {
         $galeri = Galeri::latest()->get();
+
         return view('admin.galeri.index', compact('galeri'));
     }
 
@@ -43,13 +44,16 @@ class GaleriController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.profil.edit')->with('success', 'Foto berhasil ditambahkan!');
+        // Ganti baris return lama Anda menjadi:
+        return redirect()->route('admin.profil.edit', ['tab' => 'galeri'])
+            ->with('success', 'Foto berhasil ditambahkan!');
     }
 
     // 4. Form Edit Foto (Yang Anda kirim tadi)
     public function edit($id)
     {
         $galeri = Galeri::findOrFail($id);
+
         return view('admin.galeri.edit', compact('galeri'));
     }
 
@@ -75,21 +79,31 @@ class GaleriController extends Controller
         }
 
         $galeri->update($data);
+        // Cek input hidden 'current_tab' yang kita buat tadi
+        $targetTab = $request->input('current_tab', 'profil'); // default ke profil jika tidak ada
 
-        return redirect()->route('admin.profil.edit')->with('success', 'Galeri berhasil diperbarui!');
+        // Ganti baris return lama Anda menjadi seperti ini:
+return redirect()->route('admin.profil.edit', ['tab' => 'galeri'])
+                     ->with('success', 'Foto galeri berhasil diperbarui!');
     }
 
     // 6. Proses Hapus Foto
     public function destroy($id)
     {
+        // Mengambil data galeri berdasarkan ID
         $galeri = Galeri::findOrFail($id);
 
-        if ($galeri->gambar) {
+        // Cek jika ada file gambar, maka hapus dari storage public
+        if ($galeri->gambar && Storage::disk('public')->exists($galeri->gambar)) {
             Storage::disk('public')->delete($galeri->gambar);
         }
 
+        // Hapus data dari database
         $galeri->delete();
 
-        return redirect()->route('admin.profil.edit')->with('success', 'Foto berhasil dihapus!');
+        // Kembali ke halaman edit profil dengan pesan sukses
+        // Ganti baris return lama Anda menjadi:
+        return redirect()->route('admin.profil.edit', ['tab' => 'galeri'])
+            ->with('success', 'Foto berhasil dihapus dari galeri SMP IT Raudhah!');
     }
 }

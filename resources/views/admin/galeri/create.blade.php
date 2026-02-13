@@ -34,10 +34,13 @@
                     </div>
 
                     <div class="flex items-center justify-end gap-4">
-                        <a href="{{ route('admin.galeri.index') }}" class="text-sm text-gray-600 hover:underline">Batal</a>
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold shadow-md transition">
-                            Simpan Foto
-                        </button>
+<a href="{{ route('admin.profil.edit', ['tab' => 'galeri']) }}"
+   ><x-secondary-button type="button">
+   Batal
+</x-secondary-button>
+</a>                        <x-primary-button  type="submit" >
+                            Simpan Perubahan
+                        </x-primary-button>
                     </div>
                 </form>
 

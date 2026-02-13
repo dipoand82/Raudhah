@@ -20,7 +20,7 @@ class ProfilSekolahController extends Controller
         // Tambahkan baris ini agar data galeri bisa tampil di tab
         $galeri = \App\Models\Galeri::latest()->get();
 
-        return view('admin.profil.edit', compact('profil', 'galeri'));
+        return view('admin.profil.edit', data: compact('profil', 'galeri'));
     }
 
     public function update(Request $request)
@@ -81,7 +81,10 @@ class ProfilSekolahController extends Controller
 
         // 3. Update database (Data teks + path gambar akan terupdate di sini)
         $profil->update($data);
-
-        return redirect()->back()->with('success', 'Profil Sekolah berhasil diperbarui!');
+// Ambil nilai penanda tab dari form, jika kosong default ke 'profil'
+$targetTab = $request->input('current_tab', 'profil');
+        // return redirect()->back()->with('success', 'Profil Sekolah berhasil diperbarui!');
+        return redirect()->route('admin.profil.edit', ['tab' => $targetTab])
+                     ->with('success', 'Profil Sekolah berhasil diperbarui!');
     }
 }

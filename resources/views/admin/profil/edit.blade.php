@@ -5,9 +5,28 @@
         </h2>
     </x-slot>
 
-    <div class="py-12" x-data="{ activeTab: 'profil' }">
+    <div class="py-12" x-data="{ activeTab: '{{ request()->query('tab', default: 'profil') }}' }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {{-- ALERT SUCCESS --}}
+            @if (session('success'))
+                <x-alert-success>
+                    {{ session('success') }}
+                </x-alert-success>
+            @endif
+            {{-- Tampilkan Alert Gagal (Misal dari Session Error) --}}
+            @if (session('error'))
+                <x-alert-danger>
+                    {{ session('error') }}
+                </x-alert-danger>
+            @endif
 
+            @if ($errors->any())
+                @foreach ($errors->all() as $error)
+                    <x-alert-danger timeout="8000"> {{-- Waktu 8 detik agar sempat dibaca --}}
+                        {{ $error }}
+                    </x-alert-danger>
+                @endforeach
+            @endif
             {{-- TAB NAVIGATION (Clean Style) --}}
             <div class="bg-white px-6 pt-4 rounded-t-2xl border border-gray-200 border-b-0">
                 <div class="flex space-x-8">
@@ -35,31 +54,13 @@
             {{-- KOTAK KONTEN --}}
             <div class="bg-white overflow-hidden shadow-sm rounded-b-2xl border border-gray-200">
                 <div class="p-8 text-gray-900">
-                    {{-- ALERT SUCCESS --}}
-                    @if (session('success'))
-                        <x-alert-success>
-                            {{ session('success') }}
-                        </x-alert-success>
-                    @endif
-                    {{-- Tampilkan Alert Gagal (Misal dari Session Error) --}}
-                    @if (session('error'))
-                        <x-alert-danger>
-                            {{ session('error') }}
-                        </x-alert-danger>
-                    @endif
 
-                    @if ($errors->any())
-                        @foreach ($errors->all() as $error)
-                            <x-alert-danger timeout="8000"> {{-- Waktu 8 detik agar sempat dibaca --}}
-                                {{ $error }}
-                            </x-alert-danger>
-                        @endforeach
-                    @endif
+
                     <div x-show="activeTab === 'profil'">
                         <form method="POST" action="{{ route('admin.profil.update') }}" enctype="multipart/form-data">
                             @csrf
                             @method('PATCH')
-
+<input type="hidden" name="current_tab" value="profil">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
 
                                 {{-- KOLOM KIRI: IDENTITAS --}}
@@ -189,7 +190,7 @@
                             enctype="multipart/form-data">
                             @csrf
                             @method('PATCH')
-
+<input type="hidden" name="current_tab" value="info">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                                 <div>
                                     <x-input-label for="info_penting" :value="__('Info Penting')"
@@ -222,23 +223,26 @@
                                 </a>
                             </div> --}}
                             <div class="flex items-center justify-end mt-10 pt-6 border-t border-gray-100">
+<a href="{{ route('admin.profil.edit', ['tab' => 'info']) }}">
                                 <x-primary-button class="bg-[#1072B8] hover:bg-blue-800 rounded-lg">
                                     {{ __('Simpan Perubahan') }}
                                 </x-primary-button>
+                            </a>
                             </div>
                         </form>
                     </div>
 
-                    <div x-show="activeTab === 'galeri'" x-transition class="space-y-6">
+                    <div x-show="activeTab === 'galeri'" x-transition class="space-y-6"> {{-- TAMBAHKAN BARIS INI --}}
                         <div class="flex justify-between items-center pb-4 border-b border-gray-100">
                             <div>
                                 <h3 class="text-lg font-bold text-gray-800">Kumpulan Galeri Kegiatan</h3>
                                 <p class="text-sm text-gray-500">Kelola dokumentasi foto yang tampil di halaman depan.
                                 </p>
                             </div>
-                            <a href="{{ route('admin.galeri.create') }}"
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition">
-                                <i class="fas fa-plus mr-2"></i> Tambah Foto
+                            <a href="{{ route('admin.galeri.create') }}">
+
+                                <x-primary-button> Tambah Galeri Baru
+                                </x-primary-button>
                             </a>
                         </div>
 
@@ -254,21 +258,18 @@
                                     <div class="p-3">
                                         <h4 class="font-bold text-gray-800 text-sm truncate">{{ $item->judul }}</h4>
                                         <div class="flex justify-between items-center mt-3">
+                                            {{-- Tombol Edit --}}
                                             <a href="{{ route('admin.galeri.edit', $item->id) }}"
-                                                class="text-blue-600 hover:text-blue-800 text-xs font-bold uppercase">
-                                                <i class="fas fa-edit"></i> Edit
+                                                class="text-indigo-600 hover:text-indigo-900 font-semibold transition">
+                                               Edit
                                             </a>
 
-                                            <form action="{{ route('admin.galeri.destroy', $item->id) }}"
-                                                method="POST"
-                                                onsubmit="return confirm('Hapus foto ini dari galeri?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                    class="text-red-500 hover:text-red-700 text-xs font-bold uppercase">
-                                                    <i class="fas fa-trash"></i> Hapus
-                                                </button>
-                                            </form>
+                                            {{-- PEMANGGILAN MODAL GLOBAL --}}
+                                            <x-modal-delete-global trigger="confirm-delete-galeri-{{ $item->id }}"
+                                                :action="route('admin.galeri.destroy', $item->id)" title=""
+                                                message="Menghapus Galeri {{ $item->judul }}"
+                                                submitText="Ya, Hapus Permanen" class="text-xs px-3 py-1"
+                                                {{-- Mengecilkan tombol agar serasi dengan tombol edit --}} />
                                         </div>
                                     </div>
                                 </div>
@@ -276,11 +277,14 @@
                                 <div
                                     class="col-span-full py-10 text-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 text-gray-400">
                                     <i class="fas fa-images text-4xl mb-3"></i>
-                                    <p>Bel "um ada foto di galeri.</p>
+                                    <p>Belum ada foto di galeri.</p>
                                 </div>
                             @endforelse
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div> {{-- TAMBAHKAN PENUTUP INI UNTUK x-show galeri --}}
+    {{-- Penutup p-8 --}}
 </x-app-layout>

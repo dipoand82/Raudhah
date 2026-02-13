@@ -10,7 +10,7 @@
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-2xl p-8 border border-gray-100">
                 <div class="flex items-center justify-between mb-8">
                     <div>
-                        <h2 class="text-2xl font-bold text-blue-900">Perbarui Foto</h2>
+                        <h2 class="text-2xl font-bold text-blue-900">Perbarui Galeri</h2>
                         <p class="text-gray-500">Ubah informasi atau ganti foto kegiatan SMP IT Raudhah.</p>
                     </div>
                     <a href="{{ route('admin.profil.edit') }}" class="text-gray-400 hover:text-gray-600">
@@ -60,12 +60,14 @@
                     </div>
 
                     <div class="flex justify-end gap-3 pt-6 border-t border-gray-50">
-                        <a href="{{ route('admin.profil.edit') }}"
-                            class="px-6 py-2.5 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold transition">Batal</a>
-                        <button type="submit"
-                            class="px-6 py-2.5 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition transform hover:scale-105">
+<a href="{{ route('admin.profil.edit', ['tab' => 'galeri']) }}"
+   ><x-secondary-button type="button">
+   Batal
+</x-secondary-button>
+</a>
+                        <x-primary-button  type="submit">
                             Simpan Perubahan
-                        </button>
+                        </x-primary-button>
                     </div>
                 </form>
             </div>
