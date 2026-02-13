@@ -17,7 +17,10 @@ class ProfilSekolahController extends Controller
             ['nama_sekolah' => 'SMP IT Raudhah']
         );
 
-        return view('admin.profil.edit', compact('profil'));
+        // Tambahkan baris ini agar data galeri bisa tampil di tab
+        $galeri = \App\Models\Galeri::latest()->get();
+
+        return view('admin.profil.edit', compact('profil', 'galeri'));
     }
 
     public function update(Request $request)

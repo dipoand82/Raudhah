@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Edit Profil Sekolah') }}
+            {{ __('Kelola Konten Profil') }}
         </h2>
     </x-slot>
 
@@ -21,8 +21,11 @@
                         class="pb-4 transition duration-150 text-sm tracking-wide capitalize">
                         Info
                     </button>
-                    <button @click="activeTab = 'Galeri'"
-                        :class="{ 'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'Galeri', 'text-gray-400 hover:text-gray-600': activeTab !== 'Galeri' }"
+                    <button @click="activeTab = 'galeri'"
+                        :class="{
+                            'border-b-2 border-[#1072B8] text-[#1072B8] font-bold': activeTab === 'galeri',
+                            'text-gray-400 hover:text-gray-600': activeTab !== 'galeri'
+                        }"
                         class="pb-4 transition duration-150 text-sm tracking-wide capitalize">
                         Galeri
                     </button>
@@ -91,7 +94,8 @@
 
                                     <div>
                                         <x-input-label for="program_unggulan" :value="__('Program Unggulan')" />
-                                        <p class="text-xs text-gray-500 mb-1">*Masukkan satu program unggulan per baris (tekan Enter
+                                        <p class="text-xs text-gray-500 mb-1">*Masukkan satu program unggulan per baris
+                                            (tekan Enter
                                             untuk baris baru)</p>
                                         <textarea id="program_unggulan" name="program_unggulan"
                                             class="block mt-1 w-full border-gray-300 rounded-lg bg-gray-50 focus:bg-white transition" rows="3">{{ old('program_unggulan', $profil->program_unggulan) }}</textarea>
@@ -99,7 +103,8 @@
 
                                     <div>
                                         <x-input-label for="alasan_memilih" :value="__('Alasan Memilih')" />
-                                        <p class="text-xs text-gray-500 mb-1">*Masukkan satu alasan memilih per baris (tekan Enter
+                                        <p class="text-xs text-gray-500 mb-1">*Masukkan satu alasan memilih per baris
+                                            (tekan Enter
                                             untuk baris baru)</p>
                                         <textarea id="alasan_memilih" name="alasan_memilih"
                                             class="block mt-1 w-full border-gray-300 rounded-lg bg-gray-50 focus:bg-white transition" rows="3">{{ old('alasan_memilih', $profil->alasan_memilih) }}</textarea>
@@ -208,12 +213,73 @@
 
 
                             </div>
+                            {{-- <div
+                                class="px-4 py-2 hover:bg-blue-800 transition-colors {{ request()->routeIs('admin.galeri.*') ? 'bg-blue-900 border-l-4 border-yellow-400' : '' }}">
+                                <a href="{{ route('admin.galeri.index') }}"
+                                    class="flex items-center gap-3 text-white">
+                                    <i class="fas fa-images w-5 text-center"></i>
+                                    <span class="font-medium">Galeri Kegiatan</span>
+                                </a>
+                            </div> --}}
                             <div class="flex items-center justify-end mt-10 pt-6 border-t border-gray-100">
                                 <x-primary-button class="bg-[#1072B8] hover:bg-blue-800 rounded-lg">
                                     {{ __('Simpan Perubahan') }}
                                 </x-primary-button>
                             </div>
                         </form>
+                    </div>
+
+                    <div x-show="activeTab === 'galeri'" x-transition class="space-y-6">
+                        <div class="flex justify-between items-center pb-4 border-b border-gray-100">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">Kumpulan Galeri Kegiatan</h3>
+                                <p class="text-sm text-gray-500">Kelola dokumentasi foto yang tampil di halaman depan.
+                                </p>
+                            </div>
+                            <a href="{{ route('admin.galeri.create') }}"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition">
+                                <i class="fas fa-plus mr-2"></i> Tambah Foto
+                            </a>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            @forelse($galeri as $item)
+                                <div
+                                    class="group relative bg-gray-50 rounded-xl overflow-hidden border border-gray-200 shadow-sm">
+                                    <div class="aspect-video overflow-hidden">
+                                        <img src="{{ asset('storage/' . $item->gambar) }}" alt="{{ $item->judul }}"
+                                            class="w-full h-full object-cover">
+                                    </div>
+
+                                    <div class="p-3">
+                                        <h4 class="font-bold text-gray-800 text-sm truncate">{{ $item->judul }}</h4>
+                                        <div class="flex justify-between items-center mt-3">
+                                            <a href="{{ route('admin.galeri.edit', $item->id) }}"
+                                                class="text-blue-600 hover:text-blue-800 text-xs font-bold uppercase">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+
+                                            <form action="{{ route('admin.galeri.destroy', $item->id) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('Hapus foto ini dari galeri?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                    class="text-red-500 hover:text-red-700 text-xs font-bold uppercase">
+                                                    <i class="fas fa-trash"></i> Hapus
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            @empty
+                                <div
+                                    class="col-span-full py-10 text-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 text-gray-400">
+                                    <i class="fas fa-images text-4xl mb-3"></i>
+                                    <p>Bel "um ada foto di galeri.</p>
+                                </div>
+                            @endforelse
+                        </div>
                     </div>
                 </div>
             </div>

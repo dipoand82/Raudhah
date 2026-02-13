@@ -1,0 +1,95 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\Galeri;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage; // Pastikan ini ada agar tidak error saat hapus file
+use Illuminate\Http\RedirectResponse;
+
+class GaleriController extends Controller
+{
+    // 1. Menampilkan daftar galeri
+    public function index()
+    {
+        $galeri = Galeri::latest()->get();
+        return view('admin.galeri.index', compact('galeri'));
+    }
+
+    // 2. Form Tambah Foto
+    public function create()
+    {
+        return view('admin.galeri.create');
+    }
+
+    // 3. Proses Simpan Foto Baru
+    public function store(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'judul' => 'required',
+            'gambar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        if ($request->hasFile('gambar')) {
+            $path = $request->file('gambar')->store('galeri', 'public');
+
+            Galeri::create([
+                'user_id' => Auth::id(),
+                'judul' => $request->judul,
+                'deskripsi' => $request->deskripsi,
+                'gambar' => $path,
+            ]);
+        }
+
+        return redirect()->route('admin.profil.edit')->with('success', 'Foto berhasil ditambahkan!');
+    }
+
+    // 4. Form Edit Foto (Yang Anda kirim tadi)
+    public function edit($id)
+    {
+        $galeri = Galeri::findOrFail($id);
+        return view('admin.galeri.edit', compact('galeri'));
+    }
+
+    // 5. Proses Update Foto
+    public function update(Request $request, $id)
+    {
+        $galeri = Galeri::findOrFail($id);
+
+        $request->validate([
+            'judul' => 'required',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $data = $request->only(['judul', 'deskripsi']);
+
+        if ($request->hasFile('gambar')) {
+            // Hapus foto lama
+            if ($galeri->gambar) {
+                Storage::disk('public')->delete($galeri->gambar);
+            }
+            // Simpan foto baru
+            $data['gambar'] = $request->file('gambar')->store('galeri', 'public');
+        }
+
+        $galeri->update($data);
+
+        return redirect()->route('admin.profil.edit')->with('success', 'Galeri berhasil diperbarui!');
+    }
+
+    // 6. Proses Hapus Foto
+    public function destroy($id)
+    {
+        $galeri = Galeri::findOrFail($id);
+
+        if ($galeri->gambar) {
+            Storage::disk('public')->delete($galeri->gambar);
+        }
+
+        $galeri->delete();
+
+        return redirect()->route('admin.profil.edit')->with('success', 'Foto berhasil dihapus!');
+    }
+}

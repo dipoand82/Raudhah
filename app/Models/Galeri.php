@@ -10,6 +10,8 @@ class Galeri extends Model
     use HasFactory;
 
     protected $table = 'galeris';
+
+    // Pastikan kolom ini sesuai dengan migration Anda
     protected $fillable = ['user_id', 'judul', 'deskripsi', 'gambar'];
 
     public function user()

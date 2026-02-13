@@ -11,7 +11,8 @@ use App\Http\Controllers\Admin\ManajemenUserController;
 use App\Http\Controllers\Admin\ProfilSekolahController;
 use App\Http\Controllers\Admin\TahunAjaranController;
 use App\Http\Controllers\Admin\KelasController;
-
+use App\Http\Controllers\Admin\GaleriController as AdminGaleri;
+use App\Http\Controllers\GaleriController as PublicGaleri;
 /*
 |--------------------------------------------------------------------------
 | PUBLIC ROUTES
@@ -19,9 +20,17 @@ use App\Http\Controllers\Admin\KelasController;
 */
 Route::get('/', function () {
     $profil_sekolah = ProfilSekolah::first();
-    return view('welcome', compact('profil_sekolah'));
+    $galeri = \App\Models\Galeri::latest()->take(4)->get();
+    return view('welcome', compact('profil_sekolah', 'galeri'));
 });
-
+// TAMBAHKAN DUA BARIS INI:
+Route::get('/galeri-kegiatan', [PublicGaleri::class, 'index'])->name('galeri.index');
+Route::get('/galeri-kegiatan/{id}', [PublicGaleri::class, 'show'])->name('galeri.show');
+// RUTE PUBLIK UNTUK INFO (Arahkan ke resources/views/info/index.blade.php)
+Route::get('/informasi-sekolah', function () {
+    $profil_sekolah = ProfilSekolah::first();
+    return view('info.index', compact('profil_sekolah'));
+})->name('info.index');
 /*
 |--------------------------------------------------------------------------
 | AUTH ROUTES
@@ -58,35 +67,34 @@ Route::middleware(['auth', 'verified'])
             ->prefix('manajemen-user')
             ->name('manajemen-user.') // Prefix nama route jadi 'admin.manajemen-user.' (asumsi ada group admin di luarnya)
             ->group(function () {
-                
+
                 // Halaman Utama
-                Route::get('/', 'index')->name('index'); 
-                
+                Route::get('/', 'index')->name('index');
+
                 // --- SISWA ---
-                Route::post('/siswa/store', 'storeSiswa')->name('siswa.store');   
-                Route::post('/siswa/import', 'importSiswa')->name('siswa.import'); 
-                
+                Route::post('/siswa/store', 'storeSiswa')->name('siswa.store');
+                Route::post('/siswa/import', 'importSiswa')->name('siswa.import');
+
                 // [BARU] Reset Password Siswa
                 // URL Akhir: /admin/manajemen-user/siswa/{id}/reset
                 // Nama Route: admin.manajemen-user.siswa.reset
                 Route::post('/siswa/{id}/reset', 'resetPasswordSiswa')->name('siswa.reset');
 
                 // --- GURU ---
-                Route::post('/guru/store', 'storeGuru')->name('guru.store');     
-                Route::post('/guru/import', 'importGuru')->name('guru.import');   
+                Route::post('/guru/store', 'storeGuru')->name('guru.store');
+                Route::post('/guru/import', 'importGuru')->name('guru.import');
 
                 // --- UTILITY ---
-                Route::put('/password', 'updatePassword')->name('password.update'); 
-                Route::delete('/{id}', 'destroy')->name('destroy');                 
-                
+                Route::put('/password', 'updatePassword')->name('password.update');
+                Route::delete('/{id}', 'destroy')->name('destroy');
+
                 // Download Template (Pengecualian: Beda Controller)
                 // Karena beda controller, harus tulis lengkap [Class, method]
                 Route::get('/siswa/template', [\App\Http\Controllers\Admin\SiswaController::class, 'downloadTemplate'])
-                    ->name('siswa.template'); 
+                    ->name('siswa.template');
             });
             //     Route::get('/siswa/template', [SiswaController::class, 'downloadTemplate'])
             // ->name('siswa.template');
-
 
         // ==========================================================
         // 2. DATA SISWA (DETAIL AKADEMIK)
@@ -111,7 +119,11 @@ Route::middleware(['auth', 'verified'])
         // ==========================================================
         // 3. LAIN-LAIN (Profil Sekolah, Kelas, Tahun Ajaran)
         // ==========================================================
-        
+
+        // 3. [BARU] KHUSUS GALERI (Berdiri Sendiri)
+        // Ini lebih bagus daripada ditaruh di dalam Profil atau Manajemen User
+        Route::resource('galeri', AdminGaleri::class);
+
         // PROFIL SEKOLAH
         Route::controller(ProfilSekolahController::class)
             ->prefix('profil')
