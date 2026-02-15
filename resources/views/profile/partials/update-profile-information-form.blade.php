@@ -1,11 +1,5 @@
-<section>
-    {{-- Pindahkan Notifikasi ke Sini (Di atas tombol) --}}
-    @if (session('status') === 'profile-updated')
-        <x-alert-success timeout="3000">
-            {{ __('Profil Berhasil Diperbarui!') }}
-        </x-alert-success>
-    @endif
-    
+
+<section class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
     <header>
         <h2 class="text-lg font-medium text-gray-900">
             {{ __('Informasi Profil') }}

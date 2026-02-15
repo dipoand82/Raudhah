@@ -1,18 +1,17 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Models\ProfilSekolah;
-
+use App\Http\Controllers\Admin\GaleriController as AdminGaleri;
+use App\Http\Controllers\Admin\KelasController;
 // Import Controller (Admin)
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\GuruController;
-use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\ManajemenUserController;
 use App\Http\Controllers\Admin\ProfilSekolahController;
+use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\TahunAjaranController;
-use App\Http\Controllers\Admin\KelasController;
-use App\Http\Controllers\Admin\GaleriController as AdminGaleri;
 use App\Http\Controllers\GaleriController as PublicGaleri;
+use App\Http\Controllers\ProfileController;
+use App\Models\ProfilSekolah;
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | PUBLIC ROUTES
@@ -21,6 +20,7 @@ use App\Http\Controllers\GaleriController as PublicGaleri;
 Route::get('/', function () {
     $profil_sekolah = ProfilSekolah::first();
     $galeri = \App\Models\Galeri::latest()->take(4)->get();
+
     return view('welcome', compact('profil_sekolah', 'galeri'));
 });
 // TAMBAHKAN DUA BARIS INI:
@@ -29,6 +29,7 @@ Route::get('/galeri-kegiatan/{id}', [PublicGaleri::class, 'show'])->name('galeri
 // RUTE PUBLIK UNTUK INFO (Arahkan ke resources/views/info/index.blade.php)
 Route::get('/informasi-sekolah', function () {
     $profil_sekolah = ProfilSekolah::first();
+
     return view('info.index', compact('profil_sekolah'));
 })->name('info.index');
 /*
@@ -47,7 +48,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile/sekolah', [ProfileController::class, 'updateSekolah'])->name('profile.sekolah.update');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -80,6 +81,12 @@ Route::middleware(['auth', 'verified'])
                 // Nama Route: admin.manajemen-user.siswa.reset
                 Route::post('/siswa/{id}/reset', 'resetPasswordSiswa')->name('siswa.reset');
 
+                // [TAMBAHAN BARU] Bulk Reset Password Siswa
+                // URL Akhir otomatis jadi: /admin/manajemen-user/siswa/bulk-reset
+                // Nama Route otomatis jadi: admin.manajemen-user.siswa.bulk_reset
+
+                // Route::patch('admin/manajemen-user/siswa/bulk-reset', [ManajemenUserController::class, 'bulkResetPassword'])
+                //     ->name('admin.manajemen-user.siswa.bulk_reset');
                 // --- GURU ---
                 Route::post('/guru/store', 'storeGuru')->name('guru.store');
                 Route::post('/guru/import', 'importGuru')->name('guru.import');
@@ -92,9 +99,14 @@ Route::middleware(['auth', 'verified'])
                 // Karena beda controller, harus tulis lengkap [Class, method]
                 Route::get('/siswa/template', [\App\Http\Controllers\Admin\SiswaController::class, 'downloadTemplate'])
                     ->name('siswa.template');
+
+                // Arahkan ke SiswaController meskipun berada di grup manajemen-user
+                Route::delete('/siswa/bulk-delete', [\App\Http\Controllers\Admin\SiswaController::class, 'bulkDestroy'])->name('siswa.bulk_delete');
+                Route::patch('/siswa/bulk-reset', [\App\Http\Controllers\Admin\SiswaController::class, 'bulkResetPassword'])->name('siswa.bulk_reset');
+
             });
-            //     Route::get('/siswa/template', [SiswaController::class, 'downloadTemplate'])
-            // ->name('siswa.template');
+        //     Route::get('/siswa/template', [SiswaController::class, 'downloadTemplate'])
+        // ->name('siswa.template');
 
         // ==========================================================
         // 2. DATA SISWA (DETAIL AKADEMIK)
@@ -105,16 +117,17 @@ Route::middleware(['auth', 'verified'])
             ->name('siswas.')
             ->group(function () {
                 Route::get('/', 'index')->name('index');        // Tabel Detail
-                Route::get('/create', 'create')->name('create');// Form Tambah
+                Route::get('/create', 'create')->name('create'); // Form Tambah
                 Route::post('/', 'store')->name('store');       // Simpan
                 Route::post('/import', 'import')->name('import'); // Import (Jika ada menu terpisah)
                 Route::get('/export', 'export')->name('export');
                 Route::get('/{id}/edit', 'edit')->name('edit'); // Edit Lengkap
                 Route::put('/{id}', 'update')->name('update');  // Update
+                Route::patch('/{id}/reset', 'resetPassword')->name('reset_password'); // Reset Password Siswa
+                Route::patch('/bulk-reset', 'bulkResetPassword')->name('bulk_reset');
                 Route::delete('/bulk-delete', 'bulkDestroy')->name('bulk_delete');
                 Route::delete('/{id}', 'destroy')->name('destroy'); // Hapus
             });
-
 
         // ==========================================================
         // 3. LAIN-LAIN (Profil Sekolah, Kelas, Tahun Ajaran)

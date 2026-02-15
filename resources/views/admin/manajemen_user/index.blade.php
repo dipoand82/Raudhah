@@ -316,7 +316,8 @@
                                     @foreach (session()->get('fallback_info') as $info)
                                         <li>Siswa <strong>{{ $info['nama'] }}</strong>: Kelas "{{ $info['input'] }}"
                                             tidak terdaftar, sistem tetap menggunakan
-                                            <strong>{{ $info['tetap'] }}</strong>.</li>
+                                            <strong>{{ $info['tetap'] }}</strong>.
+                                        </li>
                                     @endforeach
                                 </ul>
                                 {{-- Tombol Silang --}}
@@ -339,19 +340,33 @@
                             @csrf @method('DELETE')
                         </form>
 
+                        {{-- TAMBAHKAN INI: FORM BULK RESET PASSWORD --}}
+                        <form id="bulkResetForm" action="{{ route('admin.manajemen-user.siswa.bulk_reset') }}"
+                            method="POST">
+                            @csrf @method('PATCH')
+                        </form>
+
                         {{-- Tombol Bulk Delete (Muncul via JS) --}}
                         <div id="bulkDeleteContainer"
-                            class="hidden mb-3 bg-red-50 p-2 rounded flex justify-between items-center border border-red-200">
-                            <span class="text-red-700 text-sm font-semibold ml-2"><span id="selectedCount">0</span>
-                                Siswa dipilih</span>
+                            class="hidden mb-3 bg-indigo-50 p-2 rounded flex justify-between items-center border border-indigo-200">
+                            <span class="text-indigo-700 text-sm font-semibold ml-2">
+                                <span id="selectedCount">0</span> Siswa dipilih
+                            </span>
 
-                            {{-- PERUBAHAN 2: Tombol ini dihubungkan ke form di atas pakai attribute form="bulkDeleteForm" --}}
-                            {{-- <button type="submit" form="bulkDeleteForm" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-bold transition">Hapus Terpilih</button> --}}
-                            <x-danger-button type="button" x-data=""
-                                x-on:click="$dispatch('open-modal', 'bulk-delete-confirm')"
-                                class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-bold transition">
-                                Hapus Terpilih
-                            </x-danger-button>
+                            <div class="flex gap-2">
+                                {{-- TOMBOL RESET PASSWORD --}}
+                                <button type="button" x-data=""
+                                    x-on:click="$dispatch('open-modal', 'bulk-reset-confirm')"
+                                    class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded text-xs font-bold transition shadow-sm">
+                                    Reset Password
+                                </button>
+
+                                {{-- TOMBOL HAPUS (Sudah Ada) --}}
+                                <x-danger-button type="button" x-data=""
+                                    x-on:click="$dispatch('open-modal', 'bulk-delete-confirm')" class="text-xs">
+                                    Hapus Terpilih
+                                </x-danger-button>
+                            </div>
                         </div>
 
                         {{-- Tabel Tidak Lagi Dibungkus Form --}}
@@ -452,14 +467,14 @@
                                                         </button>
                                                     </form> --}}
                                                     {{-- MODAL RESET PASSWORD (MENGGUNAKAN GLOBAL MODAL) --}}
-                                                    <x-modal-delete-global trigger="reset-pw-{{ $u->id }}"
+                                                    <x-modal-delete-global
+                                                        trigger="reset-pw-{{ $u->id }}"
                                                         :action="route(
                                                             'admin.manajemen-user.siswa.reset',
-                                                            $u->dataSiswa->id,
+                                                            $u->dataSiswa->id
                                                         )" :message="$u->name" title="Reset Password"
-                                                        submitText="Ya, Reset Sekarang" {{-- Styling tombol ikon kuning agar pas di dalam tabel --}}
-                                                        class="!bg-transparent !border-none !shadow-none !p-1 text-yellow-600 hover:text-yellow-700 hover:!bg-yellow-50 active:!bg-yellow-100 focus:!ring-yellow-500">
-                                                        {{-- Slot buttonText untuk menampilkan ICON saja di tabel --}}
+                                                        submitText="Ya, Reset Sekarang"
+                                                        type="warning">
                                                         <x-slot name="buttonText"
                                                             class="!p-1 !bg-transparent !shadow-none !border-none text-yellow-600 hover:text-yellow-700 hover:!bg-yellow-50 transition">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
@@ -517,7 +532,8 @@
                                                             @csrf @method('delete')
                                                             <h2 class="text-lg font-bold">Hapus User?</h2>
                                                             <p class="mt-2 text-sm text-gray-600">Yakin hapus
-                                                                <strong>{{ $u->name }}</strong>?</p>
+                                                                <strong>{{ $u->name }}</strong>?
+                                                            </p>
                                                             <div class="mt-6 flex justify-end gap-3">
                                                                 <x-secondary-button
                                                                     x-on:click="$dispatch('close')">Batal</x-secondary-button>
@@ -550,6 +566,25 @@
                                     <x-danger-button type="submit" form="bulkDeleteForm">
                                         Ya, Hapus Semua
                                     </x-danger-button>
+                                </div>
+                            </div>
+                        </x-modal>
+
+                        <x-modal name="bulk-reset-confirm" focusable>
+                            <div class="p-6">
+                                <h2 class="text-lg font-bold text-gray-900">Konfirmasi Reset Password Massal</h2>
+                                <p class="mt-1 text-sm text-gray-600">
+                                    Apakah Anda yakin ingin mereset password <strong>semua siswa yang dipilih</strong>?
+                                    <br>
+                                    <span class="text-amber-600 font-bold text-xs">Password akan dikembalikan ke NISN
+                                        masing-masing.</span>
+                                </p>
+                                <div class="mt-6 flex justify-end gap-3">
+                                    <x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button>
+                                    <x-primary-button type="submit" form="bulkResetForm"
+                                        class="bg-amber-500 hover:bg-amber-600">
+                                        Ya, Reset Password
+                                    </x-primary-button>
                                 </div>
                             </div>
                         </x-modal>
@@ -755,7 +790,8 @@
                                             <span
                                                 class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">2</span>
                                             <p><strong>Buka Tahun Ajaran:</strong> Atur status Tahun Ajaran baru menjadi
-                                                <span class="font-bold">"Aktif"</span> pada menu pengaturan.</p>
+                                                <span class="font-bold">"Aktif"</span> pada menu pengaturan.
+                                            </p>
                                         </li>
                                         <li class="flex gap-3">
                                             <span
@@ -816,48 +852,82 @@
                     {{-- <form id="deleteForm" method="POST" class="hidden">@csrf @method('DELETE')</form> --}}
 
                     <script>
-                        // SCRIPT BULK DELETE & CHECKBOX
+                        // Deklarasi Elemen
                         const selectAll = document.getElementById('selectAll');
                         const items = document.querySelectorAll('.select-item');
                         const bulkDeleteContainer = document.getElementById('bulkDeleteContainer');
                         const selectedCountSpan = document.getElementById('selectedCount');
 
-                        function toggleBulkDeleteButton() {
-                            const checkedCount = document.querySelectorAll('.select-item:checked').length;
+                        // Fungsi Utama untuk Update State dan Sinkronisasi Form
+                        function toggleBulkActions() {
+                            const checkedItems = document.querySelectorAll('.select-item:checked');
+                            const checkedCount = checkedItems.length;
+
+                            // 1. Update teks jumlah terpilih
                             selectedCountSpan.innerText = checkedCount;
+
+                            // 2. Tampilkan/Sembunyikan bar tombol aksi
                             if (checkedCount > 0) {
                                 bulkDeleteContainer.classList.remove('hidden');
                             } else {
                                 bulkDeleteContainer.classList.add('hidden');
                             }
+
+                            // 3. Sinkronisasi ID ke Form Delete dan Form Reset
+                            // Hapus input hidden lama agar tidak menumpuk/duplikat
+                            document.querySelectorAll('.dynamic-id').forEach(el => el.remove());
+
+                            // Masukkan ID yang dicentang ke kedua form
+                            checkedItems.forEach(item => {
+                                const id = item.value;
+
+                                // Buat input untuk Form Delete
+                                const inputDel = document.createElement('input');
+                                inputDel.type = 'hidden';
+                                inputDel.name = 'ids[]';
+                                inputDel.value = id;
+                                inputDel.className = 'dynamic-id';
+                                document.getElementById('bulkDeleteForm').appendChild(inputDel);
+
+                                // Buat input untuk Form Reset
+                                const inputReset = document.createElement('input');
+                                inputReset.type = 'hidden';
+                                inputReset.name = 'ids[]';
+                                inputReset.value = id;
+                                inputReset.className = 'dynamic-id';
+                                document.getElementById('bulkResetForm').appendChild(inputReset);
+                            });
                         }
 
+                        // Event Listener: Klik "Pilih Semua"
                         if (selectAll) {
                             selectAll.addEventListener('change', function() {
                                 items.forEach(item => {
                                     item.checked = this.checked;
                                 });
-                                toggleBulkDeleteButton();
+                                toggleBulkActions();
                             });
                         }
 
+                        // Event Listener: Klik Checkbox Satuan
                         items.forEach(item => {
                             item.addEventListener('change', function() {
                                 if (!this.checked) {
                                     if (selectAll) selectAll.checked = false;
                                 }
+
                                 const allChecked = document.querySelectorAll('.select-item:checked').length === items
-                                .length;
+                                    .length;
                                 if (items.length > 0 && allChecked) {
                                     if (selectAll) selectAll.checked = true;
                                 }
-                                toggleBulkDeleteButton();
+                                toggleBulkActions();
                             });
                         });
 
-                        // SCRIPT HAPUS SATUAN (Cadangan jika tidak pakai form inline)
+                        // Script Hapus Satuan (Tetap dipertahankan)
                         function confirmDelete(url, name) {
-                            if (confirm('Yakin ingin menghapus data siswa ' + name + ' secara permanen?')) {
+                            if (confirm('Yakin ingin menghapus data ' + name + ' secara permanen?')) {
                                 const form = document.getElementById('deleteForm');
                                 form.action = url;
                                 form.submit();
