@@ -2,8 +2,9 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-
+use App\Models\ProfilSekolah;
+use Illuminate\Support\ServiceProvider; // Sesuaikan dengan nama modelmu
+use Illuminate\Support\Facades\View; // <--- TAMBAHKAN BARIS INI
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -19,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        View::composer('*', function ($view) {
+            $profil = ProfilSekolah::first(); // Ambil data pertama dari database
+            $view->with('profil_sekolah', $profil);
+        });
     }
 }

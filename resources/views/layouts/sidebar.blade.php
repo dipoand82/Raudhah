@@ -15,7 +15,7 @@
 
         <div class="overflow-hidden">
             <h1 class="text-sm font-bold text-[#1072B8] leading-tight truncate">
-                @if(Auth::user()->role == 'admin') SMP IT RAUDHAH
+                @if(Auth::user()->role == 'admin') {{ $profil_sekolah->nama_sekolah }}
                 @elseif(Auth::user()->role == 'guru') GURU
                 @else SISWA
                 @endif

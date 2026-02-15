@@ -233,18 +233,17 @@
                     </div>
 
                     <div x-show="activeTab === 'galeri'" x-transition class="space-y-6"> {{-- TAMBAHKAN BARIS INI --}}
-                        <div class="flex justify-between items-center pb-4 border-b border-gray-100">
-                            <div>
-                                <h3 class="text-lg font-bold text-gray-800">Kumpulan Galeri Kegiatan</h3>
-                                <p class="text-sm text-gray-500">Kelola dokumentasi foto yang tampil di halaman depan.
-                                </p>
-                            </div>
-                            <a href="{{ route('admin.galeri.create') }}">
-
-                                <x-primary-button> Tambah Galeri Baru
-                                </x-primary-button>
-                            </a>
-                        </div>
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-gray-100">
+    <div>
+        <h3 class="text-lg font-bold text-gray-800">Kumpulan Galeri Kegiatan</h3>
+        <p class="text-sm text-gray-500">Kelola dokumentasi foto yang tampil di halaman depan.</p>
+    </div>
+    <a href="{{ route('admin.galeri.create') }}" class="w-full sm:w-auto">
+        <x-primary-button class="w-full justify-center">
+            Tambah Galeri Baru
+        </x-primary-button>
+    </a>
+</div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             @forelse($galeri as $item)

@@ -83,8 +83,8 @@ class GaleriController extends Controller
         $targetTab = $request->input('current_tab', 'profil'); // default ke profil jika tidak ada
 
         // Ganti baris return lama Anda menjadi seperti ini:
-return redirect()->route('admin.profil.edit', ['tab' => 'galeri'])
-                     ->with('success', 'Foto galeri berhasil diperbarui!');
+        return redirect()->route('admin.profil.edit', ['tab' => 'galeri'])
+            ->with('success', 'Foto galeri berhasil diperbarui!');
     }
 
     // 6. Proses Hapus Foto

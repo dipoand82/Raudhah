@@ -50,7 +50,7 @@
                     <div class="text-center mb-3">
                         <h2 data-aos="fade-up"
                             class="text-4xl font-extrabold text-blue-900 uppercase tracking-wider animate-gradient-x">
-                            SMP IT RAUDHAH
+                            {{ $profil_sekolah->nama_sekolah ?? 'SMP IT Raudhah' }}
                         </h2>
                         <div class="h-1.5 w-24 bg-blue-600 mx-auto mt-4 rounded-full"></div>
                     </div>
