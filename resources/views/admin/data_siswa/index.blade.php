@@ -83,19 +83,22 @@
                         </a>
 
                         {{-- Tombol Tambah (Trigger Modal) --}}
-                        <button x-data="" x-on:click.prevent="$dispatch('open-modal', 'add-siswa')"
-                            type="button"
-                            class="inline-flex w-full items-center justify-center gap-2 bg-[#1072B8] hover:bg-[#0d5a91] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4v16m8-8H4" />
-                            </svg>
-                            Tambah Siswa
-                        </button>
+                        @can('admin')
+                            <button x-data="" x-on:click.prevent="$dispatch('open-modal', 'add-siswa')"
+                                type="button"
+                                class="inline-flex w-full items-center justify-center gap-2 bg-[#1072B8] hover:bg-[#0d5a91] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4" />
+                                </svg>
+                                Tambah Siswa
+                            </button>
+                        @endcan
                     </div>
                 </div>
 
                 {{-- [BAGIAN 2: TABEL DATA] --}}
+                @can('admin')
 
                 {{-- A. FORM BULK DELETE (Tanpa Onsubmit Confirm lagi, karena sudah pakai modal) --}}
                 <form action="{{ route('admin.siswas.bulk_delete') }}" method="POST" id="bulkDeleteForm">
@@ -137,15 +140,16 @@
                         </div>
                     </div>
                 </x-modal>
+                @endcan
 
                 <div class="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-[#3B3E42]">
                             <tr>
-                                <th class="px-4 py-4 w-10 text-center">
+                                @can('admin') <th class="px-4 py-4 w-10 text-center">
                                     <input type="checkbox" id="selectAll"
                                         class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 cursor-pointer">
-                                </th>
+                                </th> @endcan
                                 <th class="px-4 py-4 text-center text-xs font-bold text-white uppercase w-12">No</th>
                                 <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase">NISN</th>
                                 <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase">Nama Siswa</th>
@@ -153,19 +157,19 @@
                                 <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase">Tahun Ajaran
                                 </th>
                                 <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase">Status</th>
-                                <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase">Aksi</th>
+                                @can('admin') <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase">Aksi</th> @endcan
                             </tr>
                         </thead>
 
                         <tbody class="bg-white divide-y divide-gray-100">
                             @forelse($siswas as $siswa)
                                 <tr class="hover:bg-indigo-50/50 transition even:bg-gray-50">
-                                    <td class="px-4 py-4 text-center">
+                                    @can('admin') <td class="px-4 py-4 text-center">
                                         {{-- Checkbox terhubung ke form bulk delete --}}
                                         <input type="checkbox" name="ids[]" form="bulkDeleteForm"
                                             value="{{ $siswa->id }}"
                                             class="select-item rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 cursor-pointer">
-                                    </td>
+                                    </td> @endcan
                                     <td class="px-4 py-4 text-center text-sm text-balck-300 font-medium">
                                         {{ $siswas->firstItem() + $loop->index }}
                                     </td>
@@ -175,7 +179,7 @@
                                     <td class="px-6 py-4">
                                         <div class="text-sm font-bold text-gray-900">
                                             {{ $siswa->user->name ?? 'User Terhapus' }}</div>
-                                        <div class="text-xs text-gray-400">{{ $siswa->user->email ?? '' }}</div>
+                                        @can('admin') <div class="text-xs text-gray-400">{{ $siswa->user->email ?? '' }}</div> @endcan
                                     </td>
                                     <td class="px-6 py-4 text-center">
                                         @if ($siswa->kelas)
@@ -207,6 +211,8 @@
                                             {{ strtoupper($siswa->status) }}
                                         </span>
                                     </td>
+                                    @can('admin')
+
                                     <td
                                         class="px-6 py-4 text-right text-sm font-medium flex justify-end items-center gap-2">
 
@@ -248,6 +254,7 @@
                                             action="{{ route('admin.siswas.destroy', $siswa->id) }}"
                                             message="{{ $siswa->user->name ?? $siswa->nama_lengkap }}" />
                                     </td>
+                                    @endcan
                                     {{-- <td class="px-6 py-4 text-right text-sm font-medium flex justify-end items-center gap-2">
                                         <a href="{{ route('admin.siswas.edit', $siswa->id) }}"
                                         class="text-indigo-600 hover:text-indigo-900 font-semibold">Edit</a>
