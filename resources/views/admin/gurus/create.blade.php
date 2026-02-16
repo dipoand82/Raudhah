@@ -7,7 +7,7 @@
         <div class="max-w-xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white p-6 shadow-sm rounded-lg">
                 
-                <form method="POST" action="{{ route('admin.gurus.store') }}">
+                <form method="POST" action="{{ route('admin.manajemen-user.gurus.store') }}">
                     @csrf
 
                     <div class="mb-4">
@@ -21,7 +21,7 @@
                     </div>
 
                     <div class="flex justify-end gap-2">
-                        <a href="{{ route('admin.gurus.index') }}" class="px-4 py-2 text-gray-600">Batal</a>
+                        <a href="{{ route('admin.manajemen-user.index', ['tab' => 'guru']) }}" class="px-4 py-2 text-gray-600">Batal</a>
                         <x-primary-button>{{ __('Simpan Guru') }}</x-primary-button>
                     </div>
                 </form>

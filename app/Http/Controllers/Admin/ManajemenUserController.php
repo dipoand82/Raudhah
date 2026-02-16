@@ -19,90 +19,67 @@ use Illuminate\Support\Str; // <--- WAJIB TAMBAHKAN INI (Baris Penting)
 class ManajemenUserController extends Controller
 {
     // === 1. HALAMAN UTAMA (TABS) ===
-    public function index(Request $request)
-    {  
-        $search = $request->input('search');
-        // Menggunakan default 10 jika tidak ada input per_page
-        $perPage = $request->input('per_page', 30); 
+public function index(Request $request)
+{
+    // 1. Tangkap input dari Blade
+    $searchSiswa = $request->input('search');
+    $searchGuru = $request->input('search_guru');
 
-        // 1. TAMBAHKAN INI: Ambil input dari filter dropdown di Blade
-        $statusFilter = $request->input('status'); // TAMBAHKAN INI
-        $kelasFilter = $request->input('kelas_id'); // TAMBAHKAN INI
-        // ==========================================================
-        // A. Ambil Data User Role SISWA (LOGIKA BARU - JOIN & SORT)
-        // ==========================================================
-        $userSiswa = User::where('role', 'siswa')
-            // 1. Join ke tabel siswas untuk akses NISN & STATUS
-            ->join('siswas', 'users.id', '=', 'siswas.user_id')
-            // 2. Left Join ke kelas untuk sorting berdasarkan tingkat/nama kelas
-            ->leftJoin('kelas', 'siswas.kelas_id', '=', 'kelas.id')
-            // 3. Select users.* agar output tetap berupa model User
-            ->select('users.*')
-            
-            // Logika Pencarian (TETAP)
-            ->when($search, function($q) use ($search) {
-                $q->where(function($query) use ($search) {
-                    $query->where('users.name', 'like', "%{$search}%")
-                        ->orWhere('users.email', 'like', "%{$search}%")
-                        ->orWhere('siswas.nisn', 'like', "%{$search}%");
-                });
-            })
-            // 2. TAMBAHKAN INI: Filter berdasarkan Status jika dipilih
-            ->when($statusFilter, function($q) use ($statusFilter) { // TAMBAHKAN INI
-                return $q->where('siswas.status', $statusFilter);    // TAMBAHKAN INI
-            })                                                      // TAMBAHKAN INI
+    // 2. Tangkap input "Show" masing-masing (Default 30)
+    $perPageSiswa = $request->input('per_page', 30);
+    $perPageGuru = $request->input('per_page_guru', 30); // Tambahan untuk Guru
 
-            // 3. TAMBAHKAN INI: Filter berdasarkan Kelas jika dipilih
-            ->when($kelasFilter, function($q) use ($kelasFilter) {   // TAMBAHKAN INI
-                return $q->where('siswas.kelas_id', $kelasFilter);   // TAMBAHKAN INI
-            })
-            
-            // --- CUSTOM SORTING START ---
-            // Logika: Urutkan status (Aktif -> Cuti -> Keluar) terlebih dahulu
-            ->orderByRaw("FIELD(siswas.status, 'Aktif', 'Cuti','Lulus','Pindah', 'Keluar') ASC")
-            // --- CUSTOM SORTING END ---
-            
-            // Logika Pengurutan Lama (Tingkat -> Nama Kelas -> Nama Siswa)
-            ->orderBy('kelas.tingkat', 'asc')
-            ->orderBy('kelas.nama_kelas', 'asc')
-            ->orderBy('users.name', 'asc')
-            
-            // Eager Load relasi untuk keperluan view
-            ->with('dataSiswa.kelas') 
-            ->paginate($perPage, ['*'], 'siswa_page');
+    $statusFilter = $request->input('status');
+    $kelasFilter = $request->input('kelas_id');
 
-        // ==========================================================
-        // B. Ambil Data User Role GURU (TETAP SAMA)
-        // ==========================================================
-        $userGuru = User::where('role', 'guru')
-            ->when($search, function($q) use ($search) {
-                $q->where(function($query) use ($search) {
-                    $query->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                });
-            })
-            ->latest()
-            ->paginate(30, ['*'], 'guru_page');
+    // --- QUERY SISWA ---
+    $userSiswa = User::where('role', 'siswa')
+        ->join('siswas', 'users.id', '=', 'siswas.user_id')
+        ->leftJoin('kelas', 'siswas.kelas_id', '=', 'kelas.id')
+        ->select('users.*', 'kelas.tingkat', 'kelas.nama_kelas')
+        ->when($searchSiswa, function($q) use ($searchSiswa) {
+            $q->where(function($query) use ($searchSiswa) {
+                $query->where('users.name', 'like', "%{$searchSiswa}%")
+                      ->orWhere('siswas.nisn', 'like', "%{$searchSiswa}%");
+            });
+        })
+        ->when($statusFilter, function($q) use ($statusFilter) {
+            return $q->where('siswas.status', $statusFilter);
+        })
+        ->when($kelasFilter, function($q) use ($kelasFilter) {
+            return $q->where('siswas.kelas_id', $kelasFilter);
+        })
+        ->orderByRaw("FIELD(siswas.status, 'Aktif', 'Cuti','Lulus','Pindah', 'Keluar') ASC")
+        ->orderByRaw("CASE WHEN siswas.kelas_id IS NULL THEN 0 ELSE 1 END")
+        ->orderBy('kelas.tingkat', 'asc')
+        ->orderBy('kelas.nama_kelas', 'asc')
+        ->orderBy('users.name', 'asc')
+        ->with('dataSiswa.kelas')
+        ->paginate($perPageSiswa, ['*'], 'siswa_page') // Gunakan $perPageSiswa
+        ->withQueryString();
 
-        // ==========================================================
-        // C. Data Pendukung Modal (TETAP SAMA)
-        // ==========================================================
-        $kelas = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get(); 
-        
-        // Untuk modal TAMBAH (ambil satu yg aktif)
-        $tahunAjaran = TahunAjaran::where('is_active', true)->first();
-        
-        // Untuk modal EDIT (ambil semua untuk dropdown)
-        $tahunAjaranList = TahunAjaran::orderBy('tahun', 'desc')->get(); 
+    // --- QUERY GURU (VERSI TERBARU) ---
+    $userGuru = User::where('role', 'guru')
+        ->when($searchGuru, function($q) use ($searchGuru) {
+            $q->where(function($query) use ($searchGuru) {
+                $query->where('users.name', 'like', "%{$searchGuru}%")
+                      ->orWhere('users.email', 'like', "%{$searchGuru}%");
+            });
+        })
+        ->latest()
+        // GANTI: Gunakan $perPageGuru dan penanda halaman 'guru_page' agar tidak bentrok
+        ->paginate($perPageGuru, ['*'], 'guru_page')
+        ->withQueryString();
 
-        return view('admin.manajemen_user.index', compact(
-            'userSiswa', 
-            'userGuru', 
-            'kelas', 
-            'tahunAjaran', 
-            'tahunAjaranList'
-        ));
-    }
+    // --- DATA PENDUKUNG ---
+    $kelas = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
+    $tahunAjaran = TahunAjaran::where('is_active', true)->first();
+    $tahunAjaranList = TahunAjaran::orderBy('tahun', 'desc')->get();
+
+    return view('admin.manajemen_user.index', compact(
+        'userSiswa', 'userGuru', 'kelas', 'tahunAjaran', 'tahunAjaranList'
+    ));
+}
     public function storeSiswa(Request $request)
     {
         // 1. Validasi
@@ -110,8 +87,8 @@ class ManajemenUserController extends Controller
             'name' => 'required|string|max:255',
             'nisn' => 'required|numeric|unique:siswas,nisn',
             'email' => 'nullable|email|unique:users,email',
-            'kelas_id' => 'nullable|exists:kelas,id', 
-            'jenis_kelamin' => 'required|in:L,P',     
+            'kelas_id' => 'nullable|exists:kelas,id',
+            'jenis_kelamin' => 'required|in:L,P',
         ]);
 
         // 2. Ambil Data Pendukung
@@ -123,10 +100,10 @@ class ManajemenUserController extends Controller
         } else {
             // Ambil kata pertama & ubah ke lowercase
             $namaDepan = Str::lower(explode(' ', trim($request->name))[0]);
-            
+
             // Format: namadepan.nisn@raudhah.com
             $emailFinal = $namaDepan . '.' . $request->nisn . '@raudhah.com';
-            
+
             // Cek duplikasi email hasil generate
             if (User::where('email', $emailFinal)->exists()) {
                 $emailFinal = $namaDepan . $request->nisn . rand(1, 9) . '@raudhah.com';
@@ -135,7 +112,7 @@ class ManajemenUserController extends Controller
 
         // 4. Eksekusi dengan Database Transaction (Sangat Disarankan)
         return DB::transaction(function () use ($request, $emailFinal, $tahunAktif) {
-            
+
             // 5. Create/Update User (Akun Login)
             // Menggunakan updateOrCreate agar lebih "tahan banting" terhadap error data ganda
             $user = User::updateOrCreate(
@@ -170,7 +147,7 @@ class ManajemenUserController extends Controller
 public function importSiswa(Request $request)
 {
     $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
-    
+
     try {
         $import = new \App\Imports\SiswaImport;
         $import->import($request->file('file'));
@@ -202,7 +179,7 @@ public function importSiswa(Request $request)
     public function storeGuru(Request $request)
     {
         $request->validate(['name' => 'required', 'email' => 'required|email|unique:users']);
-        
+
         User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -218,7 +195,7 @@ public function importSiswa(Request $request)
     public function importGuru(Request $request)
     {
         $request->validate(['file' => 'required|mimes:xlsx,xls,csv']);
-        
+
         try {
             Excel::import(new GuruImport, $request->file('file'));
             return back()->with('success', 'Import Guru Berhasil!');
@@ -243,20 +220,30 @@ public function importSiswa(Request $request)
     }
 
     // === 8. HAPUS USER ===
-    public function destroy($id)
-    {
-        $user = User::findOrFail($id);
-        $user->delete(); // Karena cascade, data siswa/guru ikut terhapus
-        return back()->with('success', 'User berhasil dihapus');
-    }
+public function destroy($id)
+{
+    // 1. Cari user-nya dulu
+    $user = User::findOrFail($id);
 
+    // 2. Simpan role-nya ke variabel (untuk tahu ini siswa atau guru)
+    $role = $user->role;
+
+    // 3. Hapus user
+    $user->delete();
+
+    // 4. Redirect balik dengan membawa 'active_tab'
+    return back()->with([
+        'success' => 'User berhasil dihapus',
+        'active_tab' => $role // Mengirim 'siswa' atau 'guru' ke session
+    ]);
+}
     // === 9. FITUR RESET PASSWORD (SOLUSI JIKA SISWA LUPA/AKUN DIBAJAK) ===
     // Pastikan route-nya sudah dibuat di web.php: Route::post('/admin/siswa/{id}/reset', ...)
     public function resetPasswordSiswa($id)
     {
         // 1. Cari data siswa
         $siswa = Siswa::findOrFail($id);
-        
+
         // 2. Cek apakah siswa punya akun user
         if ($siswa->user) {
             // 3. Reset Password kembali ke NISN

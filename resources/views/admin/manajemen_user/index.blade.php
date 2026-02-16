@@ -3,7 +3,7 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Manajemen User') }}</h2>
     </x-slot>
 
-    <div class="py-12" x-data="{ activeTab: 'siswa' }">
+    <div class="py-12" x-data="{ activeTab: '{{ request('tab', 'siswa') }}' }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6">
 
             {{-- ALERT ERROR --}}
@@ -59,7 +59,7 @@
                     </div>
                 </div>
 
-                <div class="min-h-[400px]">
+                <div class="min-h-0">
 
 
                     {{-- ================= KONTEN TAB SISWA ================= --}}
@@ -467,14 +467,12 @@
                                                         </button>
                                                     </form> --}}
                                                     {{-- MODAL RESET PASSWORD (MENGGUNAKAN GLOBAL MODAL) --}}
-                                                    <x-modal-delete-global
-                                                        trigger="reset-pw-{{ $u->id }}"
+                                                    <x-modal-delete-global trigger="reset-pw-{{ $u->id }}"
                                                         :action="route(
                                                             'admin.manajemen-user.siswa.reset',
-                                                            $u->dataSiswa->id
+                                                            $u->dataSiswa->id,
                                                         )" :message="$u->name" title="Reset Password"
-                                                        submitText="Ya, Reset Sekarang"
-                                                        type="warning">
+                                                        submitText="Ya, Reset Sekarang" type="warning">
                                                         <x-slot name="buttonText"
                                                             class="!p-1 !bg-transparent !shadow-none !border-none text-yellow-600 hover:text-yellow-700 hover:!bg-yellow-50 transition">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5"
@@ -620,11 +618,13 @@
 
                     {{-- ================= KONTEN TAB GURU ================= --}}
                     <div x-show="activeTab === 'guru'" x-transition>
-                        {{-- TOOLBAR GURU (Pencarian & Tombol Aksi) --}}
+                        {{-- TOOLBAR GURU --}}
                         <div class="flex flex-col lg:flex-row justify-between items-center mb-6 gap-4">
                             <form method="GET" action="{{ route('admin.manajemen-user.index') }}"
                                 class="w-full lg:w-1/2 flex gap-2">
                                 <input type="hidden" name="tab" value="guru">
+                                <input type="hidden" name="per_page_guru"
+                                    value="{{ request('per_page_guru', 30) }}">
                                 <div class="relative w-full">
                                     <input type="text" name="search_guru" value="{{ request('search_guru') }}"
                                         placeholder="Cari Nama / Email Guru..."
@@ -640,27 +640,25 @@
                                 </div>
                             </form>
 
-                            <div class="flex gap-3">
-                                {{-- Tombol Import --}}
-                                <button x-on:click="$dispatch('open-modal', 'import-guru')"
-                                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                                    </svg>
-                                    Import Akun Guru
-                                </button>
+                            <div class="flex flex-col sm:flex-row items-center gap-3 mb-2 w-full lg:w-auto justify-end">
+    <button x-data="" x-on:click="$dispatch('open-modal', 'import-guru')"
+        class="inline-flex w-full items-center justify-center gap-2 bg-[#22c55e] hover:bg-[#16a34a] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+        </svg>
+        Import Akun Guru
+    </button>
 
-                                {{-- Tombol Tambah --}}
-                                <x-primary-button x-on:click="$dispatch('open-modal', 'add-guru')"
-                                    class="flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 4v16m8-8H4"></path>
-                                    </svg>
-                                    Tambah Guru
-                                </x-primary-button>
-                            </div>
+    <button type="button" x-data="" x-on:click="$dispatch('open-modal', 'add-guru')"
+        class="inline-flex w-full items-center justify-center gap-2 bg-[#1072B8] hover:bg-[#0d5a91] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 4v16m8-8H4"></path>
+        </svg>
+        Tambah Guru
+    </button>
+</div>
                         </div>
 
                         {{-- TABEL GURU --}}
@@ -674,9 +672,9 @@
                                         </th>
                                         <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase">Email
                                         </th>
-                                        <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase">Role
+                                        <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase">Role
                                         </th>
-                                        <th class="px-6 py-4 text-right text-xs font-bold text-white uppercase">Aksi
+                                        <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase">Aksi
                                         </th>
                                     </tr>
                                 </thead>
@@ -684,254 +682,403 @@
                                     @foreach ($userGuru as $g)
                                         <tr class="hover:bg-indigo-50/50 transition even:bg-gray-50">
                                             <td class="px-4 py-4 text-center text-sm font-medium text-gray-500">
-                                                {{ $loop->iteration }}</td>
+                                                {{ $userGuru->firstItem() + $loop->index }}
+                                            </td>
                                             <td class="px-6 py-4 font-medium text-gray-900">{{ $g->name }}</td>
                                             <td class="px-6 py-4 text-gray-600">{{ $g->email }}</td>
-                                            <td class="px-6 py-4">
+                                            <td class="px-6 py-4 text-center">
                                                 <span
-                                                    class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-semibold">Guru</span>
+                                                    class="bg-green-100 text-green-800 text-xs px-2.5 py-1 rounded-full font-semibold border border-green-200">Guru</span>
                                             </td>
-                                            <td class="px-6 py-4 text-right">
-                                                <form action="{{ route('admin.manajemen-user.destroy', $g->id) }}"
-                                                    method="POST" class="inline"
-                                                    onsubmit="return confirm('Hapus akun Guru ini?');">
-                                                    @csrf @method('DELETE')
-                                                    <button type="submit"
-                                                        class="text-red-600 hover:text-red-900 font-semibold text-sm">Hapus</button>
-                                                </form>
+                                            <td class="px-6 py-4">
+                                                <div class="flex justify-center items-center gap-3">
+                                                    <button type="button" x-data
+                                                        x-on:click="$dispatch('open-modal', 'edit-guru-{{ $g->id }}')"
+                                                        class="text-indigo-600 hover:text-indigo-900 font-bold text-sm">Edit</button>
+
+                                                    <button type="button" x-data
+                                                        x-on:click="$dispatch('open-modal', 'confirm-delete-guru-{{ $g->id }}')"
+                                                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-bold transition">
+                                                        Hapus
+                                                    </button>
+
+                                                    <x-modal name="confirm-delete-guru-{{ $g->id }}" focusable>
+                                                        <form method="post"
+                                                            action="{{ route('admin.manajemen-user.destroy', $g->id) }}"
+                                                            class="p-6 text-left">
+                                                            @csrf @method('delete')
+                                                            <h2 class="text-lg font-bold text-gray-900">Hapus Akun
+                                                                Guru?</h2>
+                                                            <p class="mt-2 text-sm text-gray-600">Yakin ingin menghapus
+                                                                <strong>{{ $g->name }}</strong>? Tindakan ini
+                                                                tidak bisa dibatalkan.</p>
+                                                            <div class="mt-6 flex justify-end gap-3">
+                                                                <x-secondary-button
+                                                                    x-on:click="$dispatch('close')">Batal</x-secondary-button>
+                                                                <x-danger-button>Ya, Hapus Akun</x-danger-button>
+                                                            </div>
+                                                        </form>
+                                                    </x-modal>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
-                    </div>
-                    {{-- TAMBAHKAN PEMBUNGKUS INI DI BARIS 241 --}}
-                    <div x-show="activeTab === 'panduan'" x-transition>
-                        <div class="p-2 md:p-2">
-                            {{-- Wrapper Utama: Menumpuk di HP (flex-col), Berdampingan di Desktop (md:flex-row) --}}
-                            {{-- Gap-6 memberikan jarak antar kotak saat mode HP --}}
-                            <div class="flex flex-col md:flex-row gap-6 items-stretch">
 
-                                {{-- KOTAK INFORMASI ALUR (Kiri - Kuning/Amber) --}}
-                                <div
-                                    class="w-full md:w-1/2 bg-amber-50 border border-amber-200 rounded-lg p-6 md:p-8 flex flex-col">
-                                    <div class="flex items-start gap-3 mb-6">
-                                        <div class="text-amber-600 flex-shrink-0">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                                            </svg>
-                                        </div>
-                                        <h3 class="font-bold text-amber-900 text-lg leading-tight">Inisialisasi Sistem
-                                            & Update Data</h3>
-                                    </div>
-
-                                    <ul class="text-sm text-amber-800 space-y-5 flex-grow">
-                                        <li class="flex gap-3">
-                                            <span
-                                                class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">1</span>
-                                            <p><strong>Aktivasi Periode:</strong> Pertama kali di sistem, buka menu
-                                                Tahun Ajaran dan set status menjadi <span
-                                                    class="font-bold text-amber-900">"Aktif"</span>.</p>
-                                        </li>
-                                        <li class="flex gap-3">
-                                            <span
-                                                class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">2</span>
-                                            <p><strong>Persiapan Kelas:</strong> Masuk ke fitur Kelas dan buat daftar
-                                                kelas baru yang diperlukan untuk periode ini.</p>
-                                        </li>
-                                        <li class="flex gap-3">
-                                            <span
-                                                class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">3</span>
-                                            <p><strong>Import Data (Update-or-Create):</strong> Saat import Excel,
-                                                sistem otomatis memperbarui tahun ajaran siswa ke tahun aktif. Data lama
-                                                tercatat sebagai riwayat kelulusan.</p>
-                                        </li>
-                                        <li class="flex gap-3">
-                                            <span
-                                                class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs shadow-sm">4</span>
-                                            <p><strong>Verifikasi Akhir:</strong> Periksa kembali data di Excel dan
-                                                bandingkan dengan hasil sistem menggunakan <strong>filter per
-                                                    kelas</strong>.</p>
-                                        </li>
-                                    </ul>
-
-                                    <div class="mt-8 pt-4 border-t border-amber-200 italic text-[11px] text-amber-600">
-                                        *Sistem secara otomatis mendeteksi tahun ajaran aktif berdasarkan pengaturan
-                                        global.
-                                    </div>
+                        {{-- FOOTER GURU (Show Entries & Pagination) --}}
+                        <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <form method="GET" action="{{ route('admin.manajemen-user.index') }}">
+                                <input type="hidden" name="tab" value="guru">
+                                <input type="hidden" name="search_guru" value="{{ request('search_guru') }}">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm text-gray-500">Show:</span>
+                                    <select name="per_page_guru" onchange="this.form.submit()"
+                                        class="text-sm border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-1 pl-2 pr-8 cursor-pointer">
+                                        <option value="30"
+                                            {{ request('per_page_guru', 30) == 30 ? 'selected' : '' }}>30</option>
+                                        <option value="50" {{ request('per_page_guru') == 50 ? 'selected' : '' }}>
+                                            50</option>
+                                        <option value="100"
+                                            {{ request('per_page_guru') == 100 ? 'selected' : '' }}>100</option>
+                                    </select>
                                 </div>
-
-                                {{-- KOTAK INFORMASI ALUR (Kanan - Biru) --}}
-                                <div
-                                    class="w-full md:w-1/2 bg-blue-50 border border-blue-200 rounded-lg p-6 md:p-8 flex flex-col">
-                                    <div class="flex items-start gap-3 mb-6">
-                                        <div class="text-blue-600 flex-shrink-0">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                        </div>
-                                        <h3 class="font-bold text-blue-900 text-lg leading-tight">Panduan Alur Update
-                                            Data Siswa</h3>
-                                    </div>
-
-                                    <ul class="text-sm text-blue-800 space-y-5 flex-grow">
-                                        <li class="flex gap-3">
-                                            <span
-                                                class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">1</span>
-                                            <p><strong>Luluskan Kelas 9:</strong> Siswa kelas 9 diproses lulus (kelas
-                                                jadi null), riwayat Tahun Ajaran tetap tersimpan.</p>
-                                        </li>
-                                        <li class="flex gap-3">
-                                            <span
-                                                class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">2</span>
-                                            <p><strong>Buka Tahun Ajaran:</strong> Atur status Tahun Ajaran baru menjadi
-                                                <span class="font-bold">"Aktif"</span> pada menu pengaturan.
-                                            </p>
-                                        </li>
-                                        <li class="flex gap-3">
-                                            <span
-                                                class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">3</span>
-                                            <p><strong>Import Excel:</strong> Unggah file Excel untuk update kelas siswa
-                                                menggunakan fungsi <em>Update-or-Create</em>.</p>
-                                        </li>
-                                        <li class="flex gap-3">
-                                            <span
-                                                class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">4</span>
-                                            <p><strong>Otomatisasi:</strong> Tahun ajaran siswa akan otomatis diperbarui
-                                                ke tahun aktif saat ini berdasarkan data import.</p>
-                                        </li>
-                                    </ul>
-
-                                    <div class="mt-8 pt-4 border-t border-blue-200 italic text-[11px] text-blue-600">
-                                        *Pastikan format file Excel sesuai dengan template yang disediakan.
-                                    </div>
-                                </div>
-
+                            </form>
+                            <div>
+                                {{ $userGuru->appends(['tab' => 'guru', 'search_guru' => request('search_guru'), 'per_page_guru' => request('per_page_guru', 30)])->links() }}
                             </div>
                         </div>
                     </div>
-                    <x-siswa.add-student-modal :kelas="$kelas" />
-                    {{-- MODAL TAMBAH SISWA MANUAL --}}
-                    {{-- <x-modal name="add-siswa" focusable>
-        <form method="POST" action="{{ route('admin.manajemen-user.siswa.store') }}" class="p-6">
-            @csrf
-            <div class="flex justify-between items-center mb-4 border-b pb-2"><h2 class="text-lg font-bold text-gray-900">Tambah Siswa</h2><button type="button" x-on:click="$dispatch('close')" class="text-gray-400 hover:text-gray-500"><span class="sr-only">Tutup</span><svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="col-span-2"><x-input-label value="Nama Lengkap" /><x-text-input name="name" class="w-full mt-1 focus:border-[#3B3E42] focus:ring-[#3B3E42]" required placeholder="Contoh: Budi Santoso" /></div>
-                <div class="col-span-2"><x-input-label value="Email Login (Opsional)" /><x-text-input name="email" type="email" class="w-full mt-1 focus:border-[#3B3E42] focus:ring-[#3B3E42]" placeholder="Jika kosong, akan pakai nama.nisn@raudhah.com" /></div>
-                <div><x-input-label value="NISN (Wajib)" /><x-text-input name="nisn" type="number" class="w-full mt-1 focus:border-[#3B3E42] focus:ring-[#3B3E42]" required placeholder="00123456" min="0" oninput="validity.valid||(value='');"/></div>
-                <div><x-input-label value="Jenis Kelamin" /><select name="jenis_kelamin" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42]"><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div>
-                <div class="col-span-2"><x-input-label value="Masuk Kelas" /><select name="kelas_id" class="w-full mt-1 border-gray-300 rounded-md shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42]"><option value="">-- Belum Ada Kelas --</option>@foreach ($kelas as $k)<option value="{{ $k->id }}">Kelas {{ $k->tingkat }} {{ $k->nama_kelas }}</option>@endforeach</select></div>
-            </div>
-            <div class="mt-6 flex justify-end gap-3"><x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button><x-primary-button>Simpan Siswa</x-primary-button></div>
-        </form>
-    </x-modal> --}}
+                    {{-- MODAL TAMBAH & EDIT DI LUAR TAB AGAR TIDAK DUPLIKAT --}}
 
-                    {{-- MODAL TAMBAH GURU MANUAL --}}
                     <x-modal name="add-guru" focusable>
-                        <form method="POST" action="{{ route('admin.manajemen-user.guru.store') }}" class="p-6">
+                        <form method="POST" action="{{ route('admin.manajemen-user.gurus.store') }}"
+                            class="p-6">
                             @csrf
                             <h2 class="text-lg font-bold text-gray-900 mb-4 pb-2 border-b">Tambah Akun Guru</h2>
-                            <div class="mb-3"><x-input-label value="Nama Guru" /><x-text-input name="name"
-                                    class="w-full focus:border-[#3B3E42] focus:ring-[#3B3E42]" required /></div>
-                            <div class="mb-3"><x-input-label value="Email" /><x-text-input name="email"
-                                    type="email" class="w-full focus:border-[#3B3E42] focus:ring-[#3B3E42]"
-                                    required /></div>
-                            <div class="mt-6 flex justify-end gap-3"><x-secondary-button
-                                    x-on:click="$dispatch('close')">Batal</x-secondary-button><x-primary-button>Simpan</x-primary-button>
+                            <div class="mb-4">
+                                <x-input-label value="Nama Lengkap Guru" />
+                                <x-text-input name="name" class="w-full mt-1 focus:border-[#3B3E42]"
+                                    placeholder="Contoh: Ahmad Subarjo" required />
+                            </div>
+                            <div class="mb-4">
+                                <x-input-label value="Email (Kosongkan untuk otomatis)" />
+                                <x-text-input name="email" type="email"
+                                    class="w-full mt-1 focus:border-[#3B3E42]" placeholder="guru@raudhah.com" />
+                                <p class="text-[10px] text-red-500 mt-1 capitalize font-bold tracking-wider">*Jika
+                                    kosong, sistem akan otomatis menggunakan format: namalengkap@raudhah.com</p>
+                            </div>
+                            <div class="mt-6 flex justify-end gap-3 border-t pt-4">
+                                <x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button>
+                                <x-primary-button type="submit">Buat Akun Guru</x-primary-button>
                             </div>
                         </form>
                     </x-modal>
 
-                    {{-- Form Cadangan untuk delete satuan pakai JS (Jika masih digunakan oleh bagian Hapus User tanpa siswa) --}}
-                    {{-- <form id="deleteForm" method="POST" class="hidden">@csrf @method('DELETE')</form> --}}
+                    @foreach ($userGuru as $g)
+                        <x-modal name="edit-guru-{{ $g->id }}" focusable>
+                            <form method="POST" action="{{ route('admin.manajemen-user.gurus.update', $g->id) }}"
+                                class="p-6">
+                                @csrf @method('PUT')
+                                <h2 class="text-lg font-bold text-gray-900 mb-4 pb-2 border-b">Edit Akun:
+                                    {{ $g->name }}</h2>
+                                <div class="mb-3">
+                                    <x-input-label value="Nama Guru" />
+                                    <x-text-input name="name" value="{{ $g->name }}"
+                                        class="w-full focus:border-[#3B3E42]" required />
+                                </div>
+                                <div class="mb-3">
+                                    <x-input-label value="Email" />
+                                    <x-text-input name="email" type="email" value="{{ $g->email }}"
+                                        class="w-full focus:border-[#3B3E42]" required />
+                                </div>
+                                <div class="mt-6 flex justify-end gap-3">
+                                    <x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button>
+                                    <x-primary-button type="submit">Simpan Perubahan</x-primary-button>
+                                </div>
+                            </form>
+                        </x-modal>
+                    @endforeach
 
-                    <script>
-                        // Deklarasi Elemen
-                        const selectAll = document.getElementById('selectAll');
-                        const items = document.querySelectorAll('.select-item');
-                        const bulkDeleteContainer = document.getElementById('bulkDeleteContainer');
-                        const selectedCountSpan = document.getElementById('selectedCount');
+                    {{-- MODAL IMPORT GURU --}}
+                    <x-modal name="import-guru" focusable>
+                        <form method="POST" action="{{ route('admin.manajemen-user.gurus.import') }}"
+                            enctype="multipart/form-data" class="p-6" x-data="{ fileName: '', isLoading: false }"
+                            @submit="isLoading = true">
+                            @csrf
 
-                        // Fungsi Utama untuk Update State dan Sinkronisasi Form
-                        function toggleBulkActions() {
-                            const checkedItems = document.querySelectorAll('.select-item:checked');
-                            const checkedCount = checkedItems.length;
+                            <div class="flex justify-between items-start mb-5 border-b pb-3">
+                                <h2 class="text-xl font-bold text-gray-900">Import Data Guru</h2>
+                                <button type="button" x-on:click="$dispatch('close')"
+                                    class="text-gray-400 hover:text-gray-600">
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
 
-                            // 1. Update teks jumlah terpilih
-                            selectedCountSpan.innerText = checkedCount;
+                            <div
+                                class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 flex justify-between items-center">
+                                <div>
+                                    <h3 class="text-sm font-bold text-blue-800 mb-1">Langkah 1: Siapkan File</h3>
+                                    <p class="text-xs text-blue-600">Gunakan format kolom: Nama, Email.</p>
+                                </div>
+                                <a href="{{ route('admin.manajemen-user.gurus.template') }}"
+                                    class="bg-white text-blue-700 hover:bg-blue-100 border border-blue-300 px-3 py-2 rounded text-sm font-bold shadow-sm flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4">
+                                        </path>
+                                    </svg>Template
+                                </a>
+                            </div>
 
-                            // 2. Tampilkan/Sembunyikan bar tombol aksi
-                            if (checkedCount > 0) {
-                                bulkDeleteContainer.classList.remove('hidden');
-                            } else {
-                                bulkDeleteContainer.classList.add('hidden');
-                            }
+                            <div class="mb-6">
+                                <h3 class="text-sm font-bold text-gray-700 mb-2">Langkah 2: Upload File</h3>
 
-                            // 3. Sinkronisasi ID ke Form Delete dan Form Reset
-                            // Hapus input hidden lama agar tidak menumpuk/duplikat
-                            document.querySelectorAll('.dynamic-id').forEach(el => el.remove());
+                                <div class="relative border-2 border-dashed rounded-lg p-8 transition text-center group"
+                                    :class="fileName ? 'border-green-500 bg-green-50' :
+                                        'border-gray-300 bg-gray-50 hover:border-[#3B3E42]'">
 
-                            // Masukkan ID yang dicentang ke kedua form
-                            checkedItems.forEach(item => {
-                                const id = item.value;
+                                    <input type="file" name="file"
+                                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" required
+                                        accept=".xlsx, .xls, .csv"
+                                        @change="fileName = $event.target.files[0] ? $event.target.files[0].name : ''"
+                                        x-ref="fileInput">
 
-                                // Buat input untuk Form Delete
-                                const inputDel = document.createElement('input');
-                                inputDel.type = 'hidden';
-                                inputDel.name = 'ids[]';
-                                inputDel.value = id;
-                                inputDel.className = 'dynamic-id';
-                                document.getElementById('bulkDeleteForm').appendChild(inputDel);
+                                    <template x-if="fileName">
+                                        <button type="button" @click="fileName = ''; $refs.fileInput.value = ''"
+                                            class="absolute top-2 right-2 z-20 p-1 rounded-full bg-white shadow-sm border border-green-200 text-green-600 hover:bg-green-100 transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    </template>
 
-                                // Buat input untuk Form Reset
-                                const inputReset = document.createElement('input');
-                                inputReset.type = 'hidden';
-                                inputReset.name = 'ids[]';
-                                inputReset.value = id;
-                                inputReset.className = 'dynamic-id';
-                                document.getElementById('bulkResetForm').appendChild(inputReset);
-                            });
+                                    <div
+                                        class="pointer-events-none space-y-2 flex flex-col items-center justify-center">
+                                        <div class="mb-2">
+                                            <svg class="w-12 h-12 transition-colors duration-300"
+                                                :class="fileName ? 'text-green-500' : 'text-gray-400'" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10">
+                                                </path>
+                                            </svg>
+                                        </div>
+
+                                        <p class="text-sm font-medium text-center transition-colors duration-300"
+                                            :class="fileName ? 'text-green-700 font-bold' : 'text-gray-600'"
+                                            x-text="fileName ? 'File: ' + fileName : 'Klik untuk pilih file'">
+                                        </p>
+
+                                        <template x-if="fileName">
+                                            <p class="text-xs text-green-600">File siap diunggah!</p>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end gap-3 pt-4 border-t">
+                                <x-secondary-button x-on:click="$dispatch('close')" type="button">
+                                    Batal
+                                </x-secondary-button>
+                                <x-primary-button ::disabled="isLoading || !fileName">
+                                    <span x-text="isLoading ? 'Memproses...' : 'Proses Import'"></span>
+                                </x-primary-button>
+                            </div>
+                        </form>
+                    </x-modal>
+                </div>
+
+            {{-- ================= KONTEN TAB PANDUAN ================= --}}
+<div x-show="activeTab === 'panduan'" x-transition>
+    <div class="p-4"> {{-- Padding dikurangi agar tidak terlalu jauh dari tab --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start"> {{-- Pakai Grid lebih rapi untuk 2 kolom --}}
+
+            {{-- KOTAK INFORMASI ALUR (Kiri - Kuning/Amber) --}}
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-5 shadow-sm">
+                <div class="flex items-center gap-3 mb-4"> {{-- mb-6 dikurangi jadi mb-4 --}}
+                    <div class="text-amber-600 flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                        </svg>
+                    </div>
+                    <h3 class="font-bold text-amber-900 text-base">Inisialisasi Sistem & Update Data</h3>
+                </div>
+                <ul class="text-sm text-amber-800 space-y-3"> {{-- Jarak antar poin dirapatkan --}}
+                    <li class="flex gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">1</span>
+                        <p><strong>Aktivasi Periode:</strong> Set status Tahun Ajaran menjadi <strong>"Aktif"</strong>.</p>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">2</span>
+                        <p><strong>Persiapan Kelas:</strong> Buat daftar kelas baru yang diperlukan.</p>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">3</span>
+                        <p><strong>Import Data:</strong> Sistem otomatis memperbarui tahun ajaran siswa.</p>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">4</span>
+                        <p><strong>Verifikasi:</strong> Bandingkan data Excel dengan sistem.</p>
+                    </li>
+                </ul>
+            </div>
+
+            {{-- KOTAK INFORMASI ALUR (Kanan - Biru) --}}
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-5 shadow-sm">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="text-blue-600 flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="font-bold text-blue-900 text-base">Panduan Alur Update Data Siswa</h3>
+                </div>
+                <ul class="text-sm text-blue-800 space-y-3">
+                    <li class="flex gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">1</span>
+                        <p><strong>Kelulusan:</strong> Proses lulus kelas 9 (kelas jadi null).</p>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">2</span>
+                        <p><strong>Buka Periode:</strong> Atur Tahun Ajaran baru ke <strong>"Aktif"</strong>.</p>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">3</span>
+                        <p><strong>Import:</strong> Gunakan fungsi <em>Update-or-Create</em>.</p>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">4</span>
+                        <p><strong>Otomatisasi:</strong> Tahun ajaran diperbarui otomatis ke tahun aktif.</p>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+                {{-- MODAL TAMBAH SISWA (KOMPONEN EKSTERNAL) --}}
+                <x-siswa.add-student-modal :kelas="$kelas" />
+
+                {{-- FORM CADANGAN DELETE (Standalone) --}}
+                <form id="deleteForm" method="POST" class="hidden">@csrf @method('DELETE')</form>
+
+            </div>
+        </div>
+    </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // === 1. LOGIKA AUTO-TAB (Siswa/Guru) ===
+            // Menggunakan session dari Laravel untuk otomatis membuka tab tertentu setelah reload
+            const activeTabSession = "{{ session('active_tab') }}";
+            if (activeTabSession) {
+                // Karena kita menggunakan Alpine.js (x-data="{ activeTab: '...' }"),
+                // kita harus mengubah state Alpine-nya secara manual jika diperlukan.
+                // Namun, karena di HTML sudah kita set defaultnya via request('tab'), ini sudah aman.
+            }
+
+            // === 2. LOGIKA BULK ACTION SISWA ===
+            const selectAllSiswa = document.getElementById('selectAll');
+            const itemsSiswa = document.querySelectorAll('.select-item');
+            const bulkSiswaContainer = document.getElementById('bulkDeleteContainer');
+            const selectedSiswaCount = document.getElementById('selectedCount');
+
+            function toggleSiswaBulk() {
+                const checked = document.querySelectorAll('.select-item:checked');
+                if (selectedSiswaCount) selectedSiswaCount.innerText = checked.length;
+
+                if (checked.length > 0) {
+                    bulkSiswaContainer?.classList.remove('hidden');
+                } else {
+                    bulkSiswaContainer?.classList.add('hidden');
+                }
+
+                // Bersihkan input lama & sinkronisasi ID ke form bulk siswa
+                document.querySelectorAll('.dynamic-siswa-id').forEach(el => el.remove());
+                checked.forEach(item => {
+                    ['bulkDeleteForm', 'bulkResetForm'].forEach(formId => {
+                        const form = document.getElementById(formId);
+                        if (form) {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'ids[]';
+                            input.value = item.value;
+                            input.className = 'dynamic-siswa-id';
+                            form.appendChild(input);
                         }
+                    });
+                });
+            }
 
-                        // Event Listener: Klik "Pilih Semua"
-                        if (selectAll) {
-                            selectAll.addEventListener('change', function() {
-                                items.forEach(item => {
-                                    item.checked = this.checked;
-                                });
-                                toggleBulkActions();
-                            });
+            if (selectAllSiswa) {
+                selectAllSiswa.addEventListener('change', () => {
+                    itemsSiswa.forEach(i => i.checked = selectAllSiswa.checked);
+                    toggleSiswaBulk();
+                });
+            }
+            itemsSiswa.forEach(i => i.addEventListener('change', toggleSiswaBulk));
+
+
+            // === 3. LOGIKA BULK ACTION GURU ===
+            const selectAllGuru = document.getElementById('selectAllGuru');
+            const itemsGuru = document.querySelectorAll('.select-item-guru');
+            const bulkGuruContainer = document.getElementById('bulkGuruContainer');
+            const selectedGuruCount = document.getElementById('selectedGuruCount');
+
+            function toggleGuruBulk() {
+                const checked = document.querySelectorAll('.select-item-guru:checked');
+                if (selectedGuruCount) selectedGuruCount.innerText = checked.length;
+
+                if (checked.length > 0) {
+                    bulkGuruContainer?.classList.remove('hidden');
+                } else {
+                    bulkGuruContainer?.classList.add('hidden');
+                }
+
+                // Bersihkan input lama & sinkronisasi ID ke form bulk guru
+                document.querySelectorAll('.dynamic-guru-id').forEach(el => el.remove());
+                checked.forEach(item => {
+                    ['bulkDeleteGuruForm', 'bulkResetGuruForm'].forEach(formId => {
+                        const form = document.getElementById(formId);
+                        if (form) {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'ids[]';
+                            input.value = item.value;
+                            input.className = 'dynamic-guru-id';
+                            form.appendChild(input);
                         }
+                    });
+                });
+            }
 
-                        // Event Listener: Klik Checkbox Satuan
-                        items.forEach(item => {
-                            item.addEventListener('change', function() {
-                                if (!this.checked) {
-                                    if (selectAll) selectAll.checked = false;
-                                }
+            if (selectAllGuru) {
+                selectAllGuru.addEventListener('change', () => {
+                    itemsGuru.forEach(i => i.checked = selectAllGuru.checked);
+                    toggleGuruBulk();
+                });
+            }
+            itemsGuru.forEach(i => i.addEventListener('change', toggleGuruBulk));
+        });
 
-                                const allChecked = document.querySelectorAll('.select-item:checked').length === items
-                                    .length;
-                                if (items.length > 0 && allChecked) {
-                                    if (selectAll) selectAll.checked = true;
-                                }
-                                toggleBulkActions();
-                            });
-                        });
-
-                        // Script Hapus Satuan (Tetap dipertahankan)
-                        function confirmDelete(url, name) {
-                            if (confirm('Yakin ingin menghapus data ' + name + ' secara permanen?')) {
-                                const form = document.getElementById('deleteForm');
-                                form.action = url;
-                                form.submit();
-                            }
-                        }
-                    </script>
+        // === 4. SCRIPT HAPUS SATUAN (Global) ===
+        function confirmDelete(url, name) {
+            if (confirm('Yakin ingin menghapus data ' + name + ' secara permanen?')) {
+                const form = document.getElementById('deleteForm');
+                if (form) {
+                    form.action = url;
+                    form.submit();
+                }
+            }
+        }
+    </script>
 </x-app-layout>

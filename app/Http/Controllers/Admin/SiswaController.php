@@ -204,29 +204,31 @@ class SiswaController extends Controller
     }
 
     public function bulkDestroy(Request $request)
-    {
-        // Validasi ada ID yang dikirim
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'exists:siswas,id',
-        ]);
+{
+    // 1. Validasi
+    $request->validate([
+        'ids' => 'required|array',
+        'ids.*' => 'exists:siswas,id',
+    ]);
 
-        // Ambil semua siswa yang mau dihapus
-        $siswas = Siswa::whereIn('id', $request->ids)->get();
+    // 2. Eksekusi Hapus
+    $siswas = Siswa::whereIn('id', $request->ids)->with('user')->get();
 
-        foreach ($siswas as $siswa) {
-            // Hapus User terkait (agar bersih)
-            if ($siswa->user) {
-                $siswa->user->delete();
-            }
-            // Hapus Siswa
-            // $siswa->delete();
+    foreach ($siswas as $siswa) {
+        if ($siswa->user) {
+            // Menggunakan forceDelete jika Anda ingin benar-benar menghapus dari database (bukan soft delete)
             $siswa->user->forceDelete();
         }
-
-        return redirect()->back()->with('success', 'Data siswa terpilih berhasil dihapus!');
-        // return back()->with(    'success', count($request->ids) . ' data siswa berhasil dihapus.');
+        // Jika tabel 'siswas' tidak diset cascade di database, aktifkan ini:
+        // $siswa->delete();
     }
+
+    // 3. Kembalikan dengan info tab 'siswa'
+    return redirect()->back()->with([
+        'success' => count($request->ids) . ' data siswa terpilih berhasil dihapus!',
+        'active_tab' => 'siswa' // Kunci agar kembali ke tab siswa
+    ]);
+}
 
 public function bulkResetPassword(Request $request)
     {
