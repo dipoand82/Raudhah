@@ -16,8 +16,8 @@
         <div class="overflow-hidden">
             <h1 class="text-sm font-bold text-[#1072B8] leading-tight truncate">
                 @if(Auth::user()->role == 'admin') {{ $profil_sekolah->nama_sekolah }}
-                @elseif(Auth::user()->role == 'guru') GURU
-                @else SISWA
+                @elseif(Auth::user()->role == 'guru') {{ $profil_sekolah->nama_sekolah }}
+                @else {{ $profil_sekolah->nama_sekolah }}
                 @endif
             </h1>
             <p class="text-[10px] text-gray-500 font-medium uppercase tracking-tighter">

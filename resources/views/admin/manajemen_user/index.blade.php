@@ -640,25 +640,27 @@
                                 </div>
                             </form>
 
-                            <div class="flex flex-col sm:flex-row items-center gap-3 mb-2 w-full lg:w-auto justify-end">
-    <button x-data="" x-on:click="$dispatch('open-modal', 'import-guru')"
-        class="inline-flex w-full items-center justify-center gap-2 bg-[#22c55e] hover:bg-[#16a34a] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-        </svg>
-        Import Akun Guru
-    </button>
+                            <div
+                                class="flex flex-col sm:flex-row items-center gap-3 mb-2 w-full lg:w-auto justify-end">
+                                <button x-data="" x-on:click="$dispatch('open-modal', 'import-guru')"
+                                    class="inline-flex w-full items-center justify-center gap-2 bg-[#22c55e] hover:bg-[#16a34a] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                    Import Akun Guru
+                                </button>
 
-    <button type="button" x-data="" x-on:click="$dispatch('open-modal', 'add-guru')"
-        class="inline-flex w-full items-center justify-center gap-2 bg-[#1072B8] hover:bg-[#0d5a91] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 4v16m8-8H4"></path>
-        </svg>
-        Tambah Guru
-    </button>
-</div>
+                                <button type="button" x-data=""
+                                    x-on:click="$dispatch('open-modal', 'add-guru')"
+                                    class="inline-flex w-full items-center justify-center gap-2 bg-[#1072B8] hover:bg-[#0d5a91] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 4v16m8-8H4"></path>
+                                    </svg>
+                                    Tambah Guru
+                                </button>
+                            </div>
                         </div>
 
                         {{-- TABEL GURU --}}
@@ -711,7 +713,8 @@
                                                                 Guru?</h2>
                                                             <p class="mt-2 text-sm text-gray-600">Yakin ingin menghapus
                                                                 <strong>{{ $g->name }}</strong>? Tindakan ini
-                                                                tidak bisa dibatalkan.</p>
+                                                                tidak bisa dibatalkan.
+                                                            </p>
                                                             <div class="mt-6 flex justify-end gap-3">
                                                                 <x-secondary-button
                                                                     x-on:click="$dispatch('close')">Batal</x-secondary-button>
@@ -896,74 +899,91 @@
                     </x-modal>
                 </div>
 
-            {{-- ================= KONTEN TAB PANDUAN ================= --}}
-<div x-show="activeTab === 'panduan'" x-transition>
-    <div class="p-4"> {{-- Padding dikurangi agar tidak terlalu jauh dari tab --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start"> {{-- Pakai Grid lebih rapi untuk 2 kolom --}}
+                {{-- ================= KONTEN TAB PANDUAN ================= --}}
+                <div x-show="activeTab === 'panduan'" x-transition>
+                    <div class="p-4"> {{-- Padding dikurangi agar tidak terlalu jauh dari tab --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start"> {{-- Pakai Grid lebih rapi untuk 2 kolom --}}
 
-            {{-- KOTAK INFORMASI ALUR (Kiri - Kuning/Amber) --}}
-            <div class="bg-amber-50 border border-amber-200 rounded-lg p-5 shadow-sm">
-                <div class="flex items-center gap-3 mb-4"> {{-- mb-6 dikurangi jadi mb-4 --}}
-                    <div class="text-amber-600 flex-shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                        </svg>
+                            {{-- KOTAK INFORMASI ALUR (Kiri - Kuning/Amber) --}}
+                            <div class="bg-amber-50 border border-amber-200 rounded-lg p-5 shadow-sm">
+                                <div class="flex items-center gap-3 mb-4"> {{-- mb-6 dikurangi jadi mb-4 --}}
+                                    <div class="text-amber-600 flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-bold text-amber-900 text-base">Inisialisasi Sistem & Update Data
+                                    </h3>
+                                </div>
+                                <ul class="text-sm text-amber-800 space-y-3"> {{-- Jarak antar poin dirapatkan --}}
+                                    <li class="flex gap-3">
+                                        <span
+                                            class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">1</span>
+                                        <p><strong>Aktivasi Periode:</strong> Set status Tahun Ajaran menjadi
+                                            <strong>"Aktif"</strong>.</p>
+                                    </li>
+                                    <li class="flex gap-3">
+                                        <span
+                                            class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">2</span>
+                                        <p><strong>Persiapan Kelas:</strong> Buat daftar kelas baru yang diperlukan.</p>
+                                    </li>
+                                    <li class="flex gap-3">
+                                        <span
+                                            class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">3</span>
+                                        <p><strong>Import Data:</strong> Sistem otomatis memperbarui tahun ajaran siswa.
+                                        </p>
+                                    </li>
+                                    <li class="flex gap-3">
+                                        <span
+                                            class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">4</span>
+                                        <p><strong>Verifikasi:</strong> Bandingkan data Excel dengan sistem.</p>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            {{-- KOTAK INFORMASI ALUR (Kanan - Biru) --}}
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-5 shadow-sm">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="text-blue-600 flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <h3 class="font-bold text-blue-900 text-base">Panduan Alur Update Data Siswa</h3>
+                                </div>
+                                <ul class="text-sm text-blue-800 space-y-3">
+                                    <li class="flex gap-3">
+                                        <span
+                                            class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">1</span>
+                                        <p><strong>Kelulusan:</strong> Proses lulus kelas 9 (kelas jadi null).</p>
+                                    </li>
+                                    <li class="flex gap-3">
+                                        <span
+                                            class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">2</span>
+                                        <p><strong>Buka Periode:</strong> Atur Tahun Ajaran baru ke
+                                            <strong>"Aktif"</strong>.</p>
+                                    </li>
+                                    <li class="flex gap-3">
+                                        <span
+                                            class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">3</span>
+                                        <p><strong>Import:</strong> Gunakan fungsi <em>Update-or-Create</em>.</p>
+                                    </li>
+                                    <li class="flex gap-3">
+                                        <span
+                                            class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">4</span>
+                                        <p><strong>Otomatisasi:</strong> Tahun ajaran diperbarui otomatis ke tahun
+                                            aktif.</p>
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </div>
                     </div>
-                    <h3 class="font-bold text-amber-900 text-base">Inisialisasi Sistem & Update Data</h3>
                 </div>
-                <ul class="text-sm text-amber-800 space-y-3"> {{-- Jarak antar poin dirapatkan --}}
-                    <li class="flex gap-3">
-                        <span class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">1</span>
-                        <p><strong>Aktivasi Periode:</strong> Set status Tahun Ajaran menjadi <strong>"Aktif"</strong>.</p>
-                    </li>
-                    <li class="flex gap-3">
-                        <span class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">2</span>
-                        <p><strong>Persiapan Kelas:</strong> Buat daftar kelas baru yang diperlukan.</p>
-                    </li>
-                    <li class="flex gap-3">
-                        <span class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">3</span>
-                        <p><strong>Import Data:</strong> Sistem otomatis memperbarui tahun ajaran siswa.</p>
-                    </li>
-                    <li class="flex gap-3">
-                        <span class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">4</span>
-                        <p><strong>Verifikasi:</strong> Bandingkan data Excel dengan sistem.</p>
-                    </li>
-                </ul>
-            </div>
-
-            {{-- KOTAK INFORMASI ALUR (Kanan - Biru) --}}
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-5 shadow-sm">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="text-blue-600 flex-shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-                    <h3 class="font-bold text-blue-900 text-base">Panduan Alur Update Data Siswa</h3>
-                </div>
-                <ul class="text-sm text-blue-800 space-y-3">
-                    <li class="flex gap-3">
-                        <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">1</span>
-                        <p><strong>Kelulusan:</strong> Proses lulus kelas 9 (kelas jadi null).</p>
-                    </li>
-                    <li class="flex gap-3">
-                        <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">2</span>
-                        <p><strong>Buka Periode:</strong> Atur Tahun Ajaran baru ke <strong>"Aktif"</strong>.</p>
-                    </li>
-                    <li class="flex gap-3">
-                        <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">3</span>
-                        <p><strong>Import:</strong> Gunakan fungsi <em>Update-or-Create</em>.</p>
-                    </li>
-                    <li class="flex gap-3">
-                        <span class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">4</span>
-                        <p><strong>Otomatisasi:</strong> Tahun ajaran diperbarui otomatis ke tahun aktif.</p>
-                    </li>
-                </ul>
-            </div>
-
-        </div>
-    </div>
-</div>
 
                 {{-- MODAL TAMBAH SISWA (KOMPONEN EKSTERNAL) --}}
                 <x-siswa.add-student-modal :kelas="$kelas" />

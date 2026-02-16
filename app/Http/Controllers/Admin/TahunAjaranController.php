@@ -15,15 +15,20 @@ class TahunAjaranController extends Controller
 {
     public function index()
     {
+
         $tahunAjarans = TahunAjaran::latest()->get();
         $tingkatKelas = Kelas::select('tingkat')->distinct()->orderBy('tingkat', 'desc')->pluck('tingkat');
 
-        return view('admin.tahun_ajaran.index', compact('tahunAjarans', 'tingkatKelas'));
-    }
+// Tambahkan baris ini untuk mengetes
+    return view('admin.tahun_ajaran.index', compact('tahunAjarans', 'tingkatKelas'))
+           ->with('error', 'Ini adalah tes pesan error untuk memastikan Alert muncul');    }
 
     public function store(Request $request)
-    {
-        // --- BAGIAN 1: FORMAT & VALIDASI (DARI KODE LAMA) ---
+    {// TARUH DI SINI UNTUK TES TOMBOL SIMPAN
+
+    // Kode di bawah ini tidak akan dieksekusi saat ngetes
+    $this->formatTahun($request);
+        // ---  BAGIAN 1: FORMAT & VALIDASI (DARI KODE LAMA) ---
         // Tetap dipakai agar format tahun konsisten (YYYY/YYYY) dan berurutan
         $this->formatTahun($request);
 
@@ -63,14 +68,12 @@ class TahunAjaranController extends Controller
             return back()->with('success', 'Tahun Ajaran baru berhasil ditambah dan otomatis diaktifkan.');
 
         } catch (\Exception $e) {
-            DB::rollBack(); // Batalkan semua perubahan jika ada error
-            
-            // Log error asli untuk developer
-            Log::error("Gagal store TA: " . $e->getMessage());
-            
-            // Tampilkan pesan umum ke user (agar tidak membingungkan user dengan error code)
-            return back()->with('error', 'Gagal menyimpan data sistem.');
-        }
+    DB::rollBack();
+    Log::error("Gagal Menyimpan Tahun Ajaran: " . $e->getMessage());
+
+    // Pesan ini yang akan dilihat user jika database error
+    return back()->with('error', 'Gagal menyimpan data ke sistem. Silakan coba lagi nanti.');
+}
     }
 
     public function update(Request $request, $id)
@@ -134,7 +137,7 @@ class TahunAjaranController extends Controller
 
             // 3. EKSEKUSI HAPUS (Kodingan Lama - Dipertahankan)
             $ta->delete();
-            
+
             return back()->with('success', 'Data berhasil dihapus.');
 
         } catch (\Exception $e) {
@@ -144,43 +147,41 @@ class TahunAjaranController extends Controller
         }
     }
 
-        public function graduation(Request $request)
-    {
-        // 1. Validasi input
-        $request->validate(['tingkat_akhir' => 'required']);
+public function graduation(Request $request)
+{
+    $request->validate(['tingkat_akhir' => 'required']);
 
-        try {
-            // 2. (DARI KODE BARU) Menggunakan 'whereHas'
-            // Mencari siswa 'Aktif' yang berada di dalam KELAS dengan tingkat sesuai input.
-            // Ini lebih akurat daripada hanya mengecek kolom 'tingkat' di tabel siswa.
-            $query = Siswa::where('status', 'Aktif')
-                ->whereHas('kelas', function($q) use ($request) {
-                    $q->where('tingkat', $request->tingkat_akhir);
-                });
+    try {
+        // Cari siswa aktif berdasarkan tingkat kelas
+        $query = Siswa::whereIn('status', ['Aktif', 'aktif'])
+            ->whereHas('kelas', function($q) use ($request) {
+                $q->where('tingkat', $request->tingkat_akhir);
+            });
 
-            $jumlah = $query->count();
+        $jumlah = $query->count();
 
-            // 3. Cek jika kosong
-            if ($jumlah == 0) {
-                return back()->with('error', "Tidak ada siswa aktif di kelas {$request->tingkat_akhir}.");
-            }
-
-            // 4. (GABUNGAN) Lakukan Mass Update
-            $query->update([
-                'status' => 'Lulus',
-                'kelas_id' => null,       // Melepas siswa dari kelas
-                'tingkat' => $request->tingkat_akhir // (Opsional) Menyimpan jejak tingkat terakhir saat lulus
-            ]);
-
-            // 5. Pesan Sukses
-            return back()->with('success', "BERHASIL! {$jumlah} siswa tingkat {$request->tingkat_akhir} telah diluluskan.");
-
-        } catch (\Exception $e) {
-            // 6. (DARI KODE LAMA) Error handling tetap menggunakan Log agar aman
-            Log::error("Gagal proses kelulusan: " . $e->getMessage());
-            return back()->with('error', 'Terjadi kesalahan sistem saat proses kelulusan.');
+        // JIKA TIDAK ADA DATA, KIRIM ERROR DAN STOP PROSES
+        if ($jumlah === 0) {
+            return back()->with('error', "Gagal! Tidak ada siswa aktif yang ditemukan di kelas tingkat {$request->tingkat_akhir}.");
         }
+
+        // Jika ada data, lanjutkan update
+        DB::beginTransaction();
+        $ids = $query->pluck('id');
+
+        Siswa::whereIn('id', $ids)->update([
+            'status' => 'Lulus',
+            'kelas_id' => null,
+        ]);
+
+        DB::commit();
+        return back()->with('success', "BERHASIL! {$jumlah} siswa telah diluluskan.");
+
+    } catch (\Exception $e) {
+        if (DB::transactionLevel() > 0) DB::rollBack();
+        return back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
     }
+}
 
 
     // Helper Function agar tidak nulis str_replace berulang-ulang
