@@ -167,7 +167,7 @@
                         <x-modal name="import-siswa" focusable>
                             <form method="POST" action="{{ route('admin.manajemen-user.siswa.import') }}"
                                 enctype="multipart/form-data" class="p-6" x-data="{ fileName: '', isLoading: false }"
-                                @submit="isLoading = true">
+                                @submit="isLoading = true; $dispatch('loading')">
                                 @csrf
                                 <div class="flex justify-between items-start mb-5 border-b pb-3">
                                     <h2 class="text-xl font-bold text-gray-900">Import Data Siswa</h2>
@@ -643,7 +643,7 @@
                             <div
                                 class="flex flex-col sm:flex-row items-center gap-3 mb-2 w-full lg:w-auto justify-end">
                                 <button x-data="" x-on:click="$dispatch('open-modal', 'import-guru')"
-                                    class="inline-flex w-full items-center justify-center gap-2 bg-[#22c55e] hover:bg-[#16a34a] text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
+                                    class="inline-flex w-full items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
@@ -768,7 +768,7 @@
                             <div class="mb-4">
                                 <x-input-label value="Email (Kosongkan untuk otomatis)" />
                                 <x-text-input name="email" type="email"
-                                    class="w-full mt-1 focus:border-[#3B3E42]" placeholder="guru@raudhah.com" />
+                                    class="w-full mt-1 focus:border-[#3B3E42]" placeholder="namalengkap@raudhah.com" />
                                 <p class="text-[10px] text-red-500 mt-1 capitalize font-bold tracking-wider">*Jika
                                     kosong, sistem akan otomatis menggunakan format: namalengkap@raudhah.com</p>
                             </div>
@@ -808,7 +808,7 @@
                     <x-modal name="import-guru" focusable>
                         <form method="POST" action="{{ route('admin.manajemen-user.gurus.import') }}"
                             enctype="multipart/form-data" class="p-6" x-data="{ fileName: '', isLoading: false }"
-                            @submit="isLoading = true">
+                            @submit="isLoading = true; $dispatch('loading')">
                             @csrf
 
                             <div class="flex justify-between items-start mb-5 border-b pb-3">
@@ -891,9 +891,11 @@
                                 <x-secondary-button x-on:click="$dispatch('close')" type="button">
                                     Batal
                                 </x-secondary-button>
-                                <x-primary-button ::disabled="isLoading || !fileName">
+                                {{-- <x-primary-button ::disabled="isLoading || !fileName">
                                     <span x-text="isLoading ? 'Memproses...' : 'Proses Import'"></span>
-                                </x-primary-button>
+                                </x-primary-button> --}}
+                                 <x-primary-button ::disabled="isLoading"><span
+                                x-text="isLoading ? 'Memproses...' : 'Proses Import'"></span></x-primary-button>
                             </div>
                         </form>
                     </x-modal>

@@ -132,7 +132,7 @@ class TahunAjaranController extends Controller
             $jumlahSiswa = \App\Models\Siswa::where('tahun_ajaran_id', $ta->id)->count();
 
             if ($jumlahSiswa > 0) {
-                return back()->with('error', "Gagal Hapus! Masih ada $jumlahSiswa siswa yang terdaftar di tahun ajaran ini. Silakan pindahkan mereka atau luluskan dulu.");
+                return back()->with('error', "Gagal Hapus! Masih ada $jumlahSiswa siswa yang terdaftar di tahun ajaran ini");
             }
 
             // 3. EKSEKUSI HAPUS (Kodingan Lama - Dipertahankan)

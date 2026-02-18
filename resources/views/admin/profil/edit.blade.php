@@ -60,7 +60,7 @@
                         <form method="POST" action="{{ route('admin.profil.update') }}" enctype="multipart/form-data">
                             @csrf
                             @method('PATCH')
-<input type="hidden" name="current_tab" value="profil">
+                            <input type="hidden" name="current_tab" value="profil">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
 
                                 {{-- KOLOM KIRI: IDENTITAS --}}
@@ -190,7 +190,7 @@
                             enctype="multipart/form-data">
                             @csrf
                             @method('PATCH')
-<input type="hidden" name="current_tab" value="info">
+                            <input type="hidden" name="current_tab" value="info">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                                 <div>
                                     <x-input-label for="info_penting" :value="__('Info Penting')"
@@ -223,27 +223,29 @@
                                 </a>
                             </div> --}}
                             <div class="flex items-center justify-end mt-10 pt-6 border-t border-gray-100">
-<a href="{{ route('admin.profil.edit', ['tab' => 'info']) }}">
-                                <x-primary-button class="bg-[#1072B8] hover:bg-blue-800 rounded-lg">
-                                    {{ __('Simpan Perubahan') }}
-                                </x-primary-button>
-                            </a>
+                                <a href="{{ route('admin.profil.edit', ['tab' => 'info']) }}">
+                                    <x-primary-button class="bg-[#1072B8] hover:bg-blue-800 rounded-lg">
+                                        {{ __('Simpan Perubahan') }}
+                                    </x-primary-button>
+                                </a>
                             </div>
                         </form>
                     </div>
 
                     <div x-show="activeTab === 'galeri'" x-transition class="space-y-6"> {{-- TAMBAHKAN BARIS INI --}}
-<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-gray-100">
-    <div>
-        <h3 class="text-lg font-bold text-gray-800">Kumpulan Galeri Kegiatan</h3>
-        <p class="text-sm text-gray-500">Kelola dokumentasi foto yang tampil di halaman depan.</p>
-    </div>
-    <a href="{{ route('admin.galeri.create') }}" class="w-full sm:w-auto">
-        <x-primary-button class="w-full justify-center">
-            Tambah Galeri Baru
-        </x-primary-button>
-    </a>
-</div>
+                        <div
+                            class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-gray-100">
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-800">Kumpulan Galeri Kegiatan</h3>
+                                <p class="text-sm text-gray-500">Kelola dokumentasi foto yang tampil di halaman depan.
+                                </p>
+                            </div>
+                            <a href="{{ route('admin.galeri.create') }}" class="w-full sm:w-auto">
+                                <x-primary-button class="w-full justify-center">
+                                    Tambah Galeri Baru
+                                </x-primary-button>
+                            </a>
+                        </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             @forelse($galeri as $item)
@@ -260,7 +262,7 @@
                                             {{-- Tombol Edit --}}
                                             <a href="{{ route('admin.galeri.edit', $item->id) }}"
                                                 class="text-indigo-600 hover:text-indigo-900 font-semibold transition">
-                                               Edit
+                                                Edit
                                             </a>
 
                                             {{-- PEMANGGILAN MODAL GLOBAL --}}
@@ -279,6 +281,11 @@
                                     <p>Belum ada foto di galeri.</p>
                                 </div>
                             @endforelse
+                        </div>
+                        <div class="mt-8 flex justify-center">
+                            <div class="inline-block w-full">
+                                {{ $galeri->links() }}
+                            </div>
                         </div>
                     </div>
                 </div>

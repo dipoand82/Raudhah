@@ -7,7 +7,7 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 ">
-            
+
             {{-- ALERT SUCCESS --}}
             @if(session('success'))
                 <x-alert-success>
@@ -20,7 +20,7 @@
                     {{ session('error') }}
                 </x-alert-danger>
             @endif
-            
+
             @if ($errors->any())
                 @foreach ($errors->all() as $error)
                     <x-alert-danger timeout="8000"> {{-- Waktu 8 detik agar sempat dibaca --}}
@@ -28,10 +28,10 @@
                     </x-alert-danger>
                 @endforeach
             @endif
-            
+
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 ">
-                
+
                 {{-- FORM TAMBAH (KIRI) --}}
                 <div class="md:col-span-1">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 sticky top-6">
@@ -40,7 +40,7 @@
                             <svg class="w-5 h-5 text-[#1072B8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                             Tambah Kelas Baru
                         </h3>
-                        
+
                         <form action="{{ route('admin.kelas.store') }}" method="POST">
                             @csrf
                             <div class="mb-4">
@@ -104,14 +104,14 @@
                         </td>
                         <td class="px-4 py-4 whitespace-nowrap text-center text-sm font-medium">
                             <div class="flex justify-center items-center gap-3">
-                                <button x-data x-on:click="$dispatch('open-modal', 'edit-kelas-{{ $k->id }}')"
+                                {{-- <button x-data x-on:click="$dispatch('open-modal', 'edit-kelas-{{ $k->id }}')"
                                     class="text-indigo-600 hover:text-indigo-900 font-semibold transition">
                                     Edit
-                                </button>
-                                <x-modal-delete-global 
-                                    :trigger="'delete-kelas-' . $k->id" 
-                                    :action="route('admin.kelas.destroy', $k->id)" 
-                                    :message="'Kelas ' . $k->tingkat . ' ' . $k->nama_kelas" 
+                                </button> --}}
+                                <x-modal-delete-global
+                                    :trigger="'delete-kelas-' . $k->id"
+                                    :action="route('admin.kelas.destroy', $k->id)"
+                                    :message="'Kelas ' . $k->tingkat . ' ' . $k->nama_kelas"
                                 />
                             </div>
                         </td>
@@ -125,7 +125,7 @@
                 </tbody>
             </table>
         </div>
-        
+
         {{-- PAGINATION --}}
         <div class="px-4 py-3 bg-white border-t border-gray-100">
             {{ $kelas->links() }}

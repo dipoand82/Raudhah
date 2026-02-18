@@ -12,7 +12,7 @@ class GaleriController extends Controller
     {
         $profil_sekolah = ProfilSekolah::first();
         // Menampilkan semua foto dengan scroll/halaman (seperti Gambar 2)
-        $galeri = Galeri::latest()->paginate(12);
+        $galeri = Galeri::latest()->paginate(6);
         return view('galeri.index', compact('profil_sekolah', 'galeri'));
     }
 

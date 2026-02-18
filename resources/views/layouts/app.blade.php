@@ -40,6 +40,22 @@
             </main>
         </div>
     </div>
+    {{-- MODAL LOADING GLOBAL --}}
+    <div x-data="{ isLoading: false }"
+         x-show="isLoading"
+         @loading.window="isLoading = true"
+         @loaded.window="isLoading = false"
+         x-cloak
+         class="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 transition-opacity">
+        <div class="bg-white p-6 rounded-xl shadow-xl flex flex-col items-center gap-4">
+            {{-- Spinner --}}
+            <div class="w-12 h-12 border-4 border-gray-200 border-t-[#1072B8] rounded-full animate-spin"></div>
+            <div class="text-center text-sm font-bold text-gray-700">
+                Sedang Memproses...
+                <p class="text-[10px] text-gray-500 font-normal mt-1">Mohon tunggu sebentar, jangan tutup halaman.</p>
+            </div>
+        </div>
+    </div>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
       AOS.init({

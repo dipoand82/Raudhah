@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\ProfilSekolah;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Gate; // Pastikan ini ada untuk otorisasi akses admin
+use Illuminate\Support\Facades\Log; // Pastikan ini ada untuk logging error jika diperlukan
+use App\Models\Galeri; // Pastikan ini ada untuk mengambil data galeri di tab profil
 
 class ProfilSekolahController extends Controller
 {
@@ -18,7 +21,8 @@ class ProfilSekolahController extends Controller
         );
 
         // Tambahkan baris ini agar data galeri bisa tampil di tab
-        $galeri = \App\Models\Galeri::latest()->get();
+        // $galeri = \App\Models\Galeri::latest()->get();
+        $galeri = Galeri::latest()->paginate(6)->withQueryString();
 
         return view('admin.profil.edit', data: compact('profil', 'galeri'));
     }
@@ -44,6 +48,27 @@ class ProfilSekolahController extends Controller
             'tiktok' => 'nullable|string|max:255',
             'info_footer' => 'nullable|string',
 
+        ],
+        [
+// Custom Messages untuk Logo
+    'logo.image' => 'File logo harus berupa gambar.',
+    'logo.mimes' => 'Format logo harus jpeg, png, atau jpg.',
+    'logo.max' => 'Ukuran logo tidak boleh lebih dari 2 MB.',
+
+    // Custom Messages untuk Banner
+    'banner.image' => 'File banner harus berupa gambar.',
+    'banner.mimes' => 'Format banner harus jpeg, png, atau jpg.',
+    'banner.max' => 'Ukuran banner tidak boleh lebih dari 4 MB.',
+
+    // Custom Messages untuk Brosur Info
+    'brosur_info.image' => 'File brosur harus berupa gambar.',
+    'brosur_info.mimes' => 'Format brosur harus jpeg, png, atau jpg.',
+    'brosur_info.max' => 'Ukuran file brosur tidak boleh lebih dari 4 MB.',
+
+    // Custom Messages untuk Field Teks
+    'nama_sekolah.max' => 'Nama sekolah terlalu panjang (maksimal 255 karakter).',
+    'email.email' => 'Alamat email yang dimasukkan tidak valid.',
+    'telepon.max' => 'Nomor telepon maksimal 20 karakter.',
         ]);
 
         $profil = ProfilSekolah::first();

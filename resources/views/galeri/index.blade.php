@@ -58,7 +58,7 @@
             </div>
 
             {{-- Pagination untuk pindah halaman --}}
-            <div class="mt-12">
+            <div class="mt-12 px-4 py-3 bg-white border border-gray-100 rounded-2xl shadow-sm flex justify-center">
                 {{ $galeri->links() }}
             </div>
         </div>

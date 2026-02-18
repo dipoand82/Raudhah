@@ -232,7 +232,7 @@
                 </div>
 
                 <div class="text-center mt-10">
-                    <a href="{{ route('galeri.index') }}" class="px-8 py-3 bg-blue-600 text-white font-bold rounded-full hover:bg-blue-700 transition shadow-lg inline-flex items-center gap-2">
+                    <a href="{{ route('galeri.index') }}" class="px-8 py-3 bg-blue-600 text-white font-bold rounded-full hover:bg-blue-700 transition all transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg inline-flex items-center gap-2">
                         Lihat Galeri Lainnya <i class="fas fa-arrow-right text-sm"></i>
                     </a>
                 </div>

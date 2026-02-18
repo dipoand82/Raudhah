@@ -31,6 +31,10 @@ class GaleriController extends Controller
         $request->validate([
             'judul' => 'required',
             'gambar' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ],[
+            'gambar.image' => 'File harus berupa gambar.',
+            'gambar.mimes' => 'Format gambar harus jpeg, png, atau jpg.',
+            'gambar.max' => 'Ukuran gambar tidak boleh lebih dari 2 MB.',
         ]);
 
         if ($request->hasFile('gambar')) {
@@ -46,7 +50,7 @@ class GaleriController extends Controller
 
         // Ganti baris return lama Anda menjadi:
         return redirect()->route('admin.profil.edit', ['tab' => 'galeri'])
-            ->with('success', 'Foto berhasil ditambahkan!');
+            ->with('success', 'Galeri berhasil ditambahkan!');
     }
 
     // 4. Form Edit Foto (Yang Anda kirim tadi)
@@ -54,7 +58,7 @@ class GaleriController extends Controller
     {
         $galeri = Galeri::findOrFail($id);
 
-        return view('admin.galeri.edit', compact('galeri'));
+        return view('admin.galeri.edit', compact('galeri', ));
     }
 
     // 5. Proses Update Foto
@@ -65,6 +69,10 @@ class GaleriController extends Controller
         $request->validate([
             'judul' => 'required',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ],[
+            'gambar.image' => 'File harus berupa gambar.',
+            'gambar.mimes' => 'Format gambar harus jpeg, png, atau jpg.',
+            'gambar.max' => 'Ukuran gambar tidak boleh lebih dari 2 MB.',
         ]);
 
         $data = $request->only(['judul', 'deskripsi']);

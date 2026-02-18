@@ -73,14 +73,14 @@
 
                     {{-- TOMBOL AKSI KANAN --}}
                     <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto justify-end">
-                        <a href="{{ route('admin.siswas.export', ['kelas_id' => request('kelas_id'), 'search' => request('search'), 'status' => request('status')]) }}"
-                            class="inline-flex w-full items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                            </svg>
-                            Export Data Siswa
-                        </a>
+<a href="{{ route('admin.siswas.export', ['kelas_id' => request('kelas_id'), 'search' => request('search'), 'status' => request('status')]) }}"
+   @click="$dispatch('loading'); setTimeout(() => $dispatch('loaded'), 3000)" {{-- Tambah ini --}}
+   class="inline-flex w-full items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+    </svg>
+    Export Data Siswa
+</a>
 
                         {{-- Tombol Tambah (Trigger Modal) --}}
                         @can('admin')
