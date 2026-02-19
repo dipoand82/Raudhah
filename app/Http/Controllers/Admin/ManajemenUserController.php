@@ -24,57 +24,63 @@ public function index(Request $request)
     // 1. Tangkap input dari Blade
     $searchSiswa = $request->input('search');
     $searchGuru = $request->input('search_guru');
-
-    // 2. Tangkap input "Show" masing-masing (Default 30)
     $perPageSiswa = $request->input('per_page', 30);
-    $perPageGuru = $request->input('per_page_guru', 30); // Tambahan untuk Guru
-
+    $perPageGuru = $request->input('per_page_guru', 30);
     $statusFilter = $request->input('status');
     $kelasFilter = $request->input('kelas_id');
 
-    // --- QUERY SISWA ---
+    // --- QUERY SISWA (VERSI ANTI-DUPLIKAT) ---
     $userSiswa = User::where('role', 'siswa')
-        ->join('siswas', 'users.id', '=', 'siswas.user_id')
-        ->leftJoin('kelas', 'siswas.kelas_id', '=', 'kelas.id')
-        ->select('users.*', 'kelas.tingkat', 'kelas.nama_kelas')
+        ->with(['dataSiswa.kelas']) // Eager Loading relasi
+        // Filter Pencarian (Nama di tabel Users atau NISN di tabel Siswas)
         ->when($searchSiswa, function($q) use ($searchSiswa) {
             $q->where(function($query) use ($searchSiswa) {
-                $query->where('users.name', 'like', "%{$searchSiswa}%")
-                      ->orWhere('siswas.nisn', 'like', "%{$searchSiswa}%");
+                $query->where('name', 'like', "%{$searchSiswa}%")
+                      ->orWhereHas('dataSiswa', function($sq) use ($searchSiswa) {
+                          $sq->where('nisn', 'like', "%{$searchSiswa}%");
+                      });
             });
         })
+        // Filter Status (Ada di tabel Siswas)
         ->when($statusFilter, function($q) use ($statusFilter) {
-            return $q->where('siswas.status', $statusFilter);
+            return $q->whereHas('dataSiswa', function($sq) use ($statusFilter) {
+                $sq->where('status', $statusFilter);
+            });
         })
+        // Filter Kelas (Ada di tabel Siswas)
         ->when($kelasFilter, function($q) use ($kelasFilter) {
-            return $q->where('siswas.kelas_id', $kelasFilter);
+            return $q->whereHas('dataSiswa', function($sq) use ($kelasFilter) {
+                $sq->where('kelas_id', $kelasFilter);
+            });
         })
+        // Sorting: Karena kita tidak pakai JOIN, kita gunakan Join khusus untuk sorting
+        // agar tidak merusak data utama atau pakai cara manual di bawah:
+        ->join('siswas', 'users.id', '=', 'siswas.user_id')
+        ->leftJoin('kelas', 'siswas.kelas_id', '=', 'kelas.id')
+        ->select('users.*') // Tetap select users.* agar tidak ganda
         ->orderByRaw("FIELD(siswas.status, 'Aktif', 'Cuti','Lulus','Pindah', 'Keluar') ASC")
-        ->orderByRaw("CASE WHEN siswas.kelas_id IS NULL THEN 0 ELSE 1 END")
         ->orderBy('kelas.tingkat', 'asc')
         ->orderBy('kelas.nama_kelas', 'asc')
         ->orderBy('users.name', 'asc')
-        ->with('dataSiswa.kelas')
-        ->paginate($perPageSiswa, ['*'], 'siswa_page') // Gunakan $perPageSiswa
+        ->paginate($perPageSiswa, ['*'], 'siswa_page')
         ->withQueryString();
 
-    // --- QUERY GURU (VERSI TERBARU) ---
+    // --- QUERY GURU (TETAP SAMA) ---
     $userGuru = User::where('role', 'guru')
         ->when($searchGuru, function($q) use ($searchGuru) {
             $q->where(function($query) use ($searchGuru) {
-                $query->where('users.name', 'like', "%{$searchGuru}%")
-                      ->orWhere('users.email', 'like', "%{$searchGuru}%");
+                $query->where('name', 'like', "%{$searchGuru}%")
+                      ->orWhere('email', 'like', "%{$searchGuru}%");
             });
         })
         ->latest()
-        // GANTI: Gunakan $perPageGuru dan penanda halaman 'guru_page' agar tidak bentrok
         ->paginate($perPageGuru, ['*'], 'guru_page')
         ->withQueryString();
 
     // --- DATA PENDUKUNG ---
     $kelas = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
-    $tahunAjaran = TahunAjaran::where('is_active', true)->first();
     $tahunAjaranList = TahunAjaran::orderBy('tahun', 'desc')->get();
+    $tahunAjaran = TahunAjaran::where('is_active', true)->first();
 
     return view('admin.manajemen_user.index', compact(
         'userSiswa', 'userGuru', 'kelas', 'tahunAjaran', 'tahunAjaranList'
@@ -237,6 +243,7 @@ public function destroy($id)
         'active_tab' => $role // Mengirim 'siswa' atau 'guru' ke session
     ]);
 }
+
     // === 9. FITUR RESET PASSWORD (SOLUSI JIKA SISWA LUPA/AKUN DIBAJAK) ===
     // Pastikan route-nya sudah dibuat di web.php: Route::post('/admin/siswa/{id}/reset', ...)
     public function resetPasswordSiswa($id)

@@ -3,7 +3,7 @@
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Manajemen User') }}</h2>
     </x-slot>
 
-    <div class="py-12" x-data="{ activeTab: '{{ request('tab', 'siswa') }}' }">
+    <div class="py-12" x-data="{ activeTab: '{{ session('active_tab', request('tab', 'siswa')) }}' }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6">
 
             {{-- ALERT ERROR --}}
@@ -768,7 +768,8 @@
                             <div class="mb-4">
                                 <x-input-label value="Email (Kosongkan untuk otomatis)" />
                                 <x-text-input name="email" type="email"
-                                    class="w-full mt-1 focus:border-[#3B3E42]" placeholder="namalengkap@raudhah.com" />
+                                    class="w-full mt-1 focus:border-[#3B3E42]"
+                                    placeholder="namalengkap@raudhah.com" />
                                 <p class="text-[10px] text-red-500 mt-1 capitalize font-bold tracking-wider">*Jika
                                     kosong, sistem akan otomatis menggunakan format: namalengkap@raudhah.com</p>
                             </div>
@@ -894,8 +895,8 @@
                                 {{-- <x-primary-button ::disabled="isLoading || !fileName">
                                     <span x-text="isLoading ? 'Memproses...' : 'Proses Import'"></span>
                                 </x-primary-button> --}}
-                                 <x-primary-button ::disabled="isLoading"><span
-                                x-text="isLoading ? 'Memproses...' : 'Proses Import'"></span></x-primary-button>
+                                <x-primary-button ::disabled="isLoading"><span
+                                        x-text="isLoading ? 'Memproses...' : 'Proses Import'"></span></x-primary-button>
                             </div>
                         </form>
                     </x-modal>
@@ -924,7 +925,8 @@
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">1</span>
                                         <p><strong>Aktivasi Periode:</strong> Set status Tahun Ajaran menjadi
-                                            <strong>"Aktif"</strong>.</p>
+                                            <strong>"Aktif"</strong>.
+                                        </p>
                                     </li>
                                     <li class="flex gap-3">
                                         <span
@@ -967,7 +969,8 @@
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">2</span>
                                         <p><strong>Buka Periode:</strong> Atur Tahun Ajaran baru ke
-                                            <strong>"Aktif"</strong>.</p>
+                                            <strong>"Aktif"</strong>.
+                                        </p>
                                     </li>
                                     <li class="flex gap-3">
                                         <span
@@ -1024,21 +1027,7 @@
                     bulkSiswaContainer?.classList.add('hidden');
                 }
 
-                // Bersihkan input lama & sinkronisasi ID ke form bulk siswa
-                document.querySelectorAll('.dynamic-siswa-id').forEach(el => el.remove());
-                checked.forEach(item => {
-                    ['bulkDeleteForm', 'bulkResetForm'].forEach(formId => {
-                        const form = document.getElementById(formId);
-                        if (form) {
-                            const input = document.createElement('input');
-                            input.type = 'hidden';
-                            input.name = 'ids[]';
-                            input.value = item.value;
-                            input.className = 'dynamic-siswa-id';
-                            form.appendChild(input);
-                        }
-                    });
-                });
+
             }
 
             if (selectAllSiswa) {
