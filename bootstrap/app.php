@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
         'force.change.password' => \App\Http\Middleware\EnsurePasswordIsChanged::class,
+        'role' => \App\Http\Middleware\CheckRole::class, // TAMBAHKAN BARIS INI
     ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -10,20 +10,23 @@ class TagihanSpp extends Model
     use HasFactory;
 
     protected $table = 'tagihan_spps';
+
     protected $fillable = [
-        'master_tagihan_id', 'riwayat_akademik_id', 
-        'bulan', 'tahun', 'jumlah_tagihan', 'status'
+        'master_tagihan_id', 'riwayat_akademik_id',
+        'bulan', 'tahun', 'jumlah_tagihan', 'terbayar', 'status',
     ];
 
-    public function master_tagihan()
+    public function masterTagihan() // Ubah dari master_tagihan menjadi masterTagihan
     {
-        return $this->belongsTo(MasterTagihan::class);
+        // Tambahkan foreign key 'master_tagihan_id' agar lebih pasti
+        return $this->belongsTo(MasterTagihan::class, 'master_tagihan_id');
     }
 
     // Tagihan nempel ke riwayat (Siswa di kelas X)
-    public function riwayat_akademik()
+    public function riwayatAkademik()
     {
-        return $this->belongsTo(RiwayatAkademik::class);
+        // Gunakan riwayat_akademik_id sebagai foreign key sesuai protected $fillable kamu
+        return $this->belongsTo(RiwayatAkademik::class, 'riwayat_akademik_id');
     }
 
     public function pembayarans()

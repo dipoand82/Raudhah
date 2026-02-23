@@ -1,12 +1,16 @@
 <?php
 
 use App\Http\Controllers\Admin\GaleriController as AdminGaleri;
+use App\Http\Controllers\Admin\GuruController;
 use App\Http\Controllers\Admin\KelasController;
+use App\Http\Controllers\Admin\LaporanController;
 use App\Http\Controllers\Admin\ManajemenUserController;
+use App\Http\Controllers\Admin\MasterTagihanController;
+use App\Http\Controllers\Admin\PembayaranController;
 use App\Http\Controllers\Admin\ProfilSekolahController;
 use App\Http\Controllers\Admin\SiswaController;
+use App\Http\Controllers\Admin\TagihanSiswaController;
 use App\Http\Controllers\Admin\TahunAjaranController;
-use App\Http\Controllers\Admin\GuruController;
 use App\Http\Controllers\GaleriController as PublicGaleri;
 use App\Http\Controllers\ProfileController;
 use App\Models\ProfilSekolah;
@@ -20,6 +24,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     $profil_sekolah = ProfilSekolah::first();
     $galeri = \App\Models\Galeri::latest()->take(4)->get();
+
     return view('welcome', compact('profil_sekolah', 'galeri'));
 });
 
@@ -27,6 +32,7 @@ Route::get('/galeri-kegiatan', [PublicGaleri::class, 'index'])->name('galeri.ind
 Route::get('/galeri-kegiatan/{id}', [PublicGaleri::class, 'show'])->name('galeri.show');
 Route::get('/informasi-sekolah', function () {
     $profil_sekolah = ProfilSekolah::first();
+
     return view('info.index', compact('profil_sekolah'));
 })->name('info.index');
 
@@ -70,7 +76,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
         });
 
         // RUTE SISWA (Proses & Bulk Action)
-        Route::controller(ManajemenUserController::class)->group(function() {
+        Route::controller(ManajemenUserController::class)->group(function () {
             Route::post('/siswa/store', 'storeSiswa')->name('siswa.store');
             Route::post('/siswa/import', 'importSiswa')->name('siswa.import');
             Route::post('/siswa/{id}/reset', 'resetPasswordSiswa')->name('siswa.reset');
@@ -119,5 +125,30 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
         Route::post('/', 'store')->name('store');
         Route::put('/{id}', 'update')->name('update');
         Route::delete('/{id}', 'destroy')->name('destroy');
+    });
+
+    // 4. KEUANGAN & PEMBAYARAN (Grup Tunggal - JANGAN DIDUPLIKASI)
+    // 4. KEUANGAN & PEMBAYARAN (Grup Tunggal)
+    // 4. KEUANGAN & PEMBAYARAN (Grup Tunggal)
+    // Note: Kita hapus .admin. di name rute grup ini karena sudah ada di pembungkus luar
+    // Pastikan ini berada di dalam Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () { ...
+
+    Route::prefix('keuangan')->name('keuangan.')->group(function () {
+
+        // A. Master Tagihan (Step 1)
+        // Jika tetap pakai names('master'), maka di Blade panggil: admin.keuangan.master.index / .store
+        Route::resource('master-tagihan', MasterTagihanController::class)->names('master');
+
+        // B. Tagihan Siswa (Step 2)
+        Route::get('tagihan/create-bulk', [TagihanSiswaController::class, 'createBulk'])->name('tagihan.create-bulk');
+        Route::post('tagihan/store-bulk', [TagihanSiswaController::class, 'storeBulk'])->name('tagihan.store-bulk');
+        Route::resource('tagihan', TagihanSiswaController::class);
+
+        // C. Pembayaran (Step 3)
+        Route::resource('pembayaran', PembayaranController::class)->only(['index', 'store']);
+
+
+        // D. Laporan (Step Akhir)
+        Route::get('laporan', [LaporanController::class, 'index'])->name('laporan.index');
     });
 });

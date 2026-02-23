@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class RiwayatAkademik extends Model
 {
     use HasFactory;
-
+    protected $guarded = ['id'];
     protected $table = 'riwayat_akademiks';
     protected $fillable = ['siswa_id', 'kelas_id', 'tahun_ajaran_id', 'status_siswa'];
 
@@ -30,4 +30,6 @@ class RiwayatAkademik extends Model
     {
         return $this->hasMany(TagihanSpp::class);
     }
+
+
 }

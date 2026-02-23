@@ -3,32 +3,34 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Kelas;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Log; // Sudah ada, jangan pakai tanda "\" lagi di bawah
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule; // Sudah ada, jangan pakai tanda "\" lagi di bawah
 
 class KelasController extends Controller
 {
     public function index()
     {
-        $kelas = Kelas::orderBy('tingkat', 'asc')
-                      ->orderBy('nama_kelas', 'asc')
-                      ->paginate(10);
-        
+        // Menggunakan withCount agar otomatis muncul atribut 'siswas_count' pada setiap objek kelas
+        $kelas = Kelas::withCount('siswas')
+            ->orderBy('tingkat', 'asc')
+            ->orderBy('nama_kelas', 'asc')
+            ->paginate(10);
+
         return view('admin.kelas.index', compact('kelas'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'tingkat'    => 'required|integer|in:7,8,9', 
+            'tingkat' => 'required|integer|in:7,8,9',
             'nama_kelas' => [
                 'required', 'string', 'max:5',
                 Rule::unique('kelas')->where(function ($query) use ($request) {
                     return $query->where('tingkat', $request->tingkat);
                 }),
-            ], 
+            ],
         ], [
             'nama_kelas.unique' => "Gagal! Kelas {$request->tingkat}{$request->nama_kelas} sudah ada.",
         ]);
@@ -38,19 +40,21 @@ class KelasController extends Controller
                 'tingkat' => $request->tingkat,
                 'nama_kelas' => $request->nama_kelas,
             ]);
+
             return back()->with('success', 'Kelas berhasil dibuat!');
 
         } catch (\Exception $e) {
             // Perbaikan: Hapus "\" dan panggil langsung Log::error
-            Log::error("Gagal simpan kelas: " . $e->getMessage());
+            Log::error('Gagal simpan kelas: '.$e->getMessage());
+
             return back()->with('error', 'Terjadi kesalahan sistem saat menyimpan data.');
         }
     }
 
-    public function update(Request $request, $id) 
+    public function update(Request $request, $id)
     {
         $request->validate([
-            'tingkat'    => 'required|integer|in:7,8,9',
+            'tingkat' => 'required|integer|in:7,8,9',
             'nama_kelas' => [
                 'required', 'string', 'max:5',
                 Rule::unique('kelas')->where(function ($query) use ($request) {
@@ -67,11 +71,13 @@ class KelasController extends Controller
                 'tingkat' => $request->tingkat,
                 'nama_kelas' => $request->nama_kelas,
             ]);
+
             return back()->with('success', 'Data Kelas berhasil diperbarui!');
 
         } catch (\Exception $e) {
             // Tambahkan Error Handling di Update juga agar aman
-            Log::error("Gagal update kelas ID {$id}: " . $e->getMessage());
+            Log::error("Gagal update kelas ID {$id}: ".$e->getMessage());
+
             return back()->with('error', 'Gagal memperbarui data karena kesalahan sistem.');
         }
     }
@@ -87,10 +93,12 @@ class KelasController extends Controller
             }
 
             $kelas->delete();
+
             return back()->with('success', 'Kelas berhasil dihapus.');
 
         } catch (\Exception $e) {
-            Log::error("Gagal hapus kelas ID {$id}: " . $e->getMessage());
+            Log::error("Gagal hapus kelas ID {$id}: ".$e->getMessage());
+
             return back()->with('error', 'Terjadi kesalahan saat mencoba menghapus data.');
         }
     }

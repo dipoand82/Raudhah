@@ -10,10 +10,11 @@ class MasterTagihan extends Model
     use HasFactory;
 
     protected $table = 'master_tagihans';
+
     protected $fillable = ['nama_tagihan', 'nominal', 'deskripsi'];
 
     public function tagihan_spps()
     {
-        return $this->hasMany(TagihanSpp::class);
+        return $this->hasMany(TagihanSpp::class, 'master_tagihan_id');
     }
 }

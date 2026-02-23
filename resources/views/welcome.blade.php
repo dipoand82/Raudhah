@@ -139,7 +139,7 @@
                                     <p class="text-gray-700 text-md leading-relaxed ml-2">{!! nl2br(e($profil_sekolah->visi)) !!}</p>
                                 </div>
                             @else
-                                <p class="text-gray-500 italic pl-2">Visi belum tersedia</p>
+                                <p class="text-gray-500 pl-2">Visi belum tersedia</p>
                             @endif
                         </div>
                     </div>

@@ -13,14 +13,49 @@ class DatabaseSeeder extends Seeder
         // ==========================================
         // 1. BUAT AKUN USER (3 Role)
         // ==========================================
-        
+
         // Akun Admin (Tata Usaha)
+        // ==========================================
+        // 1. BUAT AKUN USER (4 Admin dengan Nama Umum)
+        // ==========================================
+
+        // Admin 1
         $adminId = DB::table('users')->insertGetId([
-            'name' => 'Staff Tata Usaha',
-            'email' => 'admin@sekolah.com',
-            'password' => Hash::make('password123'),
+            'name' => 'Staf Administrasi 1',
+            'email' => 'admin11@raudhah.com',
+            'password' => Hash::make('AdminRaudhah1*'),
             'role' => 'admin',
-            'must_change_password' => false, // Admin tidak wajib ganti
+            'must_change_password' => false,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        // Admin 2
+        DB::table('users')->insert([
+            'name' => 'Staf Administrasi 2',
+            'email' => 'admin22@raudhah.com',
+            'password' => Hash::make('AdminRaudhah2*'),
+            'role' => 'admin',
+            'must_change_password' => false,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        // Admin 3
+        DB::table('users')->insert([
+            'name' => 'Staf Administrasi 3',
+            'email' => 'admin33@raudhah.com',
+            'password' => Hash::make('AdminRaudhah3*'),
+            'role' => 'admin',
+            'must_change_password' => false,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        // Admin 4
+        DB::table('users')->insert([
+            'name' => 'Staf Administrasi 4',
+            'email' => 'admin44@raudhah.com',
+            'password' => Hash::make('AdminRaudhah4*'),
+            'role' => 'admin',
+            'must_change_password' => false,
             'created_at' => now(), 'updated_at' => now(),
         ]);
 
@@ -104,8 +139,7 @@ class DatabaseSeeder extends Seeder
         // Tagihan Juli (Belum Lunas)
         DB::table('tagihan_spps')->insert([
             'master_tagihan_id' => $masterSppId,
-            'riwayat_akademik_id' => $riwayatId, // Sesuaikan dengan migration tagihan Anda
-            // 'siswa_id' => $siswaId, // Jika Anda sudah ubah migration tagihan pakai siswa_id, pakai baris ini
+            'riwayat_akademik_id' => $riwayatId,
             'bulan' => 'Juli',
             'tahun' => '2024',
             'jumlah_tagihan' => 150000,
@@ -117,7 +151,6 @@ class DatabaseSeeder extends Seeder
         $tagihanLunasId = DB::table('tagihan_spps')->insertGetId([
             'master_tagihan_id' => $masterSppId,
             'riwayat_akademik_id' => $riwayatId,
-            // 'siswa_id' => $siswaId,
             'bulan' => 'Agustus',
             'tahun' => '2024',
             'jumlah_tagihan' => 150000,
@@ -125,15 +158,16 @@ class DatabaseSeeder extends Seeder
             'created_at' => now(), 'updated_at' => now(),
         ]);
 
-        // Pembayaran untuk Agustus
+        // PERBAIKAN DI SINI: Sesuaikan dengan Migration Pembayarans terbaru kamu
         DB::table('pembayarans')->insert([
-            'tagihan_spp_id' => $tagihanLunasId,
-            'user_id_admin' => $adminId,
+            'siswa_id' => $siswaId,                // SESUAI MIGRATION (Baris 14)
+            'user_id_admin' => $adminId,           // SESUAI MIGRATION (Baris 16)
             'kode_pembayaran' => 'INV-20240801-001',
-            'jumlah_bayar' => 150000,
+            'total_bayar' => 150000,               // UBAH dari 'jumlah_bayar' jadi 'total_bayar' (Baris 19)
             'tanggal_bayar' => now(),
             'metode_pembayaran' => 'tunai',
-            'status_gateway' => 'success',
+            'status_gateway' => 'success',         // Status default di migration kamu 'pending'
+            'snap_token' => null,                  // SESUAI MIGRATION (Baris 23)
             'created_at' => now(), 'updated_at' => now(),
         ]);
 
