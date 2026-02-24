@@ -73,14 +73,16 @@
 
                     {{-- TOMBOL AKSI KANAN --}}
                     <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto justify-end">
-<a href="{{ route('admin.siswas.export', ['kelas_id' => request('kelas_id'), 'search' => request('search'), 'status' => request('status')]) }}"
-   @click="$dispatch('loading'); setTimeout(() => $dispatch('loaded'), 3000)" {{-- Tambah ini --}}
-   class="inline-flex w-full items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
-    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-    </svg>
-    Export Data Siswa
-</a>
+                        <a href="{{ route('admin.siswas.export', ['kelas_id' => request('kelas_id'), 'search' => request('search'), 'status' => request('status')]) }}"
+                            @click="$dispatch('loading'); setTimeout(() => $dispatch('loaded'), 3000)"
+                            {{-- Tambah ini --}}
+                            class="inline-flex w-full items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
+                            Export Data Siswa
+                        </a>
 
                         {{-- Tombol Tambah (Trigger Modal) --}}
                         @can('admin')
@@ -99,57 +101,58 @@
 
                 {{-- [BAGIAN 2: TABEL DATA] --}}
                 @can('admin')
+                    {{-- A. FORM BULK DELETE (Tanpa Onsubmit Confirm lagi, karena sudah pakai modal) --}}
+                    <form action="{{ route('admin.siswas.bulk_delete') }}" method="POST" id="bulkDeleteForm">
+                        @csrf
+                        @method('DELETE')
+                    </form>
 
-                {{-- A. FORM BULK DELETE (Tanpa Onsubmit Confirm lagi, karena sudah pakai modal) --}}
-                <form action="{{ route('admin.siswas.bulk_delete') }}" method="POST" id="bulkDeleteForm">
-                    @csrf
-                    @method('DELETE')
-                </form>
-
-                {{-- B. TOMBOL TRIGGER BULK DELETE --}}
-                <div id="bulkDeleteContainer"
-                    class="hidden mb-3 bg-red-50 p-2 rounded flex justify-between items-center border border-red-200">
-                    <span class="text-red-700 text-sm font-semibold ml-2">
-                        <span id="selectedCount">0</span> Siswa dipilih
-                    </span>
-                    {{-- Tombol ini membuka Modal Konfirmasi --}}
-                    <x-danger-button type="button" x-data=""
-                        x-on:click="$dispatch('open-modal', 'bulk-delete-confirm')"
-                        class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-bold transition">
-                        Hapus Terpilih
-                    </x-danger-button>
-                </div>
-
-                {{-- C. MODAL KONFIRMASI BULK DELETE --}}
-                <x-modal name="bulk-delete-confirm" focusable>
-                    <div class="p-6">
-                        <h2 class="text-lg font-bold text-gray-900">Konfirmasi Hapus Massal</h2>
-                        <p class="mt-1 text-sm text-gray-600">
-                            Apakah Anda yakin ingin menghapus <strong>semua data siswa yang dipilih</strong>?
-                            <br>
-                            <span class="text-red-500 font-bold text-xs">Peringatan: Data akun user, dan tagihan terkait
-                                juga akan dihapus permanen.</span>
-                        </p>
-                        <div class="mt-6 flex justify-end gap-3">
-                            <x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button>
-
-                            {{-- Tombol ini menekan form ID 'bulkDeleteForm' di atas --}}
-                            <x-danger-button type="submit" form="bulkDeleteForm">
-                                Ya, Hapus Semua
-                            </x-danger-button>
-                        </div>
+                    {{-- B. TOMBOL TRIGGER BULK DELETE --}}
+                    <div id="bulkDeleteContainer"
+                        class="hidden mb-3 bg-red-50 p-2 rounded flex justify-between items-center border border-red-200">
+                        <span class="text-red-700 text-sm font-semibold ml-2">
+                            <span id="selectedCount">0</span> Siswa dipilih
+                        </span>
+                        {{-- Tombol ini membuka Modal Konfirmasi --}}
+                        <x-danger-button type="button" x-data=""
+                            x-on:click="$dispatch('open-modal', 'bulk-delete-confirm')"
+                            class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-bold transition">
+                            Hapus Terpilih
+                        </x-danger-button>
                     </div>
-                </x-modal>
+
+                    {{-- C. MODAL KONFIRMASI BULK DELETE --}}
+                    <x-modal name="bulk-delete-confirm" focusable>
+                        <div class="p-6">
+                            <h2 class="text-lg font-bold text-gray-900">Konfirmasi Hapus Massal</h2>
+                            <p class="mt-1 text-sm text-gray-600">
+                                Apakah Anda yakin ingin menghapus <strong>semua data siswa yang dipilih</strong>?
+                                <br>
+                                <span class="text-red-500 font-bold text-xs">Peringatan: Data akun user, dan tagihan terkait
+                                    juga akan dihapus permanen.</span>
+                            </p>
+                            <div class="mt-6 flex justify-end gap-3">
+                                <x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button>
+
+                                {{-- Tombol ini menekan form ID 'bulkDeleteForm' di atas --}}
+                                <x-danger-button type="submit" form="bulkDeleteForm">
+                                    Ya, Hapus Semua
+                                </x-danger-button>
+                            </div>
+                        </div>
+                    </x-modal>
                 @endcan
 
                 <div class="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-[#3B3E42]">
                             <tr>
-                                @can('admin') <th class="px-4 py-4 w-10 text-center">
-                                    <input type="checkbox" id="selectAll"
-                                        class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 cursor-pointer">
-                                </th> @endcan
+                                @can('admin')
+                                    <th class="px-4 py-4 w-10 text-center">
+                                        <input type="checkbox" id="selectAll"
+                                            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 cursor-pointer">
+                                    </th>
+                                @endcan
                                 <th class="px-4 py-4 text-center text-xs font-bold text-white uppercase w-12">No</th>
                                 <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase">NISN</th>
                                 <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase">Nama Siswa</th>
@@ -157,19 +160,23 @@
                                 <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase">Tahun Ajaran
                                 </th>
                                 <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase">Status</th>
-                                @can('admin') <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase">Aksi</th> @endcan
+                                @can('admin')
+                                    <th class="px-6 py-4 text-center text-xs font-bold text-white uppercase">Aksi</th>
+                                @endcan
                             </tr>
                         </thead>
 
                         <tbody class="bg-white divide-y divide-gray-100">
                             @forelse($siswas as $siswa)
                                 <tr class="hover:bg-indigo-50/50 transition even:bg-gray-50">
-                                    @can('admin') <td class="px-4 py-4 text-center">
-                                        {{-- Checkbox terhubung ke form bulk delete --}}
-                                        <input type="checkbox" name="ids[]" form="bulkDeleteForm"
-                                            value="{{ $siswa->id }}"
-                                            class="select-item rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 cursor-pointer">
-                                    </td> @endcan
+                                    @can('admin')
+                                        <td class="px-4 py-4 text-center">
+                                            {{-- Checkbox terhubung ke form bulk delete --}}
+                                            <input type="checkbox" name="ids[]" form="bulkDeleteForm"
+                                                value="{{ $siswa->id }}"
+                                                class="select-item rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 cursor-pointer">
+                                        </td>
+                                    @endcan
                                     <td class="px-4 py-4 text-center text-sm text-balck-300 font-medium">
                                         {{ $siswas->firstItem() + $loop->index }}
                                     </td>
@@ -179,7 +186,9 @@
                                     <td class="px-6 py-4">
                                         <div class="text-sm font-bold text-gray-900">
                                             {{ $siswa->user->name ?? 'User Terhapus' }}</div>
-                                        @can('admin') <div class="text-xs text-gray-400">{{ $siswa->user->email ?? '' }}</div> @endcan
+                                        @can('admin')
+                                            <div class="text-xs text-gray-400">{{ $siswa->user->email ?? '' }}</div>
+                                        @endcan
                                     </td>
                                     <td class="px-6 py-4 text-center">
                                         @if ($siswa->kelas)
@@ -212,48 +221,47 @@
                                         </span>
                                     </td>
                                     @can('admin')
+                                        <td
+                                            class="px-6 py-4 text-right text-sm font-medium flex justify-end items-center gap-2">
 
-                                    <td
-                                        class="px-6 py-4 text-right text-sm font-medium flex justify-end items-center gap-2">
+                                            {{-- 1. TOMBOL PEMICU MODAL --}}
+                                            <button type="button" x-data
+                                                x-on:click="$dispatch('open-modal', 'edit-siswa-{{ $siswa->id }}')"
+                                                class="text-indigo-600 hover:text-indigo-900 font-semibold transition">
+                                                Edit
+                                            </button>
 
-                                        {{-- 1. TOMBOL PEMICU MODAL --}}
-                                        <button type="button" x-data
-                                            x-on:click="$dispatch('open-modal', 'edit-siswa-{{ $siswa->id }}')"
-                                            class="text-indigo-600 hover:text-indigo-900 font-semibold transition">
-                                            Edit
-                                        </button>
+                                            {{-- 2. STRUKTUR MODAL EDIT --}}
+                                            <x-modal name="edit-siswa-{{ $siswa->id }}" focusable>
+                                                {{-- Pastikan ada pembungkus div dengan p-6 agar tidak mepet ke pinggir --}}
+                                                <div class="p-6 text-left">
+                                                    <h2 class="text-lg font-bold mb-4 border-b pb-2 text-[#1072B8]">
+                                                        Edit Data Siswa: {{ $siswa->user->name ?? $siswa->nama_lengkap }}
+                                                    </h2>
 
-                                        {{-- 2. STRUKTUR MODAL EDIT --}}
-                                        <x-modal name="edit-siswa-{{ $siswa->id }}" focusable>
-                                            {{-- Pastikan ada pembungkus div dengan p-6 agar tidak mepet ke pinggir --}}
-                                            <div class="p-6 text-left">
-                                                <h2 class="text-lg font-bold mb-4 border-b pb-2 text-[#1072B8]">
-                                                    Edit Data Siswa: {{ $siswa->user->name ?? $siswa->nama_lengkap }}
-                                                </h2>
+                                                    <form method="POST"
+                                                        action="{{ route('admin.siswas.update', $siswa->id) }}">
+                                                        @csrf
+                                                        @method('PUT')
 
-                                                <form method="POST"
-                                                    action="{{ route('admin.siswas.update', $siswa->id) }}">
-                                                    @csrf
-                                                    @method('PUT')
+                                                        {{-- Memanggil Komponen Form --}}
+                                                        <x-siswa.edit-form :siswa="$siswa" :kelas="$kelas"
+                                                            :tahunAjaran="$tahunAjaranList" />
 
-                                                    {{-- Memanggil Komponen Form --}}
-                                                    <x-siswa.edit-form :siswa="$siswa" :kelas="$kelas"
-                                                        :tahunAjaran="$tahunAjaranList" />
+                                                        <div class="mt-6 flex justify-end gap-3 border-t pt-4">
+                                                            <x-secondary-button
+                                                                x-on:click="$dispatch('close')">Batal</x-secondary-button>
+                                                            <x-primary-button>Simpan Perubahan</x-primary-button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </x-modal>
 
-                                                    <div class="mt-6 flex justify-end gap-3 border-t pt-4">
-                                                        <x-secondary-button
-                                                            x-on:click="$dispatch('close')">Batal</x-secondary-button>
-                                                        <x-primary-button>Simpan Perubahan</x-primary-button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </x-modal>
-
-                                        {{-- 3. TOMBOL HAPUS (Tetap) --}}
-                                        <x-siswa.delete-modal trigger="delete-siswa-{{ $siswa->id }}"
-                                            action="{{ route('admin.siswas.destroy', $siswa->id) }}"
-                                            message="{{ $siswa->user->name ?? $siswa->nama_lengkap }}" />
-                                    </td>
+                                            {{-- 3. TOMBOL HAPUS (Tetap) --}}
+                                            <x-siswa.delete-modal trigger="delete-siswa-{{ $siswa->id }}"
+                                                action="{{ route('admin.siswas.destroy', $siswa->id) }}"
+                                                message="{{ $siswa->user->name ?? $siswa->nama_lengkap }}" />
+                                        </td>
                                     @endcan
                                     {{-- <td class="px-6 py-4 text-right text-sm font-medium flex justify-end items-center gap-2">
                                         <a href="{{ route('admin.siswas.edit', $siswa->id) }}"

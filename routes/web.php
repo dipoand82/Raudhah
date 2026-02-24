@@ -142,11 +142,11 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
         // B. Tagihan Siswa (Step 2)
         Route::get('tagihan/create-bulk', [TagihanSiswaController::class, 'createBulk'])->name('tagihan.create-bulk');
         Route::post('tagihan/store-bulk', [TagihanSiswaController::class, 'storeBulk'])->name('tagihan.store-bulk');
+        Route::delete('tagihan/destroy-bulk', [TagihanSiswaController::class, 'destroyBulk'])->name('tagihan.destroy-bulk');
         Route::resource('tagihan', TagihanSiswaController::class);
 
         // C. Pembayaran (Step 3)
         Route::resource('pembayaran', PembayaranController::class)->only(['index', 'store']);
-
 
         // D. Laporan (Step Akhir)
         Route::get('laporan', [LaporanController::class, 'index'])->name('laporan.index');

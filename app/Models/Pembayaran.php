@@ -24,7 +24,7 @@ class Pembayaran extends Model
     ];
 
     // Relasi ke detail (untuk melihat rincian tagihan apa saja yang dibayar)
-    public function details()
+    public function detailPembayaran()
     {
         return $this->hasMany(PembayaranDetail::class, 'pembayaran_id', 'id');
     }

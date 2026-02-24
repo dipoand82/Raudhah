@@ -24,8 +24,8 @@ class PembayaranDetail extends Model
     }
 
     // Relasi ke tagihan SPP yang dibayar
-    public function tagihan_spp()
+    public function tagihanSpp()
     {
         return $this->belongsTo(TagihanSpp::class, 'tagihan_spp_id', 'id');
-    }
+    }    
 }
