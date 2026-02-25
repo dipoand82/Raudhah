@@ -84,9 +84,10 @@
             </a>
 
             {{-- MENU KEUANGAN & TAGIHAN (Dropdown) --}}
-            <div x-data="{ open: {{ request()->routeIs('admin.keuangan.*') ? 'true' : 'false' }} }">
+            <div x-data="{ open: {{ request()->routeIs('admin.keuangan.master.*', 'admin.keuangan.tagihan.*', 'admin.keuangan.pembayaran.*') ? 'true' : 'false' }} }">
                 <button @click="open = !open"
-                    class="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.keuangan.*') ? 'bg-gray-100 text-[#0A78BD]' : 'text-gray-700 hover:bg-gray-100' }}">
+                    class="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors patterns: 
+        {{ request()->routeIs('admin.keuangan.master.*', 'admin.keuangan.tagihan.*', 'admin.keuangan.pembayaran.*') ? 'bg-[#0A78BD] text-white shadow-md' : 'text-gray-700 hover:bg-gray-100' }}">
                     <div class="flex items-center gap-3">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -101,41 +102,51 @@
                     </svg>
                 </button>
 
-                {{-- Sub-Menu Kelola Tagihan --}}
-                <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-300"
-                    class="mt-1 ml-6 space-y-1 ">
+                <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 -translate-y-1"
+                    x-transition:enter-end="opacity-100 translate-y-0" class="mt-1 ml-4 space-y-1">
 
-                    {{-- Step 1: Master Biaya --}}
                     <a href="{{ route('admin.keuangan.master.index') }}"
-                        class="block px-4 py-2 text-xs rounded-md transition-colors {{ request()->routeIs('admin.keuangan.master.*') ? 'text-[#0A78BD] font-bold' : 'text-gray-600 hover:text-[#0A78BD]' }}">
-                        • Master Biaya
+                        class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm transition-colors {{ request()->routeIs('admin.keuangan.master.*') ? 'bg-blue-50 text-[#0A78BD] font-bold' : 'text-gray-600 hover:bg-gray-100 hover:text-[#0A78BD]' }}">
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        Master Biaya
                     </a>
 
-                    {{-- Step 2: Daftar & Generate Tagihan --}}
                     <a href="{{ route('admin.keuangan.tagihan.index') }}"
-                        class="block px-4 py-2 text-xs rounded-md transition-colors {{ request()->routeIs('admin.keuangan.tagihan.index') ? 'text-[#0A78BD] font-bold' : 'text-gray-600 hover:text-[#0A78BD]' }}">
-                        • Daftar Tagihan Siswa
+                        class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm transition-colors {{ request()->routeIs('admin.keuangan.tagihan.*') ? 'bg-blue-50 text-[#0A78BD] font-bold' : 'text-gray-600 hover:bg-gray-100 hover:text-[#0A78BD]' }}">
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        Daftar Tagihan Siswa
                     </a>
 
-                    {{-- Step 3: Riwayat Pembayaran --}}
                     <a href="{{ route('admin.keuangan.pembayaran.index') }}"
-                        class="block px-4 py-2 text-xs rounded-md transition-colors {{ request()->routeIs('admin.keuangan.pembayaran.index') ? 'text-[#0A78BD] font-bold' : 'text-gray-600 hover:text-[#0A78BD]' }}">
-                        • Riwayat Pembayaran
+                        class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm transition-colors {{ request()->routeIs('admin.keuangan.pembayaran.*') ? 'bg-blue-50 text-[#0A78BD] font-bold' : 'text-gray-600 hover:bg-gray-100 hover:text-[#0A78BD]' }}">
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        Riwayat Pembayaran
                     </a>
                 </div>
             </div>
 
-            {{-- MENU LAPORAN (Dropdown) --}}
+            {{-- MENU LAPORAN --}}
             <a href="{{ route('admin.keuangan.laporan.index') }}"
-                    class="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.laporan.*') ? 'bg-gray-100 text-[#0A78BD]' : 'text-gray-700 hover:bg-gray-100' }}">
-                    <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                            </path>
-                        </svg>
-                        <span class="font-medium">Laporan</span>
-                    </div>
+                class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.keuangan.laporan.*') ? 'bg-[#0A78BD] text-white shadow-md' : 'text-gray-700 hover:bg-gray-100' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                    </path>
+                </svg>
+                <span class="font-medium">Laporan Pembayaran</span>
             </a>
 
             <a href="{{ route('admin.profil.edit') }}"
@@ -185,15 +196,14 @@
                 </svg>
                 <span class="font-medium">Data Siswa</span>
             </a>
-
-            <a href="#"
-                class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-700 hover:bg-gray-100">
+            <a href="{{ route('admin.keuangan.laporan.index') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.keuangan.laporan.*') ? 'bg-[#0A78BD] text-white shadow-md' : 'text-gray-700 hover:bg-gray-100' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                     </path>
                 </svg>
-                <span class="font-medium">Laporan Tagihan SPP</span>
+                <span class="font-medium">Laporan Pembayaran</span>
             </a>
 
             <a href="{{ route('profile.edit') }}"

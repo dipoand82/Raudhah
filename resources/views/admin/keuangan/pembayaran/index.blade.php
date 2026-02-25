@@ -14,7 +14,8 @@
                     {{-- HEADER --}}
                     <div class="mb-4">
                         <h3 class="text-lg font-bold text-gray-900">Log Transaksi Pembayaran</h3>
-                        <p class="text-sm text-gray-500">Daftar seluruh transaksi pembayaran yang telah berhasil diproses.</p>
+                        <p class="text-sm text-gray-500">Daftar seluruh transaksi pembayaran yang telah berhasil
+                            diproses.</p>
                     </div>
 
                     {{-- FILTER --}}
@@ -29,7 +30,7 @@
                             <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </button>
                         </div>
@@ -39,8 +40,9 @@
                             <select name="kelas_id" onchange="this.form.submit()"
                                 class="w-full border-gray-300 rounded-full text-sm">
                                 <option value="">-- Semua Kelas --</option>
-                                @foreach($kelasList as $k)
-                                    <option value="{{ $k->id }}" {{ request('kelas_id') == $k->id ? 'selected' : '' }}>
+                                @foreach ($kelasList as $k)
+                                    <option value="{{ $k->id }}"
+                                        {{ request('kelas_id') == $k->id ? 'selected' : '' }}>
                                         Kelas {{ $k->tingkat }} {{ $k->nama_kelas }}
                                     </option>
                                 @endforeach
@@ -73,7 +75,8 @@
                                             </td>
 
                                             <td class="px-4 py-4">
-                                                <span class="font-mono text-xs font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded border border-gray-200">
+                                                <span
+                                                    class="font-mono text-xs font-bold text-gray-600 bg-gray-100 px-2 py-1 rounded border border-gray-200">
                                                     {{ $p->kode_pembayaran }}
                                                 </span>
                                                 <div class="text-[10px] text-gray-400 mt-1">
@@ -83,7 +86,8 @@
 
                                             <td class="px-4 py-4">
                                                 @php
-                                                    $kelas = $p->detailPembayaran->first()?->tagihanSpp?->riwayatAkademik?->kelas;
+                                                    $kelas = $p->detailPembayaran->first()?->tagihanSpp
+                                                        ?->riwayatAkademik?->kelas;
                                                 @endphp
                                                 <div class="text-sm font-bold text-gray-900 leading-none">
                                                     {{ $p->siswa->nama_lengkap }}
@@ -91,7 +95,7 @@
                                                 <div class="text-[11px] text-gray-400 mt-1 font-mono">
                                                     {{ $p->siswa->nisn ?? '-' }}
                                                 </div>
-                                                @if($kelas)
+                                                @if ($kelas)
                                                     <div class="text-[11px] text-blue-500 font-bold mt-0.5">
                                                         Kelas {{ $kelas->tingkat }} {{ $kelas->nama_kelas }}
                                                     </div>
@@ -102,7 +106,9 @@
                                                 @php
                                                     $tagihanNames = $p->detailPembayaran
                                                         ->map(fn($d) => $d->tagihanSpp?->masterTagihan?->nama_tagihan)
-                                                        ->filter()->unique()->values();
+                                                        ->filter()
+                                                        ->unique()
+                                                        ->values();
                                                 @endphp
                                                 @forelse($tagihanNames as $nama)
                                                     <div>{{ $nama }}</div>
@@ -114,14 +120,22 @@
                                             <td class="px-4 py-4 text-sm text-gray-500">
                                                 @php
                                                     $periodes = $p->detailPembayaran
-                                                        ->map(fn($d) => $d->tagihanSpp?->bulan
-                                                            ? ['bulan' => $d->tagihanSpp->bulan, 'tahun' => $d->tagihanSpp->tahun]
-                                                            : null)
-                                                        ->filter()->unique()->values();
+                                                        ->map(
+                                                            fn($d) => $d->tagihanSpp?->bulan
+                                                                ? [
+                                                                    'bulan' => $d->tagihanSpp->bulan,
+                                                                    'tahun' => $d->tagihanSpp->tahun,
+                                                                ]
+                                                                : null,
+                                                        )
+                                                        ->filter()
+                                                        ->unique()
+                                                        ->values();
                                                 @endphp
                                                 @forelse($periodes as $periode)
                                                     <div>
-                                                        <span class="font-bold text-gray-700">{{ $periode['bulan'] }}</span>
+                                                        <span
+                                                            class="font-bold text-gray-700">{{ $periode['bulan'] }}</span>
                                                         {{ $periode['tahun'] }}
                                                     </div>
                                                 @empty
@@ -136,18 +150,26 @@
                                             </td>
 
                                             <td class="px-4 py-4 text-center">
-                                                <span class="px-3 py-1 rounded-full text-[10px] font-bold border bg-green-100 text-green-800 border-green-200 inline-flex items-center gap-1">
+                                                <span
+                                                    class="px-3 py-1 rounded-full text-[10px] font-bold border bg-green-100 text-green-800 border-green-200 inline-flex items-center gap-1">
                                                     <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                        <path fill-rule="evenodd"
+                                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                            clip-rule="evenodd" />
                                                     </svg>
                                                     SUCCESS
                                                 </span>
                                             </td>
-
                                             <td class="px-4 py-4 text-center">
-                                                <a href="#" class="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#1072B8] transition shadow-sm group">
-                                                    <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-[#1072B8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+
+                                                <a href="{{ route('admin.keuangan.pembayaran.cetak', $p->id) }}"
+                                                    target="_blank"
+                                                    class="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-300 rounded-lg text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-[#1072B8] transition shadow-sm group">
+                                                    <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-[#1072B8]"
+                                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                                                     </svg>
                                                     Cetak
                                                 </a>
@@ -174,7 +196,8 @@
                             <span class="text-sm text-gray-500 font-medium">Show:</span>
                             <select name="per_page" onchange="this.form.submit()"
                                 class="text-sm border-gray-300 rounded-lg shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42] py-1 pl-2 pr-8 transition cursor-pointer">
-                                <option value="30" {{ request('per_page', 30) == 30 ? 'selected' : '' }}>30</option>
+                                <option value="30" {{ request('per_page', 30) == 30 ? 'selected' : '' }}>30
+                                </option>
                                 <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
                                 <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
                             </select>

@@ -146,9 +146,14 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
         Route::resource('tagihan', TagihanSiswaController::class);
 
         // C. Pembayaran (Step 3)
+        Route::get('pembayaran/search', [PembayaranController::class, 'search'])->name('pembayaran.search');
+        Route::get('pembayaran/{id}/cetak', [PembayaranController::class, 'cetakKuitansi'])->name('pembayaran.cetak');
         Route::resource('pembayaran', PembayaranController::class)->only(['index', 'store']);
-
         // D. Laporan (Step Akhir)
         Route::get('laporan', [LaporanController::class, 'index'])->name('laporan.index');
+        Route::get('laporan/export', [LaporanController::class, 'export'])->name('laporan.export');
+        // Route::get('laporan',         [LaporanController::class, 'index'])->name('admin.keuangan.laporan.index');
+        // Route::get('laporan/export',  [LaporanController::class, 'export'])->name('admin.keuangan.laporan.export');
+
     });
 });
