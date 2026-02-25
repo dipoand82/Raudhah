@@ -172,12 +172,9 @@
                         <h2 class="text-xl font-extrabold text-gray-900">
                             Selamat datang, {{ Auth::user()->name }} 
                         </h2>
-{{-- Ganti @if($role === 'admin') menjadi: --}}
-@if(Auth::user()->role === 'admin')
-    <span class="role-badge role-admin">Admin</span>
-@else
-    <span class="role-badge role-admin">Guru</span> {{-- atau role lain --}}
-@endif 
+@if(Auth::user()->role === 'admin' || Auth::user()->role === 'guru')
+    <span class="role-badge role-staff">Staff Sekolah</span>
+@endif
                     </div>
                     <p class="text-sm text-gray-400 font-medium">
                         {{ now()->translatedFormat('l, d F Y') }} —

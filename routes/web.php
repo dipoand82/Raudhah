@@ -11,9 +11,12 @@ use App\Http\Controllers\Admin\ProfilSekolahController;
 use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\TagihanSiswaController;
 use App\Http\Controllers\Admin\TahunAjaranController;
-use App\Http\Controllers\Admin\DashboardController;  
 use App\Http\Controllers\GaleriController as PublicGaleri;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
+use App\Http\Controllers\Siswa\DashboardController as SiswaDashboard;
+use App\Http\Controllers\Siswa\KeuanganController;  
+use Illuminate\Support\Facades\Auth;
 use App\Models\ProfilSekolah;
 use Illuminate\Support\Facades\Route;
 
@@ -45,9 +48,11 @@ Route::get('/informasi-sekolah', function () {
 require __DIR__.'/auth.php';
 
 Route::get('/dashboard', function () {
+    if (Auth::user()->role === 'siswa') {
+        return redirect()->route('siswa.dashboard');
+    }
     return redirect()->route('admin.dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
-
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -62,8 +67,7 @@ Route::middleware('auth')->group(function () {
 */
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
+Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
     // 1. MANAJEMEN USER (TAB SISWA & GURU)
     Route::prefix('manajemen-user')->name('manajemen-user.')->group(function () {
 
@@ -159,4 +163,15 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
         // Route::get('laporan/export',  [LaporanController::class, 'export'])->name('admin.keuangan.laporan.export');
 
     });
+});
+/*
+|--------------------------------------------------------------------------
+| SISWA AREA
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'verified', 'role:siswa'])->prefix('siswa')->name('siswa.')->group(function () {
+    // HAPUS "DashboardController as" di sini, cukup panggil SiswaDashboard
+    Route::get('/dashboard', [SiswaDashboard::class, 'index'])->name('dashboard');
+    Route::get('/keuangan/riwayat', [KeuanganController::class, 'riwayat'])->name('keuangan.riwayat');
+    Route::get('/keuangan/bayar/{tagihan}', [KeuanganController::class, 'bayar'])->name('keuangan.bayar');
 });

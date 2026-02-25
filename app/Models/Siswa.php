@@ -55,4 +55,8 @@ class Siswa extends Model
     {
         return $this->hasMany(TagihanSpp::class);
     }
+    public function riwayatAkademik()
+{
+    return $this->hasMany(RiwayatAkademik::class);
+}
 }
