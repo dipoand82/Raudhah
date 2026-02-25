@@ -22,9 +22,9 @@ class RiwayatAkademik extends Model
         return $this->belongsTo(Kelas::class);
     }
 
-    public function tahun_ajaran()
+    public function tahunAjaran()
     {
-        return $this->belongsTo(TahunAjaran::class);
+        return $this->belongsTo(TahunAjaran::class, 'tahun_ajaran_id' );
     }
     public function tagihan_spps()
     {

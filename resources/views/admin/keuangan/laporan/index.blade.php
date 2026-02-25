@@ -20,9 +20,9 @@
                         <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1"></label>
                         <select name="periode" onchange="this.form.submit()"
                             class="rounded-full border-gray-300 text-sm focus:border-[#1072B8] focus:ring-[#1072B8] py-2 pl-4 pr-8 ">
-                            <option value="ganjil" {{ $periode == 'ganjil' ? 'selected' : '' }}>Ganjil (Jul–Des)
+                            <option value="ganjil" {{ $periode == 'ganjil' ? 'selected' : '' }}>Ganjil ( Jul–Des )
                             </option>
-                            <option value="genap" {{ $periode == 'genap' ? 'selected' : '' }}>Genap (Jan–Jun)</option>
+                            <option value="genap" {{ $periode == 'genap' ? 'selected' : '' }}>Genap ( Jan–Jun )</option>
                         </select>
                     </div>
 

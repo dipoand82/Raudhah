@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ProfilSekolahController;
 use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\TagihanSiswaController;
 use App\Http\Controllers\Admin\TahunAjaranController;
+use App\Http\Controllers\Admin\DashboardController;  
 use App\Http\Controllers\GaleriController as PublicGaleri;
 use App\Http\Controllers\ProfileController;
 use App\Models\ProfilSekolah;
@@ -44,7 +45,7 @@ Route::get('/informasi-sekolah', function () {
 require __DIR__.'/auth.php';
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return redirect()->route('admin.dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -60,6 +61,8 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // 1. MANAJEMEN USER (TAB SISWA & GURU)
     Route::prefix('manajemen-user')->name('manajemen-user.')->group(function () {
