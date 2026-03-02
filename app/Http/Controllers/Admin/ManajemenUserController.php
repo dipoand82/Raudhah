@@ -55,7 +55,7 @@ public function index(Request $request)
         })
         // Sorting: Karena kita tidak pakai JOIN, kita gunakan Join khusus untuk sorting
         // agar tidak merusak data utama atau pakai cara manual di bawah:
-        ->join('siswas', 'users.id', '=', 'siswas.user_id')
+        ->leftJoin('siswas', 'users.id', '=', 'siswas.user_id')
         ->leftJoin('kelas', 'siswas.kelas_id', '=', 'kelas.id')
         ->select('users.*') // Tetap select users.* agar tidak ganda
         ->orderByRaw("FIELD(siswas.status, 'Aktif', 'Cuti','Lulus','Pindah', 'Keluar') ASC")
@@ -81,9 +81,10 @@ public function index(Request $request)
     $kelas = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
     $tahunAjaranList = TahunAjaran::orderBy('tahun', 'desc')->get();
     $tahunAjaran = TahunAjaran::where('is_active', true)->first();
+    $totalSiswa = $userSiswa->total();
 
     return view('admin.manajemen_user.index', compact(
-        'userSiswa', 'userGuru', 'kelas', 'tahunAjaran', 'tahunAjaranList'
+        'userSiswa', 'userGuru', 'kelas', 'tahunAjaran', 'tahunAjaranList','totalSiswa'
     ));
 }
     public function storeSiswa(Request $request)

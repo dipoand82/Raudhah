@@ -414,7 +414,7 @@
                                             </td>
                                             </td>
                                             <td class="px-6 py-4 text-sm font-mono text-gray-600">
-                                                {{ $u->dataSiswa->nisn ?? 'Unlinked' }}
+                                                {{ $u->dataSiswa->nisn ?? 'Cek Excel' }}
                                             </td>
                                             <td class="text-center px-6 py-4 whitespace-nowrap">
                                                 <span
@@ -596,7 +596,10 @@
                                 <input type="hidden" name="status" value="{{ request('status') }}">
 
                                 <div class="flex items-center gap-2">
-                                    <span class="text-sm text-gray-500">Show:</span>
+                                    <span class="text-sm text-gray-500">Total Siswa:</span>
+                                <div class="text-sm text-gray-600">
+                                    <strong>{{ $totalSiswa }}</strong>, Show:
+                                </div>
                                     <select name="per_page" onchange="this.form.submit()"
                                         class="text-sm border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-1 pl-2 pr-8">
                                         <option value="30" {{ request('per_page') == 30 ? 'selected' : '' }}>30

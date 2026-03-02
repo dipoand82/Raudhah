@@ -47,70 +47,71 @@ class PembayaranController extends Controller
         return view('admin.keuangan.pembayaran.index', compact('pembayarans', 'kelasList'));
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'tagihan_ids' => 'required|array|min:1',
-            'tagihan_ids.*' => 'exists:tagihan_spps,id',
-            'jumlah_bayar_total' => 'required|numeric|min:1',
-            'metode' => 'required|in:tunai,midtrans',
-        ]);
+public function store(Request $request)
+{
+    $request->validate([
+        'tagihan_ids'   => 'required|array|min:1',
+        'tagihan_ids.*' => 'exists:tagihan_spps,id',
+        'metode'        => 'required|in:tunai,midtrans',
+    ]);
 
-        $tagihanPertama = TagihanSpp::with('riwayatAkademik')->findOrFail($request->tagihan_ids[0]);
+    try {
+        return DB::transaction(function () use ($request) {
 
-        if (! $tagihanPertama->riwayatAkademik) {
-            return back()->with('error', 'Riwayat akademik siswa tidak ditemukan.');
-        }
+            $tagihans = TagihanSpp::with('riwayatAkademik')
+                ->lockForUpdate()
+                ->whereIn('id', $request->tagihan_ids)
+                ->get();
 
-        $siswaId = $tagihanPertama->riwayatAkademik->siswa_id;
+            // Kelompokkan tagihan per siswa
+            $grouped = $tagihans->groupBy(fn($t) => $t->riwayatAkademik->siswa_id);
 
-        try {
-            return DB::transaction(function () use ($request, $siswaId) {
+            $kodeList = [];
 
-                $kodeGenerate = 'PAY-'.date('YmdHi').'-'.strtoupper(Str::random(4));
+            foreach ($grouped as $siswaId => $tagihanSiswa) {
+
+                $totalBayar = $tagihanSiswa->sum(fn($t) => $t->jumlah_tagihan - $t->terbayar);
+
+                if ($totalBayar <= 0) continue;
+
+                $kode = 'PAY-' . date('YmdHi') . '-' . strtoupper(Str::random(4));
 
                 $pembayaran = Pembayaran::create([
-                    'kode_pembayaran' => $kodeGenerate,
-                    'siswa_id' => $siswaId,
-                    'user_id_admin' => Auth::id(),
-                    'total_bayar' => $request->jumlah_bayar_total,
-                    'tanggal_bayar' => now(),
+                    'kode_pembayaran'   => $kode,
+                    'siswa_id'          => $siswaId,
+                    'user_id_admin'     => Auth::id(),
+                    'total_bayar'       => $totalBayar,
+                    'tanggal_bayar'     => now(),
                     'metode_pembayaran' => $request->metode,
-                    'status_gateway' => ($request->metode == 'tunai') ? 'settlement' : 'pending',
+                    'status_gateway'    => ($request->metode == 'tunai') ? 'settlement' : 'pending',
                 ]);
 
-                $uangTersedia = $request->jumlah_bayar_total;
-
-                foreach ($request->tagihan_ids as $id) {
-                    if ($uangTersedia <= 0) {
-                        break;
-                    }
-
-                    $tagihan = TagihanSpp::lockForUpdate()->find($id);
+                foreach ($tagihanSiswa as $tagihan) {
                     $sisaHutang = $tagihan->jumlah_tagihan - $tagihan->terbayar;
-
-                    $bayarBulanIni = min($uangTersedia, $sisaHutang);
+                    if ($sisaHutang <= 0) continue;
 
                     PembayaranDetail::create([
-                        'pembayaran_id' => $pembayaran->id,
-                        'tagihan_spp_id' => $tagihan->id,
-                        'nominal_dibayar' => $bayarBulanIni,
+                        'pembayaran_id'   => $pembayaran->id,
+                        'tagihan_spp_id'  => $tagihan->id,
+                        'nominal_dibayar' => $sisaHutang,
                     ]);
 
-                    $tagihan->terbayar += $bayarBulanIni;
-                    $tagihan->status = ($tagihan->terbayar >= $tagihan->jumlah_tagihan) ? 'lunas' : 'cicilan';
+                    $tagihan->terbayar = $tagihan->jumlah_tagihan;
+                    $tagihan->status   = 'lunas';
                     $tagihan->save();
-
-                    $uangTersedia -= $bayarBulanIni;
                 }
 
-                return back()->with('success', "Pembayaran berhasil! Kode: {$kodeGenerate}");
-            });
+                $kodeList[] = $kode;
+            }
 
-        } catch (\Exception $e) {
-            return back()->with('error', 'Terjadi kesalahan: '.$e->getMessage());
-        }
+            $pesanKode = implode(', ', $kodeList);
+            return back()->with('success', count($kodeList) . " pembayaran berhasil! Kode: {$pesanKode}");
+        });
+
+    } catch (\Exception $e) {
+        return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
     }
+}
 
     public function cetakKuitansi($id)
     {

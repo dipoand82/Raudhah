@@ -5,8 +5,8 @@
         </h2>
     </x-slot>
 
-    <div class="py-6 print:py-2">
-        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+    <div class="py-12 print:py-2">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-6 space-y-4">
 
             {{-- ============================================================
                  FILTER — rounded pill style

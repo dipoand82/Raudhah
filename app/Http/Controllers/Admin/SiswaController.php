@@ -80,6 +80,8 @@ class SiswaController extends Controller
             ->with(['user', 'kelas', 'tahunAjaran'])
             ->paginate($limit);
 
+        $totalSiswa = $siswas->total();
+
         // ==========================================================
         // E. Data Pendukung (Modal) - (DIPERTAHANKAN)
         // ==========================================================
@@ -90,7 +92,7 @@ class SiswaController extends Controller
         $tahunAjaranList = TahunAjaran::orderBy('tahun', 'desc')->get();
 
         // F. Kirim ke View - (DIPERTAHANKAN)
-        return view('admin.data_siswa.index', compact('siswas', 'kelas', 'tahunAjaranList'));
+        return view('admin.data_siswa.index', compact('siswas', 'kelas', 'tahunAjaranList','totalSiswa'));
     }
 
     // === 2. EXPORT DATA (FITUR BARU UNTUK ROUND-TRIP EXCEL) ===
@@ -204,33 +206,33 @@ class SiswaController extends Controller
     }
 
     public function bulkDestroy(Request $request)
-{
-    // 1. Validasi
-    $request->validate([
-        'ids' => 'required|array',
-        'ids.*' => 'exists:siswas,id',
-    ]);
+    {
+        // 1. Validasi
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:siswas,id',
+        ]);
 
-    // 2. Eksekusi Hapus
-    $siswas = Siswa::whereIn('id', $request->ids)->with('user')->get();
+        // 2. Eksekusi Hapus
+        $siswas = Siswa::whereIn('id', $request->ids)->with('user')->get();
 
-    foreach ($siswas as $siswa) {
-        if ($siswa->user) {
-            // Menggunakan forceDelete jika Anda ingin benar-benar menghapus dari database (bukan soft delete)
-            $siswa->user->forceDelete();
+        foreach ($siswas as $siswa) {
+            if ($siswa->user) {
+                // Menggunakan forceDelete jika Anda ingin benar-benar menghapus dari database (bukan soft delete)
+                $siswa->user->forceDelete();
+            }
+            // Jika tabel 'siswas' tidak diset cascade di database, aktifkan ini:
+            // $siswa->delete();
         }
-        // Jika tabel 'siswas' tidak diset cascade di database, aktifkan ini:
-        // $siswa->delete();
+
+        // 3. Kembalikan dengan info tab 'siswa'
+        return redirect()->back()->with([
+            'success' => count($request->ids).' data siswa terpilih berhasil dihapus!',
+            'active_tab' => 'siswa', // Kunci agar kembali ke tab siswa
+        ]);
     }
 
-    // 3. Kembalikan dengan info tab 'siswa'
-    return redirect()->back()->with([
-        'success' => count($request->ids) . ' data siswa terpilih berhasil dihapus!',
-        'active_tab' => 'siswa' // Kunci agar kembali ke tab siswa
-    ]);
-}
-
-public function bulkResetPassword(Request $request)
+    public function bulkResetPassword(Request $request)
     {
         $request->validate([
             'ids' => 'required|array',
@@ -249,7 +251,7 @@ public function bulkResetPassword(Request $request)
             }
         }
 
-        return redirect()->back()->with('success', $berhasil . ' password siswa berhasil direset ke NISN.');
+        return redirect()->back()->with('success', $berhasil.' password siswa berhasil direset ke NISN.');
     }
 
     // === 6. FORM CREATE (MANUAL) ===

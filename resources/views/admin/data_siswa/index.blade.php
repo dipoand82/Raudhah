@@ -6,7 +6,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-6">
 
             {{-- ALERT SUCCESS --}}
             @if (session('success'))
@@ -288,12 +288,17 @@
 
                 {{-- [BAGIAN 3: PAGINATION & PILIHAN LIMIT] --}}
                 <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+
                     <form method="GET" action="{{ route('admin.siswas.index') }}">
+
                         <input type="hidden" name="search" value="{{ request('search') }}">
                         <input type="hidden" name="kelas_id" value="{{ request('kelas_id') }}">
                         <input type="hidden" name="status" value="{{ request('status') }}">
 
                         <div class="flex items-center gap-2">
+                            <div class="text-sm text-gray-600">
+                                Total Siswa: <strong>{{ $totalSiswa }}, </strong>
+                            </div>
                             <span class="text-sm text-gray-500">Show:</span>
                             <select name="per_page" onchange="this.form.submit()"
                                 class="text-sm border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-1 pl-2 pr-8">

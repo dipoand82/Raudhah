@@ -6,7 +6,7 @@
     </x-slot>
 
     <div class="py-12" x-data="tagihanManager()" x-init="init()">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
             {{-- Form Hapus Massal --}}
             <form id="form-hapus-massal" action="{{ route('admin.keuangan.tagihan.destroy-bulk') }}" method="POST">
                 @csrf
@@ -16,14 +16,7 @@
                 </template>
             </form>
 
-            <form id="form-pembayaran-massal" action="{{ route('admin.keuangan.pembayaran.store') }}" method="POST">
-                @csrf
-                <template x-for="id in selectedIds" :key="id">
-                    <input type="hidden" name="tagihan_ids[]" :value="id">
-                </template>
-                <input type="hidden" name="jumlah_bayar_total" x-bind:value="jumlahBayarInput">
-                <input type="hidden" name="metode" x-bind:value="metodePembayaran">
-            </form>
+
 
             {{-- Alert Notifications --}}
             @if (session('success'))
@@ -157,14 +150,12 @@
                                     <div>
                                         <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest mb-0.5">
                                             Total Siswa</p>
-                                        <span class="text-blue-900 font-bold text-lg"><span
-                                                x-text="totalSiswa">0</span>
+                                        <span class="text-blue-900 font-bold text-lg"><span x-text="totalSiswa">0</span>
                                             Siswa</span>
                                     </div>
                                     <div class="hidden md:block w-px h-8 bg-blue-200"></div>
                                     <div>
-                                        <p
-                                            class="text-[10px] text-blue-600 font-bold uppercase tracking-widest mb-0.5">
+                                        <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest mb-0.5">
                                             Total Nominal</p>
                                         <span class="text-blue-900 font-bold font-mono text-xl"
                                             x-text="'Rp ' + new Intl.NumberFormat('id-ID').format(totalTagihan)"></span>
@@ -385,7 +376,8 @@
         </div>
         {{-- MODAL GENERATE TAGIHAN --}}
         <x-modal name="modal-generate-tagihan" focusable>
-            <form action="{{ route('admin.keuangan.tagihan.store-bulk') }}" method="POST" class="p-5 text-left">
+            <form action="{{ route('admin.keuangan.tagihan.store-bulk') }}" method="POST" class="p-5 text-left"
+                id="form-generate-massal">
                 @csrf
 
                 {{-- Header: Dibuat lebih ringkas --}}
@@ -481,7 +473,7 @@
                     <x-secondary-button x-on:click="$dispatch('close')" class="text-xs">
                         Batal
                     </x-secondary-button>
-                    <button type="submit" onclick="return confirm('Yakin ingin generate tagihan massal?')"
+                    <button type="button" x-on:click="$dispatch('open-modal', 'modal-konfirmasi-generate')"
                         class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold shadow-sm transition capitalize">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -491,6 +483,43 @@
                     </button>
                 </div>
             </form>
+        </x-modal>
+        <x-modal name="modal-konfirmasi-generate" maxWidth="md" focusable>
+            <div class="p-6 text-center">
+
+                {{-- Icon --}}
+                {{-- <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-amber-100 rounded-full">
+                    <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                </div> --}}
+
+                <h3 class="text-xl font-bold text-gray-900 mb-1">Generate Tagihan Massal?</h3>
+                <p class="text-sm text-gray-500 mb-6">
+                    Sistem akan membuat tagihan baru untuk semua siswa sesuai kriteria yang dipilih.
+                    Data ganda otomatis dilewati.
+                </p>
+
+                {{-- Info Box --}}
+                <div class="p-3 bg-amber-50 border border-amber-100 rounded-lg mb-6">
+                    <p class="text-xs text-amber-700 font-bold uppercase tracking-wider mb-1">Perhatian</p>
+                    <p class="text-sm text-amber-800">Proses ini tidak dapat dibatalkan setelah dijalankan.</p>
+                </div>
+
+                <div class="flex justify-center gap-3">
+                    <x-secondary-button x-on:click="$dispatch('close')">
+                        Batal
+                    </x-secondary-button>
+                    <button type="submit" form="form-generate-massal"
+                        class="bg-amber-600 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-amber-700 shadow-md transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Ya, Generate Sekarang
+                    </button>
+                </div>
+            </div>
         </x-modal>
 
 

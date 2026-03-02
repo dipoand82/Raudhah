@@ -6,7 +6,7 @@
     </x-slot>
 
     <div class="py-12" x-data="{ activeTab: '{{ request()->query('tab', default: 'profil') }}' }">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-6">
             {{-- ALERT SUCCESS --}}
             @if (session('success'))
                 <x-alert-success>
