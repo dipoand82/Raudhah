@@ -88,7 +88,7 @@ class GaleriController extends Controller
 
         $galeri->update($data);
         // Cek input hidden 'current_tab' yang kita buat tadi
-        $targetTab = $request->input('current_tab', 'profil'); // default ke profil jika tidak ada
+        // $targetTab = $request->input('current_tab', 'profil'); // default ke profil jika tidak ada
 
         // Ganti baris return lama Anda menjadi seperti ini:
         return redirect()->route('admin.profil.edit', ['tab' => 'galeri'])

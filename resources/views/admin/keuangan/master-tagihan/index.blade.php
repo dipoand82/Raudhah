@@ -33,6 +33,8 @@
                         nantinya.</p>
                     <p class="text-xs text-red-500 mt-2 font-medium leading-relaxed italic">* Pastikan <strong>Nama
                             Tagihan</strong> dan <strong>Nominal</strong> sudah benar.</p>
+                    <p class="text-xs text-red-500 mt-2 font-medium leading-relaxed italic">* Pastikan <strong>Tagihan Bulanan SPP</strong> hanya di buat <strong>1 kali</strong> disini.</p>
+
                 </div>
 
                 <x-primary-button x-data=""

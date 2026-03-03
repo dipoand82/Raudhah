@@ -55,62 +55,56 @@ public function store(Request $request)
         'metode'        => 'required|in:tunai,midtrans',
     ]);
 
-    try {
-        return DB::transaction(function () use ($request) {
+    return DB::transaction(function () use ($request) {
 
-            $tagihans = TagihanSpp::with('riwayatAkademik')
-                ->lockForUpdate()
-                ->whereIn('id', $request->tagihan_ids)
-                ->get();
+        $tagihans = TagihanSpp::with('riwayatAkademik')
+            ->lockForUpdate()
+            ->whereIn('id', $request->tagihan_ids)
+            ->get();
 
-            // Kelompokkan tagihan per siswa
-            $grouped = $tagihans->groupBy(fn($t) => $t->riwayatAkademik->siswa_id);
+        $grouped  = $tagihans->groupBy(fn($t) => $t->riwayatAkademik->siswa_id);
+        $kodeList = [];
 
-            $kodeList = [];
+        foreach ($grouped as $siswaId => $tagihanSiswa) {
 
-            foreach ($grouped as $siswaId => $tagihanSiswa) {
+            $totalBayar = $tagihanSiswa->sum(fn($t) => $t->jumlah_tagihan - $t->terbayar);
+            if ($totalBayar <= 0) continue;
 
-                $totalBayar = $tagihanSiswa->sum(fn($t) => $t->jumlah_tagihan - $t->terbayar);
+            $kode = 'PAY-' . date('YmdHi') . '-' . strtoupper(Str::random(4));
 
-                if ($totalBayar <= 0) continue;
+            $pembayaran = Pembayaran::create([
+                'kode_pembayaran'   => $kode,
+                'siswa_id'          => $siswaId,
+                'user_id_admin'     => Auth::id(),
+                'total_bayar'       => $totalBayar,
+                'tanggal_bayar'     => now(),
+                'metode_pembayaran' => $request->metode,
+                'status_gateway'    => $request->metode === 'tunai' ? 'settlement' : 'pending',
+            ]);
 
-                $kode = 'PAY-' . date('YmdHi') . '-' . strtoupper(Str::random(4));
+            foreach ($tagihanSiswa as $tagihan) {
+                $sisa = $tagihan->jumlah_tagihan - $tagihan->terbayar;
+                if ($sisa <= 0) continue;
 
-                $pembayaran = Pembayaran::create([
-                    'kode_pembayaran'   => $kode,
-                    'siswa_id'          => $siswaId,
-                    'user_id_admin'     => Auth::id(),
-                    'total_bayar'       => $totalBayar,
-                    'tanggal_bayar'     => now(),
-                    'metode_pembayaran' => $request->metode,
-                    'status_gateway'    => ($request->metode == 'tunai') ? 'settlement' : 'pending',
+                PembayaranDetail::create([
+                    'pembayaran_id'   => $pembayaran->id,
+                    'tagihan_spp_id'  => $tagihan->id,
+                    'nominal_dibayar' => $sisa,
                 ]);
 
-                foreach ($tagihanSiswa as $tagihan) {
-                    $sisaHutang = $tagihan->jumlah_tagihan - $tagihan->terbayar;
-                    if ($sisaHutang <= 0) continue;
-
-                    PembayaranDetail::create([
-                        'pembayaran_id'   => $pembayaran->id,
-                        'tagihan_spp_id'  => $tagihan->id,
-                        'nominal_dibayar' => $sisaHutang,
-                    ]);
-
-                    $tagihan->terbayar = $tagihan->jumlah_tagihan;
-                    $tagihan->status   = 'lunas';
-                    $tagihan->save();
-                }
-
-                $kodeList[] = $kode;
+                $tagihan->terbayar = $tagihan->jumlah_tagihan;
+                $tagihan->status   = 'lunas';
+                $tagihan->save();
             }
 
-            $pesanKode = implode(', ', $kodeList);
-            return back()->with('success', count($kodeList) . " pembayaran berhasil! Kode: {$pesanKode}");
-        });
+            $kodeList[] = $kode;
+        }
 
-    } catch (\Exception $e) {
-        return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
-    }
+        return response()->json([
+            'success' => true,
+            'message' => count($kodeList) . ' pembayaran berhasil! Kode: ' . implode(', ', $kodeList),
+        ]);
+    });
 }
 
     public function cetakKuitansi($id)

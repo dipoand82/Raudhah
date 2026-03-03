@@ -7,6 +7,25 @@
 
     <div class="py-12" x-data="tagihanManager()" x-init="init()">
         <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            {{-- TOAST SUKSES --}}
+<div x-show="showToast"
+    x-transition:leave="transition ease-in duration-500"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    class="mb-4 flex items-center justify-between gap-3 bg-green-100 border-2 border-green-600 text-green-700 px-4 py-2.5 rounded-lg shadow-md"
+    x-cloak>
+    <div class="flex items-center gap-3">
+        <svg class="w-6 h-6 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span class="text-sm font-bold" x-text="toastMessage"></span>
+    </div>
+    <button @click="showToast = false"
+        class="text-green-600 hover:text-green-800 transition duration-150 flex items-center justify-center">
+        <span class="text-3xl leading-none">&times;</span>
+    </button>
+</div>
             {{-- Form Hapus Massal --}}
             <form id="form-hapus-massal" action="{{ route('admin.keuangan.tagihan.destroy-bulk') }}" method="POST">
                 @csrf
@@ -15,8 +34,6 @@
                     <input type="hidden" name="tagihan_ids[]" :value="id">
                 </template>
             </form>
-
-
 
             {{-- Alert Notifications --}}
             @if (session('success'))
@@ -148,14 +165,17 @@
                                 </div>
                                 <div class="flex flex-col md:flex-row md:items-center gap-2 md:gap-6">
                                     <div>
-                                        <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest mb-0.5">
+                                        <p
+                                            class="text-[10px] text-blue-600 font-bold uppercase tracking-widest mb-0.5">
                                             Total Siswa</p>
-                                        <span class="text-blue-900 font-bold text-lg"><span x-text="totalSiswa">0</span>
+                                        <span class="text-blue-900 font-bold text-lg"><span
+                                                x-text="totalSiswa">0</span>
                                             Siswa</span>
                                     </div>
                                     <div class="hidden md:block w-px h-8 bg-blue-200"></div>
                                     <div>
-                                        <p class="text-[10px] text-blue-600 font-bold uppercase tracking-widest mb-0.5">
+                                        <p
+                                            class="text-[10px] text-blue-600 font-bold uppercase tracking-widest mb-0.5">
                                             Total Nominal</p>
                                         <span class="text-blue-900 font-bold font-mono text-xl"
                                             x-text="'Rp ' + new Intl.NumberFormat('id-ID').format(totalTagihan)"></span>
@@ -197,29 +217,28 @@
                             </button>
 
                             {{-- 🔵 TOMBOL LUNASI --}}
-                            <form action="{{ route('admin.keuangan.pembayaran.store') }}" method="POST"
+                            {{-- {{-- <form action="{{ route('admin.keuangan.pembayaran.store') }}" method="POST"
                                 id="form-pembayaran-massal">
                                 @csrf
                                 <template x-for="id in selectedIds" :key="id">
                                     <input type="hidden" name="tagihan_ids[]" :value="id">
                                 </template>
                                 <input type="hidden" name="jumlah_bayar_total" :value="totalTagihan">
-                                <input type="hidden" name="metode" value="tunai">
+                                <input type="hidden" name="metode" value="tunai"> --}}
 
-                                <button type="button" @click="submitPembayaran()"
-                                    :disabled="selectedIds.length === 0"
-                                    :class="selectedIds.length === 0 ?
-                                        'bg-blue-300 w-full md:w-auto justify-center py-2 md:py-2 cursor-not-allowed' :
-                                        'bg-[#1072B8] hover:bg-[#0d5a91] w-full md:w-auto justify-center py-2 md:py-2'"
-                                    class="inline-flex items-center justify-center gap-2 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-all whitespace-nowrap">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                    Lunasi <span x-text="totalSiswa">0</span> Siswa (<span
-                                        x-text="selectedIds.length">0</span> Tagihan )
-                                </button>
-                            </form>
+                            <button type="button" @click="submitPembayaran()" :disabled="selectedIds.length === 0"
+                                :class="selectedIds.length === 0 ?
+                                    'bg-blue-300 w-full md:w-auto justify-center py-2 md:py-2 cursor-not-allowed' :
+                                    'bg-[#1072B8] hover:bg-[#0d5a91] w-full md:w-auto justify-center py-2 md:py-2'"
+                                class="inline-flex items-center justify-center gap-2 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-all whitespace-nowrap">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                Lunasi <span x-text="totalSiswa">0</span> Siswa (<span
+                                    x-text="selectedIds.length">0</span> Tagihan )
+                            </button>
+                            {{-- </form> --}}
                         </div>
                     </div>
 
@@ -580,11 +599,32 @@
                     <div class="mt-8 flex justify-end gap-3 border-t pt-5">
                         <button @click="showModal = false"
                             class="bg-white border px-5 py-2 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-50 transition">Batal</button>
-                        <button type="submit" form="form-pembayaran-massal"
+                        <button type="button" @click="executePayment()"
                             class="bg-[#1072B8] text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-[#0d5a91] shadow-md transition">
                             Proses Sekarang
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <div x-show="showModalError" class="fixed inset-0 z-50 overflow-y-auto" x-cloak>
+            <div class="flex items-center justify-center min-h-screen px-4">
+                <div class="fixed inset-0 bg-gray-600 bg-opacity-75" @click="showModalError = false"></div>
+
+                <div class="bg-white rounded-xl shadow-2xl p-8 relative z-10 sm:max-w-md w-full text-center">
+                    <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full">
+                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Pembayaran Gagal</h3>
+                    <p class="text-sm text-gray-500 mb-6" x-text="errorMessage"></p>
+                    <button @click="showModalError = false"
+                        class="bg-red-600 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-red-700 transition">
+                        Tutup
+                    </button>
                 </div>
             </div>
         </div>
@@ -656,6 +696,22 @@
                 showModal: false,
                 jumlahBayarInput: 0,
                 metodePembayaran: 'tunai',
+                showModalError: false, // kontrol tampil/sembunyi modal error
+                errorMessage: '', // pesan error yang ditampilkan
+                isLoading: false, // nanti bisa dipakai disable tombol saat loading
+                showToast: false,
+                toastMessage: '',
+
+                init() { // ✅ taruh disini
+                    this.calculateTotalSiswa();
+                    const msg = sessionStorage.getItem('toast_success');
+                    if (msg) {
+                        this.toastMessage = msg;
+                        this.showToast = true;
+                        sessionStorage.removeItem('toast_success');
+                        setTimeout(() => this.showToast = false, 8000);
+                    }
+                },
 
 
                 calculateTotalSiswa() {
@@ -777,33 +833,48 @@
                 },
 
                 async executePayment() {
-                    if (this.jumlahBayarInput <= 0) return alert('Jumlah bayar tidak valid');
+                    if (this.jumlahBayarInput <= 0) return;
+
+                    this.isLoading = true; // mulai loading
+
                     try {
                         const response = await fetch("{{ route('admin.keuangan.pembayaran.store') }}", {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'Accept': 'application/json',
+                                'Accept': 'application/json', // ← ini yang bikin global handler aktif
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
                             },
                             body: JSON.stringify({
                                 tagihan_ids: this.selectedIds,
                                 jumlah_bayar_total: this.jumlahBayarInput,
-                                metode: this.metodePembayaran
+                                metode: this.metodePembayaran // ← ambil dari dropdown di modal
                             })
                         });
+
                         const result = await response.json();
+
                         if (result.success) {
+                            // bersihkan localStorage lalu reload
                             localStorage.removeItem('selected_tagihan_ids');
                             localStorage.removeItem('tagihan_siswa_map');
                             localStorage.removeItem('selected_total_nominal');
+                            sessionStorage.setItem('toast_success', result.message);
                             window.location.reload();
                         } else {
-                            alert('Gagal: ' + result.message);
+                            // tampilkan modal error
+                            this.showModal = false;
+                            this.errorMessage = result.message ?? 'Terjadi kesalahan.';
+                            this.showModalError = true;
                         }
+
                     } catch (error) {
-                        console.error(error);
-                        alert('Terjadi kesalahan sistem.');
+                        // catch ini hanya untuk error jaringan (internet putus, dll)
+                        this.showModal = false;
+                        this.errorMessage = 'Koneksi gagal. Coba lagi.';
+                        this.showModalError = true;
+                    } finally {
+                        this.isLoading = false; // selesai loading
                     }
                 },
 
