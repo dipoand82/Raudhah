@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Admin\GaleriController as AdminGaleri;
 use App\Http\Controllers\Admin\GuruController;
 use App\Http\Controllers\Admin\KelasController;
@@ -13,11 +14,10 @@ use App\Http\Controllers\Admin\TagihanSiswaController;
 use App\Http\Controllers\Admin\TahunAjaranController;
 use App\Http\Controllers\GaleriController as PublicGaleri;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Siswa\DashboardController as SiswaDashboard;
-use App\Http\Controllers\Siswa\KeuanganController;  
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Siswa\KeuanganController;
 use App\Models\ProfilSekolah;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,6 +25,9 @@ use Illuminate\Support\Facades\Route;
 | PUBLIC ROUTES
 |--------------------------------------------------------------------------
 */
+// Tambahkan Route Webhook di sini (di luar middleware apapun)
+Route::post('/webhook/midtrans', [\App\Http\Controllers\MidtransWebhookController::class, 'handle'])
+    ->name('webhook.midtrans');
 Route::get('/', function () {
     $profil_sekolah = ProfilSekolah::first();
     $galeri = \App\Models\Galeri::latest()->take(4)->get();
@@ -51,6 +54,7 @@ Route::get('/dashboard', function () {
     if (Auth::user()->role === 'siswa') {
         return redirect()->route('siswa.dashboard');
     }
+
     return redirect()->route('admin.dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 Route::middleware('auth')->group(function () {
@@ -67,7 +71,7 @@ Route::middleware('auth')->group(function () {
 */
 Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
 
-Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
     // 1. MANAJEMEN USER (TAB SISWA & GURU)
     Route::prefix('manajemen-user')->name('manajemen-user.')->group(function () {
 
@@ -174,4 +178,5 @@ Route::middleware(['auth', 'verified', 'role:siswa'])->prefix('siswa')->name('si
     Route::get('/dashboard', [SiswaDashboard::class, 'index'])->name('dashboard');
     Route::get('/keuangan/riwayat', [KeuanganController::class, 'riwayat'])->name('keuangan.riwayat');
     Route::get('/keuangan/bayar/{tagihan}', [KeuanganController::class, 'bayar'])->name('keuangan.bayar');
+    Route::get('/keuangan/sukses', [KeuanganController::class, 'sukses'])->name('keuangan.bayar.sukses');
 });

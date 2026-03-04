@@ -29,8 +29,13 @@ class TagihanSpp extends Model
         return $this->belongsTo(RiwayatAkademik::class, 'riwayat_akademik_id');
     }
 
-    public function pembayarans()
+    public function detailPembayaran()
     {
-        return $this->hasMany(Pembayaran::class);
+        return $this->hasMany(PembayaranDetail::class, 'tagihan_spp_id');
     }
+
+    // public function pembayarans()
+    // {
+    //     return $this->hasMany(Pembayaran::class);
+    // }
 }

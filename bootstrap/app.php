@@ -13,14 +13,20 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // 1. Alias Middleware kamu yang lama
         $middleware->alias([
-        'force.change.password' => \App\Http\Middleware\EnsurePasswordIsChanged::class,
-        'role' => \App\Http\Middleware\CheckRole::class, // TAMBAHKAN BARIS INI
-    ]);
-    })
-    ->withExceptions(function (Exceptions $exceptions) {  // ✅ isi bagian ini
+            'force.change.password' => \App\Http\Middleware\EnsurePasswordIsChanged::class,
+            'role' => \App\Http\Middleware\CheckRole::class,
+        ]);
 
-        $exceptions->render(function (Throwable $e, Request $request) {
+        // 2. ✅ Tambahan Pengecualian CSRF untuk Midtrans
+        $middleware->validateCsrfTokens(except: [
+            'webhook/midtrans',
+        ]);
+    })
+    ->withExceptions(function (Exceptions $exceptions) {
+
+        $exceptions->render(function (\Throwable $e, Request $request) {
 
             if ($request->expectsJson() || $request->ajax()) {
 
