@@ -47,83 +47,93 @@ class PembayaranController extends Controller
         return view('admin.keuangan.pembayaran.index', compact('pembayarans', 'kelasList'));
     }
 
-public function store(Request $request)
-{
-    $request->validate([
-        'tagihan_ids'   => 'required|array|min:1',
-        'tagihan_ids.*' => 'exists:tagihan_spps,id',
-        'metode'        => 'required|in:tunai,midtrans',
-    ]);
+    public function store(Request $request)
+    {
+        $request->validate([
+            'tagihan_ids' => 'required|array|min:1',
+            'tagihan_ids.*' => 'exists:tagihan_spps,id',
+            'metode' => 'required|in:tunai,midtrans',
+        ]);
 
-    return DB::transaction(function () use ($request) {
+        return DB::transaction(function () use ($request) {
 
-        $tagihans = TagihanSpp::with('riwayatAkademik')
-            ->lockForUpdate()
-            ->whereIn('id', $request->tagihan_ids)
-            ->get();
+            $tagihans = TagihanSpp::with('riwayatAkademik')
+                ->lockForUpdate()
+                ->whereIn('id', $request->tagihan_ids)
+                ->get();
 
-        $grouped  = $tagihans->groupBy(fn($t) => $t->riwayatAkademik->siswa_id);
-        $kodeList = [];
+            $grouped = $tagihans->groupBy(fn ($t) => $t->riwayatAkademik->siswa_id);
+            $kodeList = [];
 
-        foreach ($grouped as $siswaId => $tagihanSiswa) {
+            foreach ($grouped as $siswaId => $tagihanSiswa) {
 
-            $totalBayar = $tagihanSiswa->sum(fn($t) => $t->jumlah_tagihan - $t->terbayar);
-            if ($totalBayar <= 0) continue;
+                $totalBayar = (int) $request->jumlah_bayar_total;
+                if ($totalBayar <= 0) {
+                    continue;
+                }
 
-            $kode = 'PAY-' . date('YmdHi') . '-' . strtoupper(Str::random(4));
+                $kode = 'PAY-'.date('YmdHi').'-'.strtoupper(Str::random(4));
 
-            $pembayaran = Pembayaran::create([
-                'kode_pembayaran'   => $kode,
-                'siswa_id'          => $siswaId,
-                'user_id_admin'     => Auth::id(),
-                'total_bayar'       => $totalBayar,
-                'tanggal_bayar'     => now(),
-                'metode_pembayaran' => $request->metode,
-                'status_gateway'    => $request->metode === 'tunai' ? 'settlement' : 'pending',
-            ]);
-
-            foreach ($tagihanSiswa as $tagihan) {
-                $sisa = $tagihan->jumlah_tagihan - $tagihan->terbayar;
-                if ($sisa <= 0) continue;
-
-                PembayaranDetail::create([
-                    'pembayaran_id'   => $pembayaran->id,
-                    'tagihan_spp_id'  => $tagihan->id,
-                    'nominal_dibayar' => $sisa,
+                $pembayaran = Pembayaran::create([
+                    'kode_pembayaran' => $kode,
+                    'siswa_id' => $siswaId,
+                    'user_id_admin' => Auth::id(),
+                    'total_bayar' => $totalBayar,
+                    'tanggal_bayar' => now(),
+                    'metode_pembayaran' => $request->metode,
+                    'status_gateway' => $request->metode === 'tunai' ? 'settlement' : 'pending',
                 ]);
 
-                $tagihan->terbayar = $tagihan->jumlah_tagihan;
-                $tagihan->status   = 'lunas';
-                $tagihan->save();
+                foreach ($tagihanSiswa as $tagihan) {
+                    $sisa = $tagihan->jumlah_tagihan - $tagihan->terbayar;
+                    if ($sisa <= 0) {
+                        continue;
+                    }
+                    if ($totalBayar <= 0) {
+                        break;
+                    } // uang sudah habis, stop
+
+                    $dibayar = min($sisa, $totalBayar); // bayar sesuai yang tersedia
+                    $totalBayar -= $dibayar;            // kurangi sisa budget
+
+                    PembayaranDetail::create([
+                        'pembayaran_id' => $pembayaran->id,
+                        'tagihan_spp_id' => $tagihan->id,
+                        'nominal_dibayar' => $dibayar,
+                    ]);
+
+                    $tagihan->terbayar += $dibayar;
+                    $tagihan->status = $tagihan->terbayar >= $tagihan->jumlah_tagihan ? 'lunas' : 'cicilan';
+                    $tagihan->save();
+                }
+
+                $kodeList[] = $kode;
             }
 
-            $kodeList[] = $kode;
-        }
+            return response()->json([
+                'success' => true,
+                'message' => count($kodeList).' pembayaran berhasil! Kode: '.implode(', ', $kodeList),
+            ]);
+        });
+    }
 
-        return response()->json([
-            'success' => true,
-            'message' => count($kodeList) . ' pembayaran berhasil! Kode: ' . implode(', ', $kodeList),
-        ]);
-    });
-}
+    public function cetakKuitansi($id)
+    {
+        $p = Pembayaran::with([
+            'siswa',
+            'detailPembayaran.tagihanSpp.masterTagihan',
+        ])->findOrFail($id);
 
-public function cetakKuitansi($id)
-{
-    $p = Pembayaran::with([
-        'siswa',
-        'detailPembayaran.tagihanSpp.masterTagihan'
-    ])->findOrFail($id);
+        $terbilang = $this->terbilang($p->total_bayar);
+        $profil_sekolah = \App\Models\ProfilSekolah::first(); // sesuaikan nama model jika berbeda
 
-    $terbilang      = $this->terbilang($p->total_bayar);
-    $profil_sekolah = \App\Models\ProfilSekolah::first(); // sesuaikan nama model jika berbeda
+        $pdf = Pdf::loadView(
+            'admin.keuangan.pembayaran.kuitansi_pdf',
+            compact('p', 'terbilang', 'profil_sekolah')
+        )->setPaper([0, 0, 480, 400], 'portrait');
 
-    $pdf = Pdf::loadView(
-        'admin.keuangan.pembayaran.kuitansi_pdf',
-        compact('p', 'terbilang', 'profil_sekolah')
-    )->setPaper([0, 0, 480, 400], 'portrait');
-
-    return $pdf->stream('Kuitansi-' . $p->kode_pembayaran . '.pdf');
-}
+        return $pdf->stream('Kuitansi-'.$p->kode_pembayaran.'.pdf');
+    }
 
     // Fungsi pembantu untuk mengubah angka menjadi teks
     private function terbilang($angka)
