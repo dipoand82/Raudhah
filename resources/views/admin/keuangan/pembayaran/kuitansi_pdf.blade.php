@@ -83,9 +83,27 @@
     {{-- HEADER --}}
     <table class="header-table">
         <tr>
-            <td width="60">
-                <img src="{{ public_path('storage/logos/brosur.png') }}" style="width: 50px; height: 50px;">
-            </td>
+<td width="60">
+    @php
+        // Prioritas: logo khusus kuitansi → logo web → logo dari DB → fallback teks
+        $logoPath = null;
+        if (file_exists(public_path('storage/logos/logo_kuitansi.PNG'))) {
+            $logoPath = public_path('storage/logos/logo_kuitansi.PNG');
+        } elseif (file_exists(public_path('storage/logos/logo_smp_raudhah.PNG'))) {
+            $logoPath = public_path('storage/logos/logo_smp_raudhah.PNG');
+        } elseif ($profil_sekolah && $profil_sekolah->logo_path) {
+            $logoPath = public_path('storage/' . $profil_sekolah->logo_path);
+        }
+    @endphp
+
+    @if ($logoPath)
+        <img src="{{ $logoPath }}" style="width:80px; height:80px; object-fit:contain;">
+    @else
+        <div style="width:50px; height:50px; background:#1072B8; border-radius:50%;
+                    display:flex; align-items:center; justify-content:center;
+                    color:white; font-size:10px; font-weight:bold;">SMP</div>
+    @endif
+</td>
             <td class="col-text">
                 <div class="nama-sekolah">YAYASAN RAUDHAH EL JANNAH</div>
                 <div class="sub-sekolah">TPQ, TK IT, SD IT, SMP IT Raudhah El Jannah</div>

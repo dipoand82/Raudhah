@@ -107,25 +107,23 @@ public function store(Request $request)
     });
 }
 
-    public function cetakKuitansi($id)
-    {
-        // Ambil data pembayaran beserta rincian tagihannya
-        $p = Pembayaran::with(['siswa', 'detailPembayaran.tagihanSpp.masterTagihan'])->findOrFail($id);
+public function cetakKuitansi($id)
+{
+    $p = Pembayaran::with([
+        'siswa',
+        'detailPembayaran.tagihanSpp.masterTagihan'
+    ])->findOrFail($id);
 
-        // Data untuk dikirim ke view
-        $terbilang = $this->terbilang($p->total_bayar);
-        $data = [
-            'p' => $p,
-            'terbilang' => $terbilang,
-        ];
+    $terbilang      = $this->terbilang($p->total_bayar);
+    $profil_sekolah = \App\Models\ProfilSekolah::first(); // sesuaikan nama model jika berbeda
 
-        // Load view khusus PDF dan atur ukuran kertas (Landscape agar mirip kuitansi asli)
-        // Ukuran kustom: 600pt x 400pt (kurang lebih seukuran kuitansi fisik di foto Anda)
-        $pdf = Pdf::loadView('admin.keuangan.pembayaran.kuitansi_pdf', compact('p', 'terbilang'))
-            ->setPaper([0, 0, 480, 400], 'portrait');
+    $pdf = Pdf::loadView(
+        'admin.keuangan.pembayaran.kuitansi_pdf',
+        compact('p', 'terbilang', 'profil_sekolah')
+    )->setPaper([0, 0, 480, 400], 'portrait');
 
-        return $pdf->stream('Kuitansi-'.$p->kode_pembayaran.'.pdf');
-    }
+    return $pdf->stream('Kuitansi-' . $p->kode_pembayaran . '.pdf');
+}
 
     // Fungsi pembantu untuk mengubah angka menjadi teks
     private function terbilang($angka)
