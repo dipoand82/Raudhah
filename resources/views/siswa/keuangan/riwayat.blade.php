@@ -5,16 +5,15 @@
         </h2>
     </x-slot>
 
-    <div class="py-6" style= min-height: 100vh;">
-        <div class="max-w-4xl mx-auto px-6 sm:px-6 lg:px-6 space-y-5">
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-5">
 
-            {{-- HEADER --}}
-            <div>
-                <p class="text-sm text-gray-500 mt-0.5">Lihat semua transaksi pembayaran SPP Anda</p>
-            </div>
-
-            {{-- FILTER BULAN --}}
-            <div>
+            {{-- HEADER + FILTER --}}
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-6 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                    <h3 class="text-base font-bold text-gray-800">Log Transaksi</h3>
+                    <p class="text-sm text-gray-400 mt-0.5">Lihat semua transaksi pembayaran SPP Anda</p>
+                </div>
                 <form method="GET" action="{{ route('siswa.keuangan.riwayat') }}">
                     <select name="bulan" onchange="this.form.submit()"
                         class="text-sm border-gray-300 rounded-xl shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 pl-4 pr-8 bg-white cursor-pointer">
@@ -33,8 +32,7 @@
 
                         {{-- Header Kartu --}}
                         <div class="flex items-start justify-between gap-3 mb-3">
-                            <div class="flex items-center gap-3">
-                                {{-- Checkbox / Indikator --}}
+                            <div class="flex items-center gap-3 min-w-0">
                                 <div class="flex items-center justify-center w-5 h-5 rounded border-2 flex-shrink-0"
                                     style="border-color:#1072B8;">
                                     <svg class="w-3 h-3" style="color:#1072B8;" fill="currentColor" viewBox="0 0 20 20">
@@ -43,23 +41,21 @@
                                             clip-rule="evenodd" />
                                     </svg>
                                 </div>
-                                <div>
+                                <div class="min-w-0">
                                     @php
                                         $namaTagihan = $p->detailPembayaran->map(fn($d) => $d->tagihanSpp?->masterTagihan?->nama_tagihan)->filter()->unique()->implode(', ');
                                         $periodeTagihan = $p->detailPembayaran->map(fn($d) => $d->tagihanSpp?->bulan ? $d->tagihanSpp->bulan . ' ' . $d->tagihanSpp->tahun : null)->filter()->unique()->implode(', ');
                                     @endphp
-                                    <p class="font-bold text-gray-900 text-sm leading-tight">
+                                    <p class="font-bold text-gray-900 text-sm leading-tight truncate">
                                         {{ $namaTagihan ?: 'Pembayaran' }}
-                                        @if($periodeTagihan)
-                                            {{ $periodeTagihan }}
-                                        @endif
+                                        @if($periodeTagihan) {{ $periodeTagihan }} @endif
                                     </p>
                                     <p class="text-xs text-gray-400 mt-0.5">{{ $periodeTagihan }}</p>
                                 </div>
                             </div>
 
-                            <div class="flex items-center gap-2 flex-shrink-0">
-                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-700 border border-green-200 inline-flex items-center gap-1">
+                            <div class="flex flex-col sm:flex-row items-end sm:items-center gap-1.5 flex-shrink-0">
+                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-green-100 text-green-700 border border-green-200 inline-flex items-center gap-1 whitespace-nowrap">
                                     <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"
                                             d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -67,29 +63,29 @@
                                     </svg>
                                     Berhasil
                                 </span>
-                                <p class="text-base font-extrabold" style="color:#1072B8;">
+                                <p class="text-base font-extrabold whitespace-nowrap" style="color:#1072B8;">
                                     Rp {{ number_format($p->total_bayar, 0, ',', '.') }}
                                 </p>
                             </div>
                         </div>
 
                         {{-- Divider --}}
-                        <div class="border-t border-gray-50 mb-3"></div>
+                        <div class="border-t border-gray-100 mb-3"></div>
 
                         {{-- Detail Grid --}}
-                        <div class="grid grid-cols-3 gap-x-4 gap-y-2 text-xs mb-4">
-                            <div>
-                                <span class="text-gray-400 block">ID Transaksi</span>
-                                <span class="font-mono font-bold text-gray-700 text-[11px]">{{ $p->kode_pembayaran }}</span>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-3 text-xs mb-4">
+                            <div class="col-span-2 sm:col-span-1">
+                                <span class="text-gray-400 block mb-0.5">ID Transaksi</span>
+                                <span class="font-mono font-bold text-gray-700 text-[11px] break-all">{{ $p->kode_pembayaran }}</span>
                             </div>
                             <div>
-                                <span class="text-gray-400 block">Tanggal</span>
+                                <span class="text-gray-400 block mb-0.5">Tanggal</span>
                                 <span class="font-semibold text-gray-700">{{ $p->created_at->format('d M Y') }}</span>
                             </div>
                             <div>
-                                <span class="text-gray-400 block">Metode</span>
+                                <span class="text-gray-400 block mb-0.5">Metode</span>
                                 <span class="font-semibold text-gray-700 capitalize">
-                                    {{ $p->metode === 'tunai' ? 'Tunai / Manual' : ucfirst($p->metode) }}
+                                    {{ $p->metode_pembayaran === 'tunai' ? 'Tunai / Manual' : ucfirst($p->metode_pembayaran) }}
                                 </span>
                             </div>
                         </div>
@@ -109,8 +105,7 @@
                 </div>
             @empty
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 px-5 py-14 text-center">
-                    <div class="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3"
-                        style="background:#e8f2fb;">
+                    <div class="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-3" style="background:#e8f2fb;">
                         <svg class="w-7 h-7" style="color:#1072B8;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
