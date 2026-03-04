@@ -2,8 +2,8 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        @page { margin: 10px; } 
-        
+        @page { margin: 10px; }
+
         body {
             font-family: 'Helvetica', Arial, sans-serif;
             font-size: 10px;
@@ -45,35 +45,35 @@
         .info-table .label { width: 85px; }
         .info-table .colon { width: 8px; }
 
-        .detail-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 5px; 
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
         }
-        .detail-table td { 
-            padding: 4px 2px; 
-            border-bottom: 1px dotted #888; 
+        .detail-table td {
+            padding: 4px 2px;
+            border-bottom: 1px dotted #888;
         }
 
-        .total-section { 
-            width: 100%; 
-            margin-top: 10px; 
+        .total-section {
+            width: 100%;
+            margin-top: 10px;
         }
-        .total-box { 
-            background: #f2f2f2; 
-            padding: 8px; 
+        .total-box {
+            background: #f2f2f2;
+            padding: 8px;
             border: 1px solid #999;
             font-weight: bold;
         }
         .terbilang { font-weight: normal; font-style: italic; font-size: 9px; margin-top: 3px; }
 
-        .footer-table { 
-            width: 100%; 
-            margin-top: 15px; 
+        .footer-table {
+            width: 100%;
+            margin-top: 15px;
         }
-        .col-sign { 
-            text-align: center; 
-            width: 160px; 
+        .col-sign {
+            text-align: center;
+            width: 160px;
         }
     </style>
 </head>

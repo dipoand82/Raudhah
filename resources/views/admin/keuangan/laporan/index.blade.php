@@ -15,6 +15,22 @@
                 <form method="GET" action="{{ route('admin.keuangan.laporan.index') }}"
                     class="flex flex-wrap gap-3 items-end">
 
+                    <div class="flex flex-col gap-1">
+    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1"></label>
+    <div class="relative">
+        <input type="text" name="search" value="{{ request('search') }}"
+            placeholder="Cari nama / NISN..."
+            class="rounded-full border-gray-300 text-sm focus:border-[#1072B8] focus:ring-[#1072B8] py-2 pl-4 pr-10 w-52">
+        <button type="submit"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#1072B8] transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+        </button>
+    </div>
+</div>
+
                     {{-- Semester --}}
                     <div class="flex flex-col gap-1">
                         <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1"></label>

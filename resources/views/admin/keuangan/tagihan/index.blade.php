@@ -8,21 +8,29 @@
     <div class="py-12" x-data="tagihanManager()" x-init="init()">
         <div class="max-w-7xl mx-auto px-4 sm:px-6">
             {{-- TOAST SUKSES --}}
-<div x-show="showToast"
+<div x-show="toast.show"
     x-transition:leave="transition ease-in duration-500"
     x-transition:leave-start="opacity-100"
     x-transition:leave-end="opacity-0"
-    class="mb-4 flex items-center justify-between gap-3 bg-green-100 border-2 border-green-600 text-green-700 px-4 py-2.5 rounded-lg shadow-md"
+    :class="toast.type === 'success'
+        ? 'bg-green-100 border-green-600 text-green-700'
+        : 'bg-red-100 border-red-500 text-red-800'"
+    class="mb-4 flex items-center justify-between border-2 px-4 py-2.5 rounded-lg shadow-md"
     x-cloak>
     <div class="flex items-center gap-3">
-        <svg class="w-6 h-6 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        {{-- Icon success --}}
+        <svg x-show="toast.type === 'success'" class="w-6 h-6 text-green-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
-        <span class="text-sm font-bold" x-text="toastMessage"></span>
+        {{-- Icon error --}}
+        <svg x-show="toast.type === 'error'" class="w-6 h-6 text-red-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span class="text-sm font-bold" x-text="toast.message"></span>
     </div>
-    <button @click="showToast = false"
-        class="text-green-600 hover:text-green-800 transition duration-150 flex items-center justify-center">
+    <button @click="toast.show = false"
+        :class="toast.type === 'success' ? 'text-green-600 hover:text-green-800' : 'text-red-500 hover:text-red-700'"
+        class="transition duration-150 flex items-center justify-center ml-4">
         <span class="text-3xl leading-none">&times;</span>
     </button>
 </div>
@@ -375,7 +383,9 @@
                             <input type="hidden" name="periode" value="{{ request('periode') }}">
                             <input type="hidden" name="master_tagihan_id"
                                 value="{{ request('master_tagihan_id') }}">
-
+        <span class="text-sm text-gray-500">
+            Total Tagihan: <strong>{{ $tagihans->total() }}</strong>,
+        </span>
                             <span class="text-sm text-gray-500 font-medium">Show:</span>
                             <select name="per_page" onchange="this.form.submit()"
                                 class="text-sm border-gray-300 rounded-lg shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42] py-1 pl-2 pr-8 transition cursor-pointer">
@@ -660,7 +670,7 @@
                     <x-secondary-button x-on:click="$dispatch('close')">
                         Batal
                     </x-secondary-button>
-                    <button type="submit" form="form-hapus-massal"
+                    <button type="button" @click="executeHapus()"
                         class="bg-red-600 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-red-700 shadow-md transition flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -674,252 +684,255 @@
 
 
     </div>
-    <script>
-        @if (session('success') || session('error'))
-            localStorage.removeItem('selected_tagihan_ids');
-            localStorage.removeItem('tagihan_siswa_map');
-            localStorage.removeItem('selected_total_nominal');
-        @endif
-        document.addEventListener('alpine:init', () => {
-            Alpine.store('hapusInfo', {
-                jumlah: 0,
-                nominal: 0
-            });
-        });
+<script>
+    // Auto scroll ke atas setiap kali halaman load
+    window.scrollTo({ top: 0, behavior: 'instant' });
 
-        function tagihanManager() {
-            return {
-                selectedIds: JSON.parse(localStorage.getItem('selected_tagihan_ids')) || [],
-                tagihanToSiswaMap: JSON.parse(localStorage.getItem('tagihan_siswa_map')) || {},
-                totalTagihan: parseInt(localStorage.getItem('selected_total_nominal')) || 0,
-                totalSiswa: 0,
-                showModal: false,
-                jumlahBayarInput: 0,
-                metodePembayaran: 'tunai',
-                showModalError: false, // kontrol tampil/sembunyi modal error
-                errorMessage: '', // pesan error yang ditampilkan
-                isLoading: false, // nanti bisa dipakai disable tombol saat loading
-                showToast: false,
-                toastMessage: '',
+    // Bersihkan localStorage jika ada response dari server
+    @if (session('success') || session('error') || $errors->any())
+        localStorage.removeItem('selected_tagihan_ids');
+        localStorage.removeItem('tagihan_siswa_map');
+        localStorage.removeItem('selected_total_nominal');
+    @endif
 
-                init() { // ✅ taruh disini
-                    this.calculateTotalSiswa();
-                    const msg = sessionStorage.getItem('toast_success');
-                    if (msg) {
-                        this.toastMessage = msg;
-                        this.showToast = true;
-                        sessionStorage.removeItem('toast_success');
-                        setTimeout(() => this.showToast = false, 8000);
+    document.addEventListener('alpine:init', () => {
+        Alpine.store('hapusInfo', { jumlah: 0, nominal: 0 });
+    });
+
+    function tagihanManager() {
+        return {
+            selectedIds: JSON.parse(localStorage.getItem('selected_tagihan_ids')) || [],
+            tagihanToSiswaMap: JSON.parse(localStorage.getItem('tagihan_siswa_map')) || {},
+            totalTagihan: parseInt(localStorage.getItem('selected_total_nominal')) || 0,
+            totalSiswa: 0,
+            showModal: false,
+            jumlahBayarInput: 0,
+            metodePembayaran: 'tunai',
+            isLoading: false,
+
+            // ── Toast (object tunggal, meniru style komponen blade) ──
+            toast: { show: false, message: '', type: 'success', _timer: null },
+
+            showToast(message, type = 'success', duration = 6000) {
+                if (this.toast._timer) clearTimeout(this.toast._timer);
+                this.toast.message = message;
+                this.toast.type = type;
+                this.toast.show = true;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                this.toast._timer = setTimeout(() => { this.toast.show = false; }, duration);
+            },
+
+            // ── Init ────────────────────────────────────────────────
+            init() {
+                this.calculateTotalSiswa();
+                this.jumlahBayarInput = this.totalTagihan;
+
+                // Baca toast yang disimpan sebelum reload (lunasi / hapus AJAX)
+                const saved = sessionStorage.getItem('toast_data');
+                if (saved) {
+                    sessionStorage.removeItem('toast_data');
+                    const { message, type } = JSON.parse(saved);
+                    this.$nextTick(() => this.showToast(message, type));
+                }
+            },
+
+            // ── Helpers ─────────────────────────────────────────────
+            calculateTotalSiswa() {
+                this.totalSiswa = new Set(Object.values(this.tagihanToSiswaMap)).size;
+            },
+
+            saveToStorage() {
+                localStorage.setItem('selected_tagihan_ids', JSON.stringify(this.selectedIds));
+                localStorage.setItem('tagihan_siswa_map', JSON.stringify(this.tagihanToSiswaMap));
+                localStorage.setItem('selected_total_nominal', this.totalTagihan);
+            },
+
+            updateSelection(e) {
+                const id = e.target.value;
+                const nominal = parseInt(e.target.dataset.nominal) || 0;
+                const siswaId = e.target.dataset.siswaId;
+
+                if (e.target.checked) {
+                    if (!this.selectedIds.map(i => i.toString()).includes(id.toString())) {
+                        this.selectedIds.push(id);
+                        this.totalTagihan += nominal;
+                        this.tagihanToSiswaMap[id] = siswaId;
                     }
-                },
+                } else {
+                    this.selectedIds = this.selectedIds.filter(i => i.toString() !== id.toString());
+                    this.totalTagihan -= nominal;
+                    delete this.tagihanToSiswaMap[id];
+                }
 
+                this.calculateTotalSiswa();
+                this.saveToStorage();
+                this.jumlahBayarInput = this.totalTagihan;
 
-                calculateTotalSiswa() {
-                    const uniqueSiswaIds = [...new Set(Object.values(this.tagihanToSiswaMap))];
-                    this.totalSiswa = uniqueSiswaIds.length;
-                },
+                const url = new URL(window.location.href);
+                if (parseInt(url.searchParams.get('page') || '1') > 1) {
+                    url.searchParams.set('page', '1');
+                    url.searchParams.set('selected_ids', this.selectedIds.join(','));
+                    window.location.href = url.toString();
+                    return;
+                }
 
-                saveToStorage() {
-                    localStorage.setItem('selected_tagihan_ids', JSON.stringify(this.selectedIds));
-                    localStorage.setItem('tagihan_siswa_map', JSON.stringify(this.tagihanToSiswaMap));
-                    localStorage.setItem('selected_total_nominal', this.totalTagihan);
-                },
+                this.$nextTick(() => {
+                    this.sortTable();
+                    this.updatePaginationLinks();
+                });
+            },
 
-                updateSelection(e) {
-                    const id = e.target.value;
-                    const nominal = parseInt(e.target.dataset.nominal) || 0;
-                    const siswaId = e.target.dataset.siswaId;
-
-                    if (e.target.checked) {
-                        if (!this.selectedIds.map(i => i.toString()).includes(id.toString())) {
-                            this.selectedIds.push(id);
-                            this.totalTagihan += nominal;
-                            this.tagihanToSiswaMap[id] = siswaId;
-                        }
-                    } else {
-                        this.selectedIds = this.selectedIds.filter(i => i.toString() !== id.toString());
-                        this.totalTagihan -= nominal;
-                        delete this.tagihanToSiswaMap[id];
+            toggleAll(e) {
+                document.querySelectorAll('.tagihan-checkbox').forEach(cb => {
+                    if (cb.checked !== e.target.checked) {
+                        cb.checked = e.target.checked;
+                        this.updateSelection({ target: cb });
                     }
+                });
+            },
 
-                    this.calculateTotalSiswa();
-                    this.saveToStorage();
-                    this.jumlahBayarInput = this.totalTagihan;
-
-                    const url = new URL(window.location.href);
-                    const currentPage = parseInt(url.searchParams.get('page') || '1');
-
-                    if (currentPage > 1) {
-                        url.searchParams.set('page', '1');
-                        url.searchParams.set('selected_ids', this.selectedIds.join(','));
-                        window.location.href = url.toString();
-                        return;
-                    }
-
-                    this.$nextTick(() => {
-                        this.sortTable();
-                        this.updatePaginationLinks();
-                    });
-                },
-
-                toggleAll(e) {
-                    const checkboxes = document.querySelectorAll('.tagihan-checkbox');
-                    checkboxes.forEach(cb => {
-                        if (cb.checked !== e.target.checked) {
-                            cb.checked = e.target.checked;
-                            this.updateSelection({
-                                target: cb
-                            });
-                        }
-                    });
-                },
-
-                sortTable() {
-                    const tbody = document.querySelector('table tbody');
-                    if (!tbody) return;
-                    const rows = Array.from(tbody.querySelectorAll('tr'));
-                    rows.sort((a, b) => {
+            sortTable() {
+                const tbody = document.querySelector('table tbody');
+                if (!tbody) return;
+                Array.from(tbody.querySelectorAll('tr'))
+                    .sort((a, b) => {
                         const cbA = a.querySelector('.tagihan-checkbox');
                         const cbB = b.querySelector('.tagihan-checkbox');
-                        const aChecked = cbA ? this.selectedIds.map(id => id.toString()).includes(cbA.value
-                            .toString()) : false;
-                        const bChecked = cbB ? this.selectedIds.map(id => id.toString()).includes(cbB.value
-                            .toString()) : false;
-                        if (aChecked && !bChecked) return -1;
-                        if (!aChecked && bChecked) return 1;
-                        return 0;
+                        const aChecked = cbA ? this.selectedIds.map(id => id.toString()).includes(cbA.value.toString()) : false;
+                        const bChecked = cbB ? this.selectedIds.map(id => id.toString()).includes(cbB.value.toString()) : false;
+                        return aChecked === bChecked ? 0 : aChecked ? -1 : 1;
+                    })
+                    .forEach(row => tbody.appendChild(row));
+            },
+
+            updatePaginationLinks() {
+                const ids = this.selectedIds.join(',');
+                document.querySelectorAll('[aria-label="Pagination"] a, nav[aria-label="Pagination"] a, .pagination a')
+                    .forEach(link => {
+                        if (!link.href || link.href === '#') return;
+                        try {
+                            const url = new URL(link.href);
+                            ids ? url.searchParams.set('selected_ids', ids) : url.searchParams.delete('selected_ids');
+                            link.href = url.toString();
+                        } catch (e) {}
                     });
-                    rows.forEach(row => tbody.appendChild(row));
-                },
+            },
 
-                updatePaginationLinks() {
-                    const ids = this.selectedIds.join(',');
-                    document.querySelectorAll('[aria-label="Pagination"] a, nav[aria-label="Pagination"] a, .pagination a')
-                        .forEach(link => {
-                            if (!link.href || link.href === '#') return;
-                            try {
-                                const url = new URL(link.href);
-                                if (ids) {
-                                    url.searchParams.set('selected_ids', ids);
-                                } else {
-                                    url.searchParams.delete('selected_ids');
-                                }
-                                link.href = url.toString();
-                            } catch (e) {}
-                        });
-                },
+            clearSelection() {
+                document.querySelectorAll('.tagihan-checkbox').forEach(cb => cb.checked = false);
+                this.selectedIds = [];
+                this.tagihanToSiswaMap = {};
+                this.totalTagihan = 0;
+                this.totalSiswa = 0;
+                this.jumlahBayarInput = 0;
+                localStorage.removeItem('selected_tagihan_ids');
+                localStorage.removeItem('tagihan_siswa_map');
+                localStorage.removeItem('selected_total_nominal');
+                this.updatePaginationLinks();
+            },
 
-                clearSelection() {
-                    document.querySelectorAll('.tagihan-checkbox').forEach(cb => {
-                        cb.checked = false;
+            // ── LUNASI (AJAX) ────────────────────────────────────────
+            submitPembayaran() {
+                this.jumlahBayarInput = this.totalTagihan;
+                this.showModal = true;
+            },
+
+            async executePayment() {
+                if (this.jumlahBayarInput <= 0) return;
+                this.isLoading = true;
+
+                try {
+                    const response = await fetch("{{ route('admin.keuangan.pembayaran.store') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            tagihan_ids: this.selectedIds,
+                            jumlah_bayar_total: this.jumlahBayarInput,
+                            metode: this.metodePembayaran
+                        })
                     });
 
-                    this.selectedIds = [];
-                    this.tagihanToSiswaMap = {};
-                    this.totalTagihan = 0;
-                    this.totalSiswa = 0;
-                    this.jumlahBayarInput = 0;
+                    const result = await response.json();
+                    this.showModal = false;
+
+                    // Bersihkan pilihan lalu simpan pesan → reload
+                    localStorage.removeItem('selected_tagihan_ids');
+                    localStorage.removeItem('tagihan_siswa_map');
+                    localStorage.removeItem('selected_total_nominal');
+
+                    sessionStorage.setItem('toast_data', JSON.stringify({
+                        message: result.message || (result.success ? 'Pembayaran berhasil diproses!' : 'Pembayaran gagal diproses.'),
+                        type: result.success ? 'success' : 'error'
+                    }));
+
+                    window.location.href = window.location.pathname + window.location.search;
+
+                } catch (error) {
+                    this.showModal = false;
+                    sessionStorage.setItem('toast_data', JSON.stringify({
+                        message: 'Koneksi gagal. Silakan coba lagi.',
+                        type: 'error'
+                    }));
+                    window.location.href = window.location.pathname + window.location.search;
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+
+            // ── HAPUS MASSAL (AJAX) ──────────────────────────────────
+            submitHapus() {
+                if (this.selectedIds.length === 0) return;
+                Alpine.store('hapusInfo', {
+                    jumlah: this.selectedIds.length,
+                    nominal: this.totalTagihan
+                });
+                this.$dispatch('open-modal', 'modal-hapus-tagihan');
+            },
+
+            async executeHapus() {
+                try {
+                    const jumlah = this.selectedIds.length; // simpan sebelum dikosongkan
+
+                    const response = await fetch("{{ route('admin.keuangan.tagihan.destroy-bulk') }}", {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({ tagihan_ids: this.selectedIds })
+                    });
+
+                    const result = await response.json();
+                    this.$dispatch('close');
 
                     localStorage.removeItem('selected_tagihan_ids');
                     localStorage.removeItem('tagihan_siswa_map');
                     localStorage.removeItem('selected_total_nominal');
 
-                    this.updatePaginationLinks();
-                },
+                    sessionStorage.setItem('toast_data', JSON.stringify({
+                        message: result.message || (result.success
+                            ? `${jumlah} tagihan berhasil dihapus.`
+                            : 'Gagal menghapus tagihan.'),
+                        type: result.success ? 'success' : 'error'
+                    }));
 
-                submitPembayaran() {
-                    this.jumlahBayarInput = this.totalTagihan;
-                    this.showModal = true;
-                },
+                    window.location.href = window.location.pathname + window.location.search;
 
-                async executePayment() {
-                    if (this.jumlahBayarInput <= 0) return;
-
-                    this.isLoading = true; // mulai loading
-
-                    try {
-                        const response = await fetch("{{ route('admin.keuangan.pembayaran.store') }}", {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json', // ← ini yang bikin global handler aktif
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            body: JSON.stringify({
-                                tagihan_ids: this.selectedIds,
-                                jumlah_bayar_total: this.jumlahBayarInput,
-                                metode: this.metodePembayaran // ← ambil dari dropdown di modal
-                            })
-                        });
-
-                        const result = await response.json();
-
-                        if (result.success) {
-                            // bersihkan localStorage lalu reload
-                            localStorage.removeItem('selected_tagihan_ids');
-                            localStorage.removeItem('tagihan_siswa_map');
-                            localStorage.removeItem('selected_total_nominal');
-                            sessionStorage.setItem('toast_success', result.message);
-                            window.location.reload();
-                        } else {
-                            // tampilkan modal error
-                            this.showModal = false;
-                            this.errorMessage = result.message ?? 'Terjadi kesalahan.';
-                            this.showModalError = true;
-                        }
-
-                    } catch (error) {
-                        // catch ini hanya untuk error jaringan (internet putus, dll)
-                        this.showModal = false;
-                        this.errorMessage = 'Koneksi gagal. Coba lagi.';
-                        this.showModalError = true;
-                    } finally {
-                        this.isLoading = false; // selesai loading
-                    }
-                },
-
-                // --- Method Baru Untuk Hapus Massal ---
-                submitHapus() {
-                    if (this.selectedIds.length === 0) return alert('Pilih tagihan terlebih dahulu');
-
-                    // Simpan info ke Alpine store agar bisa dibaca modal
-                    Alpine.store('hapusInfo', {
-                        jumlah: this.selectedIds.length,
-                        nominal: this.totalTagihan
-                    });
-
-                    this.$dispatch('open-modal', 'modal-hapus-tagihan');
-                },
-
-                async executeHapus() {
-                    try {
-                        const response = await fetch("{{ route('admin.keuangan.tagihan.destroy-bulk') }}", {
-                            method: 'DELETE',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
-                            body: JSON.stringify({
-                                tagihan_ids: this.selectedIds
-                            })
-                        });
-                        const result = await response.json();
-                        if (result.success) {
-                            localStorage.removeItem('selected_tagihan_ids');
-                            localStorage.removeItem('tagihan_siswa_map');
-                            localStorage.removeItem('selected_total_nominal');
-                            this.showModalHapus = false;
-                            window.location.reload();
-                        } else {
-                            alert('Gagal: ' + result.message);
-                        }
-                    } catch (error) {
-                        console.error(error);
-                        alert('Terjadi kesalahan sistem.');
-                    }
+                } catch (error) {
+                    this.$dispatch('close');
+                    sessionStorage.setItem('toast_data', JSON.stringify({
+                        message: 'Terjadi kesalahan sistem. Silakan coba lagi.',
+                        type: 'error'
+                    }));
+                    window.location.href = window.location.pathname + window.location.search;
                 }
             }
         }
-    </script>
+    }
+</script>
 </x-app-layout>

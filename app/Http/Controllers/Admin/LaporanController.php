@@ -8,7 +8,7 @@ use App\Models\Kelas;
 use App\Models\MasterTagihan;
 use App\Models\RiwayatAkademik;
 use App\Models\TagihanSpp;
-use Illuminate\Http\Request;   // ← WAJIB: pakai Facades\Excel, bukan Excel langsung
+use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
 class LaporanController extends Controller
@@ -16,9 +16,9 @@ class LaporanController extends Controller
     public function index(Request $request)
     {
         $kelasList = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
-        $tahun = $request->get('tahun', date('Y'));
-        $periode = $request->get('periode', 'ganjil');
-        $perPage = $request->get('per_page', 300);
+        $tahun     = $request->get('tahun', date('Y'));
+        $periode   = $request->get('periode', 'ganjil');
+        $perPage   = $request->get('per_page', 300);
 
         $bulanList = ($periode === 'ganjil')
             ? ['Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
@@ -32,6 +32,15 @@ class LaporanController extends Controller
 
         if ($request->filled('kelas_id')) {
             $query->where('riwayat_akademiks.kelas_id', $request->kelas_id);
+        }
+
+        // ── Filter Search ──────────────────────────────────────────────────
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('siswa', fn ($q) => $q
+                ->where('nama_lengkap', 'LIKE', "%{$search}%")
+                ->orWhere('nisn', 'LIKE', "%{$search}%")
+            );
         }
 
         $query->join('kelas', 'riwayat_akademiks.kelas_id', '=', 'kelas.id')
@@ -61,17 +70,15 @@ class LaporanController extends Controller
 
     public function export(Request $request)
     {
-        $tahun = $request->get('tahun', date('Y'));
+        $tahun   = $request->get('tahun', date('Y'));
         $periode = $request->get('periode', 'ganjil');
-        $kelasId = $request->get('kelas_id'); //
+        $kelasId = $request->get('kelas_id');
 
-        // 1. Tentukan Nama Kelas untuk Filename
-        $namaKelas = 'Semua_Kelas'; // Default jika tidak ada filter kelas
+        $namaKelas = 'Semua_Kelas';
         if ($request->filled('kelas_id')) {
             $kelas = Kelas::find($kelasId);
             if ($kelas) {
-                // Menggabungkan tingkat dan nama (misal: Kelas_7_A)
-                $namaKelas = 'Kelas_'.$kelas->tingkat.'_'.$kelas->nama_kelas;
+                $namaKelas = 'Kelas_' . $kelas->tingkat . '_' . $kelas->nama_kelas;
             }
         }
 
@@ -91,6 +98,15 @@ class LaporanController extends Controller
             $query->where('riwayat_akademiks.kelas_id', $kelasId);
         }
 
+        // ── Filter Search (ikut saat export) ──────────────────────────────
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(fn ($q) => $q
+                ->where('siswas.nama_lengkap', 'LIKE', "%{$search}%")
+                ->orWhere('siswas.nisn', 'LIKE', "%{$search}%")
+            );
+        }
+
         $siswas = $query->orderBy('kelas.tingkat')
             ->orderBy('kelas.nama_kelas')
             ->orderBy('siswas.nama_lengkap')
@@ -107,9 +123,7 @@ class LaporanController extends Controller
             $tagihans[$t->riwayat_akademik_id][$t->master_tagihan_id][$bulanKey] = $t;
         }
 
-        $data = compact('siswas', 'tagihans', 'bulanList', 'masterTagihans', 'periode', 'tahun');
-
-        // 2. Gunakan $namaKelas di dalam $filename
+        $data     = compact('siswas', 'tagihans', 'bulanList', 'masterTagihans', 'periode', 'tahun');
         $filename = "Laporan_Keuangan_{$namaKelas}_{$periode}_{$tahun}.xlsx";
 
         return Excel::download(new LaporanPembayaranExport($data), $filename);

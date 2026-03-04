@@ -179,29 +179,38 @@ class TagihanSiswaController extends Controller
         });
     }
 
-    public function destroyBulk(Request $request)
-    {
-        $request->validate([
-            'tagihan_ids' => 'required|array',
-            'tagihan_ids.*' => 'exists:tagihan_spps,id',
-        ], [
-            'tagihan_ids.required' => 'Pilih setidaknya satu tagihan untuk dihapus.',
-            'tagihan_ids.*.exists' => 'Salah satu tagihan tidak ditemukan atau sudah dihapus.',
+public function destroyBulk(Request $request)
+{
+    $request->validate([
+        'tagihan_ids'   => 'required|array',
+        'tagihan_ids.*' => 'exists:tagihan_spps,id',
+    ], [
+        'tagihan_ids.required'  => 'Pilih setidaknya satu tagihan untuk dihapus.',
+        'tagihan_ids.*.exists'  => 'Salah satu tagihan tidak ditemukan atau sudah dihapus.',
+    ]);
+
+    try {
+        $deletedCount = TagihanSpp::whereIn('id', $request->tagihan_ids)
+            ->where('status', 'belum_lunas')
+            ->delete();
+
+        if ($deletedCount === 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal. Hanya tagihan berstatus BELUM LUNAS yang bisa dihapus.',
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => "{$deletedCount} tagihan berhasil dihapus dari sistem.",
         ]);
 
-        try {
-            $deletedCount = TagihanSpp::whereIn('id', $request->tagihan_ids)
-                ->where('status', 'belum_lunas')
-                ->delete();
-
-            if ($deletedCount === 0) {
-                return back()->with('error', 'Gagal. Hanya tagihan berstatus BELUM LUNAS yang bisa dihapus.');
-            }
-
-            return back()->with('success', "$deletedCount tagihan berhasil dihapus dari sistem.");
-
-        } catch (\Exception $e) {
-            return back()->with('error', 'Terjadi kesalahan sistem: '.$e->getMessage());
-        }
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage(),
+        ], 500);
     }
+}
 }
