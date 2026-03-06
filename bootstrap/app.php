@@ -13,15 +13,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // 1. Alias Middleware kamu yang lama
         $middleware->alias([
             'force.change.password' => \App\Http\Middleware\EnsurePasswordIsChanged::class,
             'role' => \App\Http\Middleware\CheckRole::class,
         ]);
 
-        // 2. ✅ Tambahan Pengecualian CSRF untuk Midtrans
+        // ini sesuai dengan URL yang kamu daftarkan di dashboard Midtrans
         $middleware->validateCsrfTokens(except: [
             'webhook/midtrans',
+            'api/webhook/midtrans', // Tambahkan ini jika route kamu ada di api.php
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
@@ -34,7 +34,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     return response()->json([
                         'success' => false,
                         'message' => 'Data tidak valid.',
-                        'errors'  => $e->errors(),
+                        'errors' => $e->errors(),
                     ], 422);
                 }
 

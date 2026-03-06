@@ -13,7 +13,8 @@ class TagihanSpp extends Model
 
     protected $fillable = [
         'master_tagihan_id', 'riwayat_akademik_id',
-        'bulan', 'tahun', 'jumlah_tagihan', 'terbayar', 'status',
+        'bulan', 'tahun', 'jumlah_tagihan', 'terbayar', 'status','snap_token',        // TAMBAHKAN INI
+        'midtrans_order_id'
     ];
 
     public function masterTagihan() // Ubah dari master_tagihan menjadi masterTagihan

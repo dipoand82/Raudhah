@@ -174,9 +174,20 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'verified', 'role:siswa'])->prefix('siswa')->name('siswa.')->group(function () {
-    // HAPUS "DashboardController as" di sini, cukup panggil SiswaDashboard
+
+    // Dashboard Utama Siswa (Menggunakan index dari DashboardController)
     Route::get('/dashboard', [SiswaDashboard::class, 'index'])->name('dashboard');
-    Route::get('/keuangan/riwayat', [KeuanganController::class, 'riwayat'])->name('keuangan.riwayat');
-    Route::get('/keuangan/bayar/{tagihan}', [KeuanganController::class, 'bayar'])->name('keuangan.bayar');
-    Route::get('/keuangan/sukses', [KeuanganController::class, 'sukses'])->name('keuangan.bayar.sukses');
+
+    // Fitur Keuangan
+    Route::prefix('keuangan')->name('keuangan.')->group(function () {
+
+        // 1. Riwayat Pembayaran
+        Route::get('/riwayat', [KeuanganController::class, 'riwayat'])->name('riwayat');
+
+        // 2. Endpoint AJAX untuk mendapatkan Snap Token Midtrans (Tanpa pindah halaman)
+        // Pastikan di Controller namanya: getSnapToken
+        Route::post('/snap-token/{tagihan}', [KeuanganController::class, 'getSnapToken'])->name('snap-token');
+        // 3. Halaman sukses setelah pembayaran (Callback dari Midtrans)
+        Route::get('/pembayaran/detail-sukses', [KeuanganController::class, 'getDetailSukses'])->name('detail-sukses');
+    });
 });
