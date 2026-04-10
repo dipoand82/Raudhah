@@ -10,6 +10,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        // Mengambil data siswa yang sedang login
         $user  = Auth::user();
         $siswa = $user->siswa;
 
@@ -27,11 +28,11 @@ class DashboardController extends Controller
 
         $totalTagihan      = $semuaTagihan->count();
         $sudahLunas        = $semuaTagihan->where('status', 'lunas')->count();
-        $belumLunas        = $semuaTagihan->whereIn('status', ['belum_lunas', 'cicilan'])->count();
+        $belumLunas        = $semuaTagihan->whereIn('status', ['belum_lunas', 'cicilan','pending'])->count();
 
         // Tagihan yang belum lunas untuk ditampilkan di dashboard
         $tagihanBelumLunas = $semuaTagihan
-            ->whereIn('status', ['belum_lunas', 'cicilan'])
+            ->whereIn('status', ['belum_lunas', 'cicilan','pending'])
             ->sortBy('tahun')
             ->values();
 

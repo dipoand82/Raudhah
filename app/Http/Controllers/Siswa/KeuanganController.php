@@ -26,7 +26,7 @@ class KeuanganController extends Controller
         $tagihanBelumLunas = TagihanSpp::whereHas('riwayatAkademik', function ($q) use ($siswa) {
             $q->where('siswa_id', $siswa->id);
         })
-            ->whereIn('status', ['belum_lunas', 'cicilan'])
+            ->whereIn('status', ['belum_lunas', 'cicilan','pending'])
             ->with('masterTagihan')
             ->orderBy('bulan', 'asc')
             ->get();

@@ -6,9 +6,9 @@
     </x-slot>
 
     {{-- Midtrans Snap JS (load sekali di sini) --}}
-    @if(config('services.midtrans.is_production'))
-        <script src="https://app.midtrans.com/snap/snap.js"
-            data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+    @if (config('services.midtrans.is_production'))
+        <script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ config('services.midtrans.client_key') }}">
+        </script>
     @else
         <script src="https://app.sandbox.midtrans.com/snap/snap.js"
             data-client-key="{{ config('services.midtrans.client_key') }}"></script>
@@ -17,7 +17,9 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
 
         /* Modal Backdrop */
         #modal-backdrop {
@@ -30,6 +32,7 @@
             align-items: center;
             justify-content: center;
         }
+
         #modal-backdrop.active {
             display: flex;
             animation: fadeIn 0.2s ease;
@@ -48,6 +51,7 @@
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             overflow: hidden;
         }
+
         #modal-backdrop.active #modal-box {
             transform: translateY(0);
             opacity: 1;
@@ -68,13 +72,17 @@
             padding: 10px 0;
             border-bottom: 1px dashed #f0f0f0;
         }
-        .detail-row:last-child { border-bottom: none; }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
 
         /* Loading spinner */
         .spinner {
             display: inline-block;
-            width: 18px; height: 18px;
-            border: 2px solid rgba(255,255,255,0.4);
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
             border-top-color: white;
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
@@ -85,31 +93,72 @@
         /* Pulse badge */
         .pulse-dot {
             display: inline-block;
-            width: 8px; height: 8px;
+            width: 8px;
+            height: 8px;
             background: #22c55e;
             border-radius: 50%;
             margin-right: 6px;
-            box-shadow: 0 0 0 0 rgba(34,197,94,0.5);
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
             animation: pulse 1.5s infinite;
         }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.5); }
-            70% { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
-            100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
+            }
+
+            70% {
+                box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+            }
         }
+
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
+
         .card-animate {
             animation: slideUp 0.4s ease both;
         }
-        .card-animate:nth-child(1) { animation-delay: 0.05s; }
-        .card-animate:nth-child(2) { animation-delay: 0.1s; }
-        .card-animate:nth-child(3) { animation-delay: 0.15s; }
+
+        .card-animate:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .card-animate:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .card-animate:nth-child(3) {
+            animation-delay: 0.15s;
+        }
     </style>
 
     <div class="py-10">
@@ -141,7 +190,8 @@
                     <div class="flex items-center justify-between">
                         <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Total Tagihan</p>
                         <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background:#e8f2fb;">
-                            <svg class="w-4 h-4" style="color:#1072B8;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4" style="color:#1072B8;" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
@@ -150,11 +200,13 @@
                     <p class="text-3xl font-extrabold text-gray-900">{{ $totalTagihan ?? 0 }}</p>
                 </div>
 
-                <div class="card-animate bg-white rounded-2xl p-5 shadow-sm border border-orange-100 flex flex-col gap-2">
+                <div
+                    class="card-animate bg-white rounded-2xl p-5 shadow-sm border border-orange-100 flex flex-col gap-2">
                     <div class="flex items-center justify-between">
                         <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Belum Lunas</p>
                         <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-orange-50">
-                            <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
                             </svg>
@@ -163,11 +215,13 @@
                     <p class="text-3xl font-extrabold text-orange-500">{{ $belumLunas ?? 0 }}</p>
                 </div>
 
-                <div class="card-animate bg-white rounded-2xl p-5 shadow-sm border border-green-100 flex flex-col gap-2">
+                <div
+                    class="card-animate bg-white rounded-2xl p-5 shadow-sm border border-green-100 flex flex-col gap-2">
                     <div class="flex items-center justify-between">
                         <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Sudah Lunas</p>
                         <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-green-50">
-                            <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
@@ -186,61 +240,69 @@
                     </span>
                 </div>
 
-                @forelse($tagihanBelumLunas ?? [] as $tagihan)
-                    <div class="px-6 py-5 border-b border-gray-100 last:border-b-0 hover:bg-gray-50/60 transition-colors duration-150">
-
-                        {{-- Baris Atas --}}
-                        <div class="flex items-start justify-between gap-3 mb-3">
-                            <div>
-                                <div class="flex items-center gap-2 flex-wrap">
-                                    <p class="font-bold text-gray-900 text-sm">
-                                        {{ $tagihan->masterTagihan->nama_tagihan }}
-                                        @if($tagihan->bulan)
-                                            Bulan {{ $tagihan->bulan }} {{ $tagihan->tahun }}
+                <div class="p-4 space-y-4 bg-gray-50/30">
+                    @forelse($tagihanBelumLunas ?? [] as $tagihan)
+                        <div
+                            class="px-6 py-5 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-200">
+                            {{-- Baris Atas --}}
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <div>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <p class="font-bold text-gray-900 text-sm">
+                                            {{ $tagihan->masterTagihan->nama_tagihan }}
+                                            @if ($tagihan->bulan)
+                                                Bulan {{ $tagihan->bulan }} {{ $tagihan->tahun }}
+                                            @endif
+                                        </p>
+                                        @if ($tagihan->status === 'cicilan')
+                                            <span
+                                                class="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-100 text-orange-700 border border-orange-200">Cicilan</span>
+                                        @else
+                                            <span
+                                                class="px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">Belum
+                                                Lunas</span>
                                         @endif
-                                    </p>
-                                    @if($tagihan->status === 'cicilan')
-                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-100 text-orange-700 border border-orange-200">Cicilan</span>
-                                    @else
-                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">Belum Lunas</span>
-                                    @endif
-                                </div>
-                                <p class="text-xs text-gray-400 mt-0.5">{{ $tagihan->bulan }} {{ $tagihan->tahun }}</p>
-                            </div>
-                            <div class="text-right flex-shrink-0">
-                                <p class="text-[10px] text-gray-400 mb-0.5">Jumlah</p>
-                                <p class="text-base font-extrabold text-blue-600">
-                                    Rp {{ number_format($tagihan->jumlah_tagihan, 0, ',', '.') }}
-                                </p>
-                            </div>
-                        </div>
-
-                        {{-- Baris Info --}}
-                        <div class="grid grid-cols-2 gap-4 text-xs mb-4">
-                            <div>
-                                <p class="text-gray-400 mb-0.5">Jatuh Tempo</p>
-                                <p class="font-semibold text-gray-700">
-                                    {{ $tagihan->jatuh_tempo ? \Carbon\Carbon::parse($tagihan->jatuh_tempo)->format('d F Y') : '-' }}
-                                </p>
-                            </div>
-                            <div>
-                                <p class="text-gray-400 mb-0.5">Kategori</p>
-                                <p class="font-semibold text-gray-700">{{ $tagihan->masterTagihan->nama_tagihan ?? '-' }}</p>
-                            </div>
-                            @if($tagihan->terbayar > 0)
-                                <div class="col-span-2">
-                                    <p class="text-gray-400 mb-0.5">Sudah Dibayar</p>
-                                    <p class="font-semibold text-orange-600">
-                                        Rp {{ number_format($tagihan->terbayar, 0, ',', '.') }}
-                                        (Sisa: Rp {{ number_format($tagihan->jumlah_tagihan - $tagihan->terbayar, 0, ',', '.') }})
+                                    </div>
+                                    <p class="text-xs text-gray-400 mt-0.5">{{ $tagihan->bulan }}
+                                        {{ $tagihan->tahun }}
                                     </p>
                                 </div>
-                            @endif
-                        </div>
+                                <div class="text-right flex-shrink-0">
+                                    <p class="text-[10px] text-gray-400 mb-0.5">Jumlah</p>
+                                    <p class="text-base font-extrabold text-blue-600">
+                                        Rp {{ number_format($tagihan->jumlah_tagihan, 0, ',', '.') }}
+                                    </p>
+                                </div>
+                            </div>
 
-                        {{--TOMBOL BAYAR — panggil modal dengan teks dinamis --}}
-                        <button
-                            onclick="bukaModalBayar({
+                            {{-- Baris Info --}}
+                            <div class="grid grid-cols-2 gap-4 text-xs mb-4">
+                                <div>
+                                    <p class="text-gray-400 mb-0.5">Jatuh Tempo</p>
+                                    <p class="font-semibold text-gray-700">
+                                        {{ $tagihan->jatuh_tempo ? \Carbon\Carbon::parse($tagihan->jatuh_tempo)->format('d F Y') : '-' }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-400 mb-0.5">Kategori</p>
+                                    <p class="font-semibold text-gray-700">
+                                        {{ $tagihan->masterTagihan->nama_tagihan ?? '-' }}</p>
+                                </div>
+                                @if ($tagihan->terbayar > 0)
+                                    <div class="col-span-2">
+                                        <p class="text-gray-400 mb-0.5">Sudah Dibayar</p>
+                                        <p class="font-semibold text-orange-600">
+                                            Rp {{ number_format($tagihan->terbayar, 0, ',', '.') }}
+                                            (Sisa: Rp
+                                            {{ number_format($tagihan->jumlah_tagihan - $tagihan->terbayar, 0, ',', '.') }})
+                                        </p>
+                                    </div>
+                                @endif
+                            </div>
+
+                            {{-- TOMBOL BAYAR — panggil modal dengan teks dinamis --}}
+                            <button
+                                onclick="bukaModalBayar({
                                 id: {{ $tagihan->id }},
                                 nama: '{{ addslashes($tagihan->masterTagihan->nama_tagihan) }}',
                                 bulan: '{{ $tagihan->bulan }} {{ $tagihan->tahun }}',
@@ -248,329 +310,350 @@
                                 terbayar: {{ $tagihan->terbayar ?? 0 }},
                                 jatuh_tempo: '{{ $tagihan->jatuh_tempo ? \Carbon\Carbon::parse($tagihan->jatuh_tempo)->format('d F Y') : '-' }}'
                             })"
-                            class="w-full text-center py-3 rounded-xl text-white font-bold text-sm transition hover:opacity-90 active:scale-95 cursor-pointer"
-                            style="background: {{ $tagihan->status === 'pending' ? 'linear-gradient(90deg, #F59E0B 0%, #D97706 100%)' : 'linear-gradient(90deg, #1072B8 0%, #0d5a91 100%)' }};">
+                                class="w-full text-center py-3 rounded-xl text-white font-bold text-sm transition hover:opacity-90 active:scale-95 cursor-pointer"
+                                style="background: {{ $tagihan->status === 'pending' ? 'linear-gradient(90deg, #F59E0B 0%, #D97706 100%)' : 'linear-gradient(90deg, #1072B8 0%, #0d5a91 100%)' }};">
 
-                            @if($tagihan->status === 'pending')
-                                <div class="flex items-center justify-center gap-2">
-                                    <svg class="w-4 h-4 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    Lanjutkan Pembayaran
-                                </div>
-                            @else
-                                Bayar Sekarang
-                            @endif
-                        </button>
-                    </div>
-                @empty
-                    <div class="px-6 py-14 text-center">
-                        <div class="w-14 h-14 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-3">
-                            <svg class="w-7 h-7 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                    clip-rule="evenodd" />
-                            </svg>
+                                @if ($tagihan->status === 'pending')
+                                    <div class="flex items-center justify-center gap-2">
+                                        <svg class="w-4 h-4 animate-pulse" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Lanjutkan Pembayaran
+                                    </div>
+                                @else
+                                    Bayar Sekarang
+                                @endif
+                            </button>
                         </div>
-                        <p class="font-bold text-gray-700 text-sm">Semua tagihan sudah lunas!</p>
-                        <p class="text-xs text-gray-400 mt-1">Tidak ada tagihan yang perlu dibayar saat ini.</p>
-                    </div>
-                @endforelse
+                    @empty
+                        <div class="px-6 py-14 text-center">
+                            <div
+                                class="w-14 h-14 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-3">
+                                <svg class="w-7 h-7 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <p class="font-bold text-gray-700 text-sm">Semua tagihan sudah lunas!</p>
+                            <p class="text-xs text-gray-400 mt-1">Tidak ada tagihan yang perlu dibayar saat ini.</p>
+                        </div>
+                    @endforelse
+                </div>
+
             </div>
-
         </div>
-    </div>
 
-    {{-- =========================================
+        {{-- =========================================
          MODAL KONFIRMASI PEMBAYARAN
          ========================================= --}}
-    <div id="modal-backdrop" onclick="tutupModal(event)">
-        <div id="modal-box">
+        <div id="modal-backdrop" onclick="tutupModal(event)">
+            <div id="modal-box">
 
-            {{-- Modal Header --}}
-            <div class="modal-header">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-blue-200 text-xs font-medium mb-0.5">Konfirmasi Pembayaran</p>
-                        <h3 class="text-white text-lg font-bold" id="modal-nama-tagihan">—</h3>
+                {{-- Modal Header --}}
+                <div class="modal-header">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-200 text-xs font-medium mb-0.5">Konfirmasi Pembayaran</p>
+                            <h3 class="text-white text-lg font-bold" id="modal-nama-tagihan">—</h3>
+                        </div>
+                        <button onclick="tutupModal(null, true)"
+                            class="w-8 h-8 rounded-full flex items-center justify-center transition hover:bg-white/20"
+                            style="color: rgba(255,255,255,0.7);">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
                     </div>
-                    <button onclick="tutupModal(null, true)"
-                        class="w-8 h-8 rounded-full flex items-center justify-center transition hover:bg-white/20"
-                        style="color: rgba(255,255,255,0.7);">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    {{-- Ikon QRIS kecil --}}
+                    <div class="mt-3 inline-flex items-center gap-1.5 bg-white/15 rounded-lg px-3 py-1.5">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                         </svg>
+                        <span class="text-white text-xs font-semibold">Bayar via QRIS</span>
+                    </div>
+                </div>
+
+                {{-- Modal Body --}}
+                <div class="p-6">
+
+                    {{-- Detail rows --}}
+                    <div class="mb-5">
+                        <div class="detail-row">
+                            <span class="text-xs text-gray-400 font-medium">Periode</span>
+                            <span class="text-xs font-semibold text-gray-700" id="modal-periode">—</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="text-xs text-gray-400 font-medium">Jatuh Tempo</span>
+                            <span class="text-xs font-semibold text-gray-700" id="modal-jatuh-tempo">—</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="text-xs text-gray-400 font-medium">Nominal Tagihan</span>
+                            <span class="text-xs font-semibold text-gray-800" id="modal-nominal">—</span>
+                        </div>
+                        <div class="detail-row" id="modal-row-terbayar" style="display:none;">
+                            <span class="text-xs text-gray-400 font-medium">Sudah Dibayar</span>
+                            <span class="text-xs font-semibold text-orange-500" id="modal-terbayar">—</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="text-xs text-orange-500 font-medium">Biaya Layanan QRIS (0.7%)</span>
+                            <span class="text-xs font-semibold text-orange-500" id="modal-fee">—</span>
+                        </div>
+                    </div>
+
+                    {{-- Total --}}
+                    <div class="rounded-xl p-4 mb-5"
+                        style="background: linear-gradient(135deg, #e8f2fb 0%, #dceefa 100%); border: 1px solid #c3dff5;">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-bold text-gray-700">Total Bayar</span>
+                            <span class="text-xl font-extrabold" style="color:#1072B8;" id="modal-total">—</span>
+                        </div>
+                    </div>
+
+                    {{-- Info --}}
+                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 mb-5">
+                        <p class="text-xs text-blue-600 leading-relaxed">
+                            <span class="font-bold">ℹ️ Cara bayar:</span> Klik tombol di bawah, QR Code akan muncul.
+                            Scan
+                            menggunakan GoPay, OVO, Dana, atau mobile banking.
+                        </p>
+                    </div>
+
+                    {{-- Tombol Bayar --}}
+                    <button id="modal-pay-btn" onclick="prosessPembayaran()"
+                        class="w-full py-3.5 rounded-xl text-white font-bold text-sm transition active:scale-95 flex items-center justify-center gap-2"
+                        style="background: linear-gradient(90deg, #1072B8 0%, #0d5a91 100%); box-shadow: 0 4px 15px rgba(16,114,184,0.35);">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                        </svg>
+                        Buka QR Code & Bayar
+                    </button>
+
+                    <button onclick="tutupModal(null, true)"
+                        class="w-full mt-2.5 py-2.5 rounded-xl text-gray-400 text-sm font-medium hover:text-gray-600 hover:bg-gray-50 transition">
+                        Batalkan
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+        <div id="modal-success-backdrop"
+            class="fixed inset-0 z-[1000] hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm">
+            <div class="bg-white rounded-3xl w-full max-w-sm m-4 overflow-hidden shadow-2xl transform transition-all">
+                <div class="p-8 text-center">
+                    <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-10 h-10 text-green-500" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-extrabold text-gray-900 mb-2">Pembayaran Berhasil!</h3>
+                    <p class="text-gray-500 text-sm mb-6">Tagihan Anda telah lunas dan tercatat di sistem.</p>
+
+                    <div class="bg-gray-50 rounded-2xl p-4 text-left mb-6 space-y-2 border border-gray-100">
+                        <div class="flex justify-between text-xs">
+                            <span class="text-gray-400">Order ID</span>
+                            <span class="font-bold text-gray-700" id="success-order-id">-</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-gray-400">Item</span>
+                            <span class="font-bold text-gray-700" id="success-item">-</span>
+                        </div>
+                        <div class="flex justify-between pt-2 border-t border-dashed border-gray-200">
+                            <span class="text-sm font-bold text-gray-700">Total</span>
+                            <span class="text-sm font-extrabold text-blue-600">Rp <span
+                                    id="success-total">0</span></span>
+                        </div>
+                    </div>
+
+                    <button onclick="location.reload()"
+                        class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition">
+                        Selesai
                     </button>
                 </div>
-                {{-- Ikon QRIS kecil --}}
-                <div class="mt-3 inline-flex items-center gap-1.5 bg-white/15 rounded-lg px-3 py-1.5">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
-                    </svg>
-                    <span class="text-white text-xs font-semibold">Bayar via QRIS</span>
-                </div>
-            </div>
-
-            {{-- Modal Body --}}
-            <div class="p-6">
-
-                {{-- Detail rows --}}
-                <div class="mb-5">
-                    <div class="detail-row">
-                        <span class="text-xs text-gray-400 font-medium">Periode</span>
-                        <span class="text-xs font-semibold text-gray-700" id="modal-periode">—</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="text-xs text-gray-400 font-medium">Jatuh Tempo</span>
-                        <span class="text-xs font-semibold text-gray-700" id="modal-jatuh-tempo">—</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="text-xs text-gray-400 font-medium">Nominal Tagihan</span>
-                        <span class="text-xs font-semibold text-gray-800" id="modal-nominal">—</span>
-                    </div>
-                    <div class="detail-row" id="modal-row-terbayar" style="display:none;">
-                        <span class="text-xs text-gray-400 font-medium">Sudah Dibayar</span>
-                        <span class="text-xs font-semibold text-orange-500" id="modal-terbayar">—</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="text-xs text-orange-500 font-medium">Biaya Layanan QRIS (0.7%)</span>
-                        <span class="text-xs font-semibold text-orange-500" id="modal-fee">—</span>
-                    </div>
-                </div>
-
-                {{-- Total --}}
-                <div class="rounded-xl p-4 mb-5" style="background: linear-gradient(135deg, #e8f2fb 0%, #dceefa 100%); border: 1px solid #c3dff5;">
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm font-bold text-gray-700">Total Bayar</span>
-                        <span class="text-xl font-extrabold" style="color:#1072B8;" id="modal-total">—</span>
-                    </div>
-                </div>
-
-                {{-- Info --}}
-                <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 mb-5">
-                    <p class="text-xs text-blue-600 leading-relaxed">
-                        <span class="font-bold">ℹ️ Cara bayar:</span> Klik tombol di bawah, QR Code akan muncul. Scan menggunakan GoPay, OVO, Dana, atau mobile banking.
-                    </p>
-                </div>
-
-                {{-- Tombol Bayar --}}
-                <button id="modal-pay-btn" onclick="prosessPembayaran()"
-                    class="w-full py-3.5 rounded-xl text-white font-bold text-sm transition active:scale-95 flex items-center justify-center gap-2"
-                    style="background: linear-gradient(90deg, #1072B8 0%, #0d5a91 100%); box-shadow: 0 4px 15px rgba(16,114,184,0.35);">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
-                    </svg>
-                    Buka QR Code & Bayar
-                </button>
-
-                <button onclick="tutupModal(null, true)"
-                    class="w-full mt-2.5 py-2.5 rounded-xl text-gray-400 text-sm font-medium hover:text-gray-600 hover:bg-gray-50 transition">
-                    Batalkan
-                </button>
-
             </div>
         </div>
-    </div>
 
-    <div id="modal-success-backdrop" class="fixed inset-0 z-[1000] hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm">
-    <div class="bg-white rounded-3xl w-full max-w-sm m-4 overflow-hidden shadow-2xl transform transition-all">
-        <div class="p-8 text-center">
-            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                </svg>
-            </div>
-            <h3 class="text-xl font-extrabold text-gray-900 mb-2">Pembayaran Berhasil!</h3>
-            <p class="text-gray-500 text-sm mb-6">Tagihan Anda telah lunas dan tercatat di sistem.</p>
+        <script>
+            // ─────────────────────────────────────
+            // State aktif tagihan yang dibuka
+            // ─────────────────────────────────────
+            let activeTagihanId = null;
 
-            <div class="bg-gray-50 rounded-2xl p-4 text-left mb-6 space-y-2 border border-gray-100">
-                <div class="flex justify-between text-xs">
-                    <span class="text-gray-400">Order ID</span>
-                    <span class="font-bold text-gray-700" id="success-order-id">-</span>
-                </div>
-                <div class="flex justify-between text-xs">
-                    <span class="text-gray-400">Item</span>
-                    <span class="font-bold text-gray-700" id="success-item">-</span>
-                </div>
-                <div class="flex justify-between pt-2 border-t border-dashed border-gray-200">
-                    <span class="text-sm font-bold text-gray-700">Total</span>
-                    <span class="text-sm font-extrabold text-blue-600">Rp <span id="success-total">0</span></span>
-                </div>
-            </div>
-
-            <button onclick="location.reload()" class="w-full py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition">
-                Selesai
-            </button>
-        </div>
-    </div>
-</div>
-
-    <script>
-        // ─────────────────────────────────────
-        // State aktif tagihan yang dibuka
-        // ─────────────────────────────────────
-        let activeTagihanId = null;
-
-        function formatRupiah(angka) {
-            return 'Rp ' + angka.toLocaleString('id-ID');
-        }
-
-        // ─────────────────────────────────────
-        // Buka modal & isi data
-        // ─────────────────────────────────────
-        function bukaModalBayar(data) {
-            activeTagihanId = data.id;
-
-            const sisa     = data.jumlah - data.terbayar;
-            const fee      = Math.ceil(sisa * 0.007);
-            const total    = sisa + fee;
-
-            document.getElementById('modal-nama-tagihan').textContent  = data.nama;
-            document.getElementById('modal-periode').textContent       = data.bulan;
-            document.getElementById('modal-jatuh-tempo').textContent   = data.jatuh_tempo;
-            document.getElementById('modal-nominal').textContent       = formatRupiah(data.jumlah);
-            document.getElementById('modal-fee').textContent           = '+ ' + formatRupiah(fee);
-            document.getElementById('modal-total').textContent         = formatRupiah(total);
-
-            // Tampilkan baris "sudah dibayar" hanya kalau ada cicilan
-            const rowTerbayar = document.getElementById('modal-row-terbayar');
-            if (data.terbayar > 0) {
-                rowTerbayar.style.display = 'flex';
-                document.getElementById('modal-terbayar').textContent =
-                    formatRupiah(data.terbayar) + ' (sisa ' + formatRupiah(sisa) + ')';
-            } else {
-                rowTerbayar.style.display = 'none';
+            function formatRupiah(angka) {
+                return 'Rp ' + angka.toLocaleString('id-ID');
             }
 
-            // Reset tombol
-            setLoadingBtn(false);
+            // ─────────────────────────────────────
+            // Buka modal & isi data
+            // ─────────────────────────────────────
+            function bukaModalBayar(data) {
+                activeTagihanId = data.id;
 
-            // Tampilkan modal
-            document.getElementById('modal-backdrop').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
+                const sisa = data.jumlah - data.terbayar;
+                const fee = Math.ceil(sisa * 0.007);
+                const total = sisa + fee;
 
-        // ─────────────────────────────────────
-        // Tutup modal
-        // ─────────────────────────────────────
-        function tutupModal(event, force = false) {
-            if (!force && event && event.target !== document.getElementById('modal-backdrop')) return;
-            document.getElementById('modal-backdrop').classList.remove('active');
-            document.body.style.overflow = '';
-            activeTagihanId = null;
-        }
+                document.getElementById('modal-nama-tagihan').textContent = data.nama;
+                document.getElementById('modal-periode').textContent = data.bulan;
+                document.getElementById('modal-jatuh-tempo').textContent = data.jatuh_tempo;
+                document.getElementById('modal-nominal').textContent = formatRupiah(data.jumlah);
+                document.getElementById('modal-fee').textContent = '+ ' + formatRupiah(fee);
+                document.getElementById('modal-total').textContent = formatRupiah(total);
 
-        // ─────────────────────────────────────
-        // Loading state tombol
-        // ─────────────────────────────────────
-        function setLoadingBtn(loading) {
-            const btn = document.getElementById('modal-pay-btn');
-            if (loading) {
-                btn.disabled = true;
-                btn.innerHTML = `<span class="spinner"></span> Memuat QR Code...`;
-                btn.style.opacity = '0.85';
-            } else {
-                btn.disabled = false;
-                btn.innerHTML = `
+                // Tampilkan baris "sudah dibayar" hanya kalau ada cicilan
+                const rowTerbayar = document.getElementById('modal-row-terbayar');
+                if (data.terbayar > 0) {
+                    rowTerbayar.style.display = 'flex';
+                    document.getElementById('modal-terbayar').textContent =
+                        formatRupiah(data.terbayar) + ' (sisa ' + formatRupiah(sisa) + ')';
+                } else {
+                    rowTerbayar.style.display = 'none';
+                }
+
+                // Reset tombol
+                setLoadingBtn(false);
+
+                // Tampilkan modal
+                document.getElementById('modal-backdrop').classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            // ─────────────────────────────────────
+            // Tutup modal
+            // ─────────────────────────────────────
+            function tutupModal(event, force = false) {
+                if (!force && event && event.target !== document.getElementById('modal-backdrop')) return;
+                document.getElementById('modal-backdrop').classList.remove('active');
+                document.body.style.overflow = '';
+                activeTagihanId = null;
+            }
+
+            // ─────────────────────────────────────
+            // Loading state tombol
+            // ─────────────────────────────────────
+            function setLoadingBtn(loading) {
+                const btn = document.getElementById('modal-pay-btn');
+                if (loading) {
+                    btn.disabled = true;
+                    btn.innerHTML = `<span class="spinner"></span> Memuat QR Code...`;
+                    btn.style.opacity = '0.85';
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = `
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
                     </svg>
                     Buka QR Code & Bayar`;
-                btn.style.opacity = '1';
-            }
-        }
-
-        // ─────────────────────────────────────
-        // Fetch Snap Token → Buka Midtrans Snap
-        // ─────────────────────────────────────
-        async function prosessPembayaran() {
-            if (!activeTagihanId) return;
-
-            setLoadingBtn(true);
-
-            try {
-                const res = await fetch(`/siswa/keuangan/snap-token/${activeTagihanId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    },
-                });
-
-                const json = await res.json();
-
-                if (!json.snap_token) {
-                    throw new Error(json.message ?? 'Gagal mendapatkan token');
+                    btn.style.opacity = '1';
                 }
-
-                // Tutup modal kita, buka Snap Midtrans
-                tutupModal(null, true);
-
-window.snap.pay(json.snap_token, {
-    onSuccess: async function (result) {
-        // 1. Tampilkan loading sebentar selagi mengambil data terbaru
-        showToast('Pembayaran Berhasil! Memuat detail...');
-
-        try {
-            // 2. Ambil detail sukses dari endpoint yang kita buat tadi
-            const res = await fetch(`/siswa/keuangan/pembayaran/detail-sukses?order_id=${result.order_id}`);
-            const data = await res.json();
-
-            if (res.ok) {
-                // 3. Isi data ke elemen Modal Sukses
-                document.getElementById('success-order-id').textContent = '#' + data.order_id;
-                document.getElementById('success-item').textContent = data.nama_tagihan + ' (' + data.periode + ')';
-                document.getElementById('success-total').textContent = data.total;
-
-                // 4. Munculkan Modal Sukses
-                const modalSukses = document.getElementById('modal-success-backdrop');
-                modalSukses.classList.remove('hidden');
-                modalSukses.classList.add('flex');
-            } else {
-                throw new Error('Gagal memuat detail');
             }
-        } catch (e) {
-            // Fallback: Jika modal gagal muncul, reload halaman agar status tagihan terupdate
-            console.error(e);
-            window.location.reload();
-        }
-    },
-    onPending: function () {
-        showToast('Pembayaran pending. Selesaikan pembayaran Anda.');
-        // Untuk pending, sebaiknya reload agar status tombol berubah jadi 'Lanjutkan Pembayaran'
-        setTimeout(() => window.location.reload(), 2000);
-    },
-    onError: function () {
-        showToast('Pembayaran gagal. Silakan coba lagi.', 'error');
-    },
-    onClose: function () {
-        // Tidak perlu reload jika hanya menutup popup tanpa bayar
-    }
-});
 
-            } catch (err) {
-                setLoadingBtn(false);
-                showToast(err.message || 'Terjadi kesalahan. Coba lagi.', 'error');
+            // ─────────────────────────────────────
+            // Fetch Snap Token → Buka Midtrans Snap
+            // ─────────────────────────────────────
+            async function prosessPembayaran() {
+                if (!activeTagihanId) return;
+
+                setLoadingBtn(true);
+
+                try {
+                    const res = await fetch(`/siswa/keuangan/snap-token/${activeTagihanId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                'content'),
+                        },
+                    });
+
+                    const json = await res.json();
+
+                    if (!json.snap_token) {
+                        throw new Error(json.message ?? 'Gagal mendapatkan token');
+                    }
+
+                    // Tutup modal kita, buka Snap Midtrans
+                    tutupModal(null, true);
+
+                    // TAMBAHKAN INI UNTUK MEMBERSIHKAN STATE MIDTRANS YANG NYANGKUT
+                    if (typeof window.snap.hide === 'function') {
+                        window.snap.hide();
+                    }
+
+                    window.snap.pay(json.snap_token, {
+                        onSuccess: async function(result) {
+                            // 1. Tampilkan loading sebentar selagi mengambil data terbaru
+                            showToast('Pembayaran Berhasil! Memuat detail...');
+
+                            try {
+                                // 2. Ambil detail sukses dari endpoint yang kita buat tadi
+                                const res = await fetch(
+                                    `/siswa/keuangan/pembayaran/detail-sukses?order_id=${result.order_id}`);
+                                const data = await res.json();
+
+                                if (res.ok) {
+                                    // 3. Isi data ke elemen Modal Sukses
+                                    document.getElementById('success-order-id').textContent = '#' + data
+                                        .order_id;
+                                    document.getElementById('success-item').textContent = data.nama_tagihan +
+                                        ' (' + data.periode + ')';
+                                    document.getElementById('success-total').textContent = data.total;
+
+                                    // 4. Munculkan Modal Sukses
+                                    const modalSukses = document.getElementById('modal-success-backdrop');
+                                    modalSukses.classList.remove('hidden');
+                                    modalSukses.classList.add('flex');
+                                } else {
+                                    throw new Error('Gagal memuat detail');
+                                }
+                            } catch (e) {
+                                // Fallback: Jika modal gagal muncul, reload halaman agar status tagihan terupdate
+                                console.error(e);
+                                window.location.reload();
+                            }
+                        },
+                        onPending: function() {
+                            showToast('Pembayaran pending. Selesaikan pembayaran Anda.');
+                            // Untuk pending, sebaiknya reload agar status tombol berubah jadi 'Lanjutkan Pembayaran'
+                            setTimeout(() => window.location.reload(), 2000);
+                        },
+                        onError: function() {
+                            showToast('Pembayaran gagal. Silakan coba lagi.', 'error');
+                        },
+                        onClose: function() {
+                            window.location.reload();
+                        }
+                    });
+
+                } catch (err) {
+                    setLoadingBtn(false);
+                    showToast(err.message || 'Terjadi kesalahan. Coba lagi.', 'error');
+                }
             }
-        }
 
-        // ─────────────────────────────────────
-        // Toast notifikasi ringan
-        // ─────────────────────────────────────
-        function showToast(msg, type = 'info') {
-            const existing = document.getElementById('toast-notif');
-            if (existing) existing.remove();
+            // ─────────────────────────────────────
+            // Toast notifikasi ringan
+            // ─────────────────────────────────────
+            function showToast(msg, type = 'info') {
+                const existing = document.getElementById('toast-notif');
+                if (existing) existing.remove();
 
-            const colors = type === 'error'
-                ? 'background:#fee2e2; border-color:#fca5a5; color:#b91c1c;'
-                : 'background:#eff6ff; border-color:#93c5fd; color:#1d4ed8;';
+                const colors = type === 'error' ?
+                    'background:#fee2e2; border-color:#fca5a5; color:#b91c1c;' :
+                    'background:#eff6ff; border-color:#93c5fd; color:#1d4ed8;';
 
-            const toast = document.createElement('div');
-            toast.id = 'toast-notif';
-            toast.style.cssText = `
+                const toast = document.createElement('div');
+                toast.id = 'toast-notif';
+                toast.style.cssText = `
                 position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
                 padding:12px 20px; border-radius:12px; border:1px solid;
                 font-size:13px; font-weight:600; z-index:9999;
@@ -578,15 +661,15 @@ window.snap.pay(json.snap_token, {
                 animation: slideUp 0.3s ease;
                 ${colors}
             `;
-            toast.textContent = msg;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
-        }
+                toast.textContent = msg;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 4000);
+            }
 
-        // Escape key tutup modal
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') tutupModal(null, true);
-        });
-    </script>
+            // Escape key tutup modal
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Escape') tutupModal(null, true);
+            });
+        </script>
 
 </x-app-layout>

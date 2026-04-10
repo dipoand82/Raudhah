@@ -170,7 +170,7 @@
                                     <p class="text-gray-500 text-lg">Misi belum tersedia</p>
                                 @endforelse
                             @else
-                                <p class="text-gray-500">Data profil belum tersedia</p>
+                                <p class="text-gray-500">Misi belum tersedia</p>
                             @endif
                         </div>
                     </div>

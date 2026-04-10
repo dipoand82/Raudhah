@@ -47,6 +47,6 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Opsional: Gunakan Bootstrap untuk Pagination
-        Paginator::useBootstrap();
+        // Paginator::useBootstrapFour();
     }
 }

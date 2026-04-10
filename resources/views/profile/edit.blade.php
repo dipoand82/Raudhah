@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile Admin') }}
+            {{ __('Profile ') . ucfirst(auth()->user()->role ?? 'User') }}
         </h2>
     </x-slot>
 

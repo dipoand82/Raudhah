@@ -333,7 +333,6 @@
                 <div class="flex items-center gap-3">
                     <span class="text-sm text-gray-500">Total <strong>{{ $siswas->total() }}</strong> siswa
                     </span>
-
                     <form method="GET" action="{{ route('admin.keuangan.laporan.index') }}"
                         class="flex items-center gap-2">
                         {{-- Pertahankan filter aktif --}}
@@ -351,7 +350,13 @@
                             @endforeach
                         </select>
                     </form>
+                                                                                <div class=" text-left">
+                            <p class="text-xs text-red-500 font-medium">
+                                * Jumlah data yang ditampilkan mempengaruhi jumlah total terbayar
+                            </p>
+                        </div>
                 </div>
+
 
                 {{-- Kanan: Pagination links --}}
                 <div>
