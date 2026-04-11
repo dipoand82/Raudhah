@@ -29,6 +29,9 @@ class AppServiceProvider extends ServiceProvider
         if (str_contains(request()->getHost(), 'ngrok-free.dev')) {
             URL::forceScheme('https');
         }
+        if (str_contains(env('APP_URL'), 'ngrok')) {
+            URL::forceScheme('https');
+        }
 
         // 1. Sharing data profil ke semua view
         View::composer('*', function ($view) {

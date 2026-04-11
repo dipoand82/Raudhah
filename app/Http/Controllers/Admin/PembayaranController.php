@@ -67,10 +67,22 @@ class PembayaranController extends Controller
 
             foreach ($grouped as $siswaId => $tagihanSiswa) {
 
-                $totalBayar = (int) $request->jumlah_bayar_total;
-                if ($totalBayar <= 0) {
+            $inputBayar = (int) $request->jumlah_bayar_total;
+
+                if ($inputBayar <= 0) {
+                    $totalBayarSiswa = $tagihanSiswa->sum(fn($t) => $t->jumlah_tagihan - $t->terbayar);
+                } else {
+                    $totalBayarSiswa = $inputBayar;
+                }
+
+                if ($totalBayarSiswa <= 0) {
                     continue;
                 }
+
+                // $totalBayar = (int) $request->jumlah_bayar_total;
+                // if ($totalBayar <= 0) {
+                //     continue;
+                // }
 
                 $kode = 'PAY-'.date('YmdHi').'-'.strtoupper(Str::random(4));
 
@@ -78,7 +90,7 @@ class PembayaranController extends Controller
                     'kode_pembayaran' => $kode,
                     'siswa_id' => $siswaId,
                     'user_id_admin' => Auth::id(),
-                    'total_bayar' => $totalBayar,
+                    'total_bayar' => $totalBayarSiswa,
                     'tanggal_bayar' => now(),
                     'metode_pembayaran' => $request->metode,
                     'status_gateway' => $request->metode === 'tunai' ? 'settlement' : 'pending',
@@ -89,12 +101,12 @@ class PembayaranController extends Controller
                     if ($sisa <= 0) {
                         continue;
                     }
-                    if ($totalBayar <= 0) {
+                    if ($totalBayarSiswa <= 0) {
                         break;
                     } // uang sudah habis, stop
 
-                    $dibayar = min($sisa, $totalBayar); // bayar sesuai yang tersedia
-                    $totalBayar -= $dibayar;            // kurangi sisa budget
+                    $dibayar = min($sisa, $totalBayarSiswa); // bayar sesuai yang tersedia
+                    $totalBayarSiswa -= $dibayar;            // kurangi sisa budget
 
                     PembayaranDetail::create([
                         'pembayaran_id' => $pembayaran->id,

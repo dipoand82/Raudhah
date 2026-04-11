@@ -20,8 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // ini sesuai dengan URL yang kamu daftarkan di dashboard Midtrans
         $middleware->validateCsrfTokens(except: [
-            'webhook/midtrans',
+            '/webhook/midtrans',
+            'midtrans/webhook',
             'api/webhook/midtrans', // Tambahkan ini jika route kamu ada di api.php
+            'midtrans/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
