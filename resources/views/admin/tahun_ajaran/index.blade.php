@@ -153,7 +153,7 @@
                         {{-- FOOTER TABEL --}}
                         <div class="divide-y divide-gray-100 rounded-xl bg-white p-2 text-center">
                             <p class="text-sm text-red-500 font-medium inline-block">
-                                *Tahun ajaran baru otomatis menjadi <strong>Aktif</strong> setelah disimpan*
+                                *Harap Perhatikan Tahun ajaran <strong>Aktif</strong>, Tahun ajaran baru otomatis menjadi <strong>Aktif</strong> setelah disimpan*
                                 {{-- <br>*Pastikan Tahun Ajaran terbaru sudah di-set <strong>AKTIF</strong>                                  --}}
                             </p>
                         </div>

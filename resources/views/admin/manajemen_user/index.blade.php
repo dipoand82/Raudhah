@@ -920,32 +920,32 @@
                                                 d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                                         </svg>
                                     </div>
-                                    <h3 class="font-bold text-amber-900 text-base">Inisialisasi Sistem & Update Data
+                                    <h3 class="font-bold text-amber-900 text-base">Pertama Sistem dijalankan & Update Data
                                     </h3>
                                 </div>
                                 <ul class="text-sm text-amber-800 space-y-3"> {{-- Jarak antar poin dirapatkan --}}
                                     <li class="flex gap-3">
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">1</span>
-                                        <p><strong>Aktivasi Periode:</strong> Set status Tahun Ajaran menjadi
+                                        <p><strong>Tahun Ajaran:</strong> Buat Tahun Ajaran baru dan Set status Tahun Ajaran terbaru menjadi
                                             <strong>"Aktif"</strong>.
                                         </p>
                                     </li>
                                     <li class="flex gap-3">
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">2</span>
-                                        <p><strong>Persiapan Kelas:</strong> Buat daftar kelas baru yang diperlukan.</p>
+                                        <p><strong>Kelas Tersedia:</strong> Buat semua daftar kelas baru yang diperlukan.</p>
                                     </li>
                                     <li class="flex gap-3">
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">3</span>
-                                        <p><strong>Import Data:</strong> Sistem otomatis memperbarui tahun ajaran siswa.
+                                        <p><strong>Import Data Siswa:</strong> Buat Nama sekaligus Akun Siswa di Menu Manajemen User Siswa .
                                         </p>
                                     </li>
                                     <li class="flex gap-3">
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">4</span>
-                                        <p><strong>Verifikasi:</strong> Bandingkan data Excel dengan sistem.</p>
+                                        <p><strong>Verifikasi Import Akun:</strong> Bandingkan data Excel dengan sistem sebelum upload data Excel siswa.</p>
                                     </li>
                                 </ul>
                             </div>
@@ -960,31 +960,30 @@
                                                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                     </div>
-                                    <h3 class="font-bold text-blue-900 text-base">Panduan Alur Update Data Siswa</h3>
+                                    <h3 class="font-bold text-blue-900 text-base">Panduan Alur Update Data Siswa & Kenaikan Kelas</h3>
                                 </div>
                                 <ul class="text-sm text-blue-800 space-y-3">
                                     <li class="flex gap-3">
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">1</span>
-                                        <p><strong>Kelulusan:</strong> Proses lulus kelas 9 (kelas jadi null).</p>
+                                        <p><strong>Kelulusan:</strong> Proses lulus kelas 9 di Kelola Tahun Ajaran, Proses Kelulusan (siswa kelas 9 yang lulus otomatis kelas jadi null).</p>
                                     </li>
                                     <li class="flex gap-3">
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">2</span>
-                                        <p><strong>Buka Periode:</strong> Atur Tahun Ajaran baru ke
+                                        <p><strong>Tahun Ajaran:</strong> Buat Tahun Ajaran baru  jika diperlukan & Atur Tahun Ajaran baru ke
                                             <strong>"Aktif"</strong>.
                                         </p>
                                     </li>
                                     <li class="flex gap-3">
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">3</span>
-                                        <p><strong>Import:</strong> Gunakan fungsi <em>Update-or-Create</em>.</p>
+                                        <p><strong>Import Data Siswa:</strong> Import Kembali data siswa dengan update data <strong>Kelas</strong> masing" siswa di Excel .</p>
                                     </li>
                                     <li class="flex gap-3">
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">4</span>
-                                        <p><strong>Otomatisasi:</strong> Tahun ajaran diperbarui otomatis ke tahun
-                                            aktif.</p>
+                                        <p><strong> Panduan ini dilakukan biasanya disaat terjadi Kenaikan Kelas dan Tahun Ajaran Berubah</strong></p>
                                     </li>
                                 </ul>
                             </div>

@@ -133,8 +133,10 @@
                                             {{-- Kolom Aksi --}}
                                             <td class="px-4 py-4 whitespace-nowrap text-center text-sm font-medium">
                                                 <div class="flex justify-center items-center gap-3">
+
                                                     <x-modal-delete-global :trigger="'delete-kelas-' . $k->id" :action="route('admin.kelas.destroy', $k->id)"
-                                                        :message="'Kelas ' . $k->tingkat . ' ' . $k->nama_kelas" />
+                                                        title="Hapus" submitText="Ya, Hapus Kelas" :message="'Kelas ' . $k->tingkat . ' ' . $k->nama_kelas" />
+
                                                 </div>
                                             </td>
                                         </tr>
