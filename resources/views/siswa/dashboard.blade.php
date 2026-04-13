@@ -1,4 +1,33 @@
 <x-app-layout>
+    @if(str_contains(Auth::user()->email, 'dummy') || is_null(Auth::user()->email))
+    <div x-data="{ showEmailModal: true }"
+         x-show="showEmailModal"
+         class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6 mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-blue-700">📧 Hubungkan Email Anda</h3>
+                <button @click="showEmailModal = false" class="text-gray-400 hover:text-gray-600 font-bold text-2xl">&times;</button>
+            </div>
+
+            <p class="text-sm text-gray-600 mb-4">
+                Demi keamanan, mohon masukkan email pribadi Anda. Email ini berfungsi untuk memulihkan akun jika Anda lupa password.
+            </p>
+
+            <form method="POST" action="{{ route('profile.update') }}">
+                @csrf
+                @method('patch')
+
+                <x-text-input name="email" type="email" class="w-full mb-3" placeholder="email@contoh.com" required />
+
+                <div class="flex justify-end gap-2">
+                    <x-secondary-button @click="showEmailModal = false">Nanti Saja</x-secondary-button>
+                    <x-primary-button>Simpan Email</x-primary-button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endif
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Dashboard Siswa') }}

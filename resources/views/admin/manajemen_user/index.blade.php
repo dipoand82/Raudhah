@@ -529,7 +529,7 @@
                                                             class="p-6">
                                                             @csrf @method('delete')
                                                             <h2 class="text-lg font-bold">Hapus User?</h2>
-                                                            <p class="mt-2 text-sm text-gray-600">Yakin hapus
+                                                            <p class="mt-2 text-sm text-gray-600 ">Yakin hapus
                                                                 <strong>{{ $u->name }}</strong>?
                                                             </p>
                                                             <div class="mt-6 flex justify-end gap-3">

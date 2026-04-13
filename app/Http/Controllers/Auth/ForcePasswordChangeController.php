@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rules;
-use Illuminate\Support\Facades\Redirect; // Tambahan
 
 class ForcePasswordChangeController extends Controller
 {
@@ -19,25 +19,45 @@ class ForcePasswordChangeController extends Controller
     }
 
     /**
-     * Proses simpan password baru.
+     * Proses simpan email dan password baru.
      */
     public function update(Request $request)
     {
-        // 1. Validasi Input (Password wajib diisi, dikonfirmasi, dan sesuai standar keamanan)
+        // 1. Validasi Input
+        // Menambahkan validasi email, dan mengecualikan ID user saat ini dari pengecekan 'unique'
         $request->validate([
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ], [
+            // EMAIL
+            // 'email.required' => 'Email wajib diisi.',
+            // 'email.email' => 'Format email tidak valid.',
+            // 'email.unique' => 'Email sudah digunakan.',
+
+            // PASSWORD
+            'password.required' => 'Password wajib diisi.',
+            'password.confirmed' => 'Konfirmasi ulangi password tidak cocok.',
+            'password.min' => 'Password minimal 8 karakter.',
         ]);
 
         // 2. Ambil User yang sedang login
-        $user = $request->user();
+      $user = $request->user();
 
-        // 3. Update Password & Matikan Status 'Wajib Ganti'
-        $user->update([
-            'password' => Hash::make($request->password), // Enkripsi password baru
-            'must_change_password' => false,              // <--- PENTING: Cabut tanda wajib ganti
-        ]);
+    // UPDATE HANYA PASSWORD
+    $user->update([
+        'password' => Hash::make($request->password),
+        'must_change_password' => false,
+    ]);
 
-        // 4. Kembalikan ke Dashboard dengan pesan sukses
-        return Redirect::route('dashboard')->with('status', 'Password berhasil diperbarui! Akun Anda sekarang aman.');
+    // Refresh session biar tidak logout
+    $request->session()->put('password_hash_web', $user->password);
+
+    // REDIRECT
+    if ($user->role === 'siswa') {
+        return redirect()->route('siswa.dashboard')
+            ->with('status', 'Password berhasil diperbarui!');
     }
+
+    return redirect()->route('dashboard')
+        ->with('status', 'Password berhasil diperbarui!');
+}
 }

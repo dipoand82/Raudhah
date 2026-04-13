@@ -26,6 +26,7 @@
 
         <div>
             <x-input-label for="email" :value="__('Email')" />
+            <p class="text-red-500">Gunakan email pribadi Anda agar akun lebih aman dan mudah dipulihkan jika lupa password.</p>
             <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
