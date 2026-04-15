@@ -19,6 +19,8 @@
                     @csrf
                     @method('patch')
 
+                    <input type="hidden" name="name" value="{{ Auth::user()->name }}">
+
                     <x-text-input name="email" type="email" class="w-full mb-3" placeholder="email@contoh.com"
                         required />
 

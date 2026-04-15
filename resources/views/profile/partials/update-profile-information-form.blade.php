@@ -1,4 +1,3 @@
-
 <section class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
     <header>
         <h2 class="text-lg font-medium text-gray-900">
@@ -6,7 +5,7 @@
         </h2>
 
         <p class="mt-1 text-sm text-gray-600">
-            {{ __("Perbarui akun dan email.") }}
+            {{ __('Perbarui akun dan email.') }}
         </p>
     </header>
 
@@ -18,35 +17,36 @@
         @csrf
         @method('patch')
 
-<div>
-    <x-input-label for="name" :value="__('Name')" />
+        <div>
+            <x-input-label for="name" :value="__('Name')" />
 
-    <x-text-input id="name" type="text"
-        class="mt-1 block w-full bg-gray-100 cursor-not-allowed"
-        :value="old('name', $user->name)"
-        disabled />
+            <x-text-input id="name" type="text" class="mt-1 block w-full bg-gray-100 cursor-not-allowed"
+                :value="old('name', $user->name)" disabled />
 
-    <input type="hidden" name="name" value="{{ $user->name }}">
+            <input type="hidden" name="name" value="{{ $user->name }}">
 
-    <p class="text-xs text-gray-500 mt-1">
-        Nama tidak dapat diubah.
-    </p>
+            <p class="text-xs text-gray-500 mt-1">
+                Nama tidak dapat diubah.
+            </p>
 
-    <x-input-error class="mt-2" :messages="$errors->get('name')" />
-</div>
+            <x-input-error class="mt-2" :messages="$errors->get('name')" />
+        </div>
 
         <div>
             <x-input-label for="email" :value="__('Email')" />
-            <p class="text-red-500">Ubah menggunakan email pribadi Anda agar akun lebih aman dan mudah dipulihkan jika lupa password.</p>
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
+            <p class="text-red-500 ">Email yang diinputkan akan digunakan untuk login sistem dan pemulihan akun
+                ketika lupa password</p>
+            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)"
+                required autocomplete="username" />
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
-            @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
+            @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && !$user->hasVerifiedEmail())
                 <div>
                     <p class="text-sm mt-2 text-gray-800">
                         {{ __('Your email address is unverified.') }}
 
-                        <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <button form="send-verification"
+                            class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             {{ __('Click here to re-send the verification email.') }}
                         </button>
                     </p>
@@ -58,14 +58,18 @@
                     @endif
                 </div>
             @endif
+            <p class="text-xs text-gray-500 mt-1">
+                Ubah menggunakan email pribadi yang aktif dan dapat diakses.
+            </p>
         </div>
 
-       <div class="flex items-center gap-4">
-    {{-- Tombol Simpan --}}
-    <x-primary-button>{{ __('Simpan Perubahan') }}</x-primary-button>
 
-    {{-- Notifikasi Sukses --}}
+        <div class="flex items-center gap-4">
+            {{-- Tombol Simpan --}}
+            <x-primary-button>{{ __('Simpan Perubahan') }}</x-primary-button>
 
-</div>
+            {{-- Notifikasi Sukses --}}
+
+        </div>
     </form>
 </section>

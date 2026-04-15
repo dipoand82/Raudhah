@@ -21,7 +21,7 @@ class ProfileController extends Controller
             'user' => $request->user(),
         ]);
     }
-    
+
 
     /**
      * Update the user's profile information.
@@ -30,9 +30,9 @@ class ProfileController extends Controller
     {
         $request->user()->fill($request->validated());
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
+        // if ($request->user()->isDirty('email')) {
+        //     $request->user()->email_verified_at = null;
+        // }
 
         $request->user()->save();
 
