@@ -10,33 +10,28 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Mengambil data siswa yang sedang login
-        $user  = Auth::user();
+        $user = Auth::user();
         $siswa = $user->siswa;
 
-        // Guard: jika data siswa tidak ditemukan
-        if (!$siswa) {
+        if (! $siswa) {
             abort(403, 'Data siswa tidak ditemukan untuk akun ini.');
         }
 
-        // Ambil semua tagihan lewat: Siswa → RiwayatAkademik → TagihanSpp
+        // Logika pengambilan tagihan Anda...
         $semuaTagihan = TagihanSpp::whereHas('riwayatAkademik', function ($q) use ($siswa) {
-                $q->where('siswa_id', $siswa->id);
-            })
+            $q->where('siswa_id', $siswa->id);
+        })
             ->with('masterTagihan')
             ->get();
 
-        $totalTagihan      = $semuaTagihan->count();
-        $sudahLunas        = $semuaTagihan->where('status', 'lunas')->count();
-        $belumLunas        = $semuaTagihan->whereIn('status', ['belum_lunas', 'cicilan','pending'])->count();
+        $totalTagihan = $semuaTagihan->count();
+        $sudahLunas = $semuaTagihan->where('status', 'lunas')->count();
+        $belumLunas = $semuaTagihan->whereIn('status', ['belum_lunas', 'cicilan', 'pending'])->count();
+        $tagihanBelumLunas = $semuaTagihan->whereIn('status', ['belum_lunas', 'cicilan', 'pending'])->values();
 
-        // Tagihan yang belum lunas untuk ditampilkan di dashboard
-        $tagihanBelumLunas = $semuaTagihan
-            ->whereIn('status', ['belum_lunas', 'cicilan','pending'])
-            ->sortBy('tahun')
-            ->values();
-
+        // Tambahkan variabel 'user' ke compact agar view bisa mengecek must_change_password
         return view('siswa.dashboard', compact(
+            'user', // Penting untuk pengecekan modal
             'siswa',
             'totalTagihan',
             'sudahLunas',

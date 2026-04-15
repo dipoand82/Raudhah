@@ -413,9 +413,15 @@
                                                 <div class="text-xs text-gray-400">{{ $u->email }}</div>
                                             </td>
                                             </td>
-                                            <td class="px-6 py-4 text-sm font-mono text-gray-600">
-                                                {{ $u->dataSiswa->nisn ?? 'Cek Excel' }}
-                                            </td>
+<td class="px-6 py-4 text-sm font-mono text-gray-600">
+    @if($u->dataSiswa && $u->dataSiswa->nisn)
+        {{ $u->dataSiswa->nisn }}
+    @else
+        <span class="text-red-600 font-semibold italic text-center ">
+            NISN Ganda (Cek Excel & Import Ulang Data Ini!)
+        </span>
+    @endif
+</td>
                                             <td class="text-center px-6 py-4 whitespace-nowrap">
                                                 <span
                                                     class="text-center px-2.5 py-1 inline-flex text-sm font-semibold rounded-full bg-blue-50 text-blue-700 border border-blue-100 capitalize">
@@ -529,7 +535,7 @@
                                                             class="p-6">
                                                             @csrf @method('delete')
                                                             <h2 class="text-lg font-bold">Hapus User?</h2>
-                                                            <p class="mt-2 text-sm text-gray-600 ">Yakin hapus
+                                                            <p class="mt-2 text-sm text-gray-600">Yakin hapus
                                                                 <strong>{{ $u->name }}</strong>?
                                                             </p>
                                                             <div class="mt-6 flex justify-end gap-3">

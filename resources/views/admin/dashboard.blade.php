@@ -589,15 +589,20 @@
                 {{-- KIRI: Tabel Transaksi Terbaru --}}
                 <div>
                     <div class="dash-card">
+
                         <div class="dash-card-header">
                             <div>
                                 <h3>Transaksi Terbaru</h3>
                                 <p>Pembayaran yang baru diproses</p>
                             </div>
+                            @can('admin')
                             <a href="{{ route('admin.keuangan.pembayaran.index') }}" class="btn-outline-sm">
                                 Lihat Semua
                             </a>
+                            @endcan
+
                         </div>
+
 
                         <table class="dash-table">
                             <thead>

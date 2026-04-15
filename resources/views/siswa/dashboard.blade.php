@@ -1,32 +1,34 @@
 <x-app-layout>
-    @if(str_contains(Auth::user()->email, 'dummy') || is_null(Auth::user()->email))
-    <div x-data="{ showEmailModal: true }"
-         x-show="showEmailModal"
-         class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
+    @if (str_contains(Auth::user()->email, 'dummy') || is_null(Auth::user()->email))
+        <div x-data="{ showEmailModal: true }" x-show="showEmailModal"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
 
-        <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6 mx-4">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-blue-700">📧 Hubungkan Email Anda</h3>
-                <button @click="showEmailModal = false" class="text-gray-400 hover:text-gray-600 font-bold text-2xl">&times;</button>
-            </div>
-
-            <p class="text-sm text-gray-600 mb-4">
-                Demi keamanan, mohon masukkan email pribadi Anda. Email ini berfungsi untuk memulihkan akun jika Anda lupa password.
-            </p>
-
-            <form method="POST" action="{{ route('profile.update') }}">
-                @csrf
-                @method('patch')
-
-                <x-text-input name="email" type="email" class="w-full mb-3" placeholder="email@contoh.com" required />
-
-                <div class="flex justify-end gap-2">
-                    <x-secondary-button @click="showEmailModal = false">Nanti Saja</x-secondary-button>
-                    <x-primary-button>Simpan Email</x-primary-button>
+            <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6 mx-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-blue-700">📧 Hubungkan Email Anda</h3>
+                    <button @click="showEmailModal = false"
+                        class="text-gray-400 hover:text-gray-600 font-bold text-2xl">&times;</button>
                 </div>
-            </form>
+
+                <p class="text-sm text-gray-600 mb-4">
+                    Demi keamanan, mohon masukkan email pribadi Anda. Email ini berfungsi untuk memulihkan akun jika
+                    Anda lupa password.
+                </p>
+
+                <form method="POST" action="{{ route('profile.update') }}">
+                    @csrf
+                    @method('patch')
+
+                    <x-text-input name="email" type="email" class="w-full mb-3" placeholder="email@contoh.com"
+                        required />
+
+                    <div class="flex justify-end gap-2">
+                        <x-secondary-button @click="showEmailModal = false">Nanti Saja</x-secondary-button>
+                        <x-primary-button>Simpan Email</x-primary-button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
     @endif
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -42,6 +44,8 @@
         <script src="https://app.sandbox.midtrans.com/snap/snap.js"
             data-client-key="{{ config('services.midtrans.client_key') }}"></script>
     @endif
+
+
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -373,6 +377,47 @@
                 </div>
 
             </div>
+        </div>
+        <div x-data="{ showAktivasi: {{ $user->must_change_password ? 'true' : 'false' }} }">
+            <x-modal name="modal-aktivasi-profil" show="showAktivasi" maxWidth="md" focusable>
+                <div class="p-6 text-center">
+
+                    <div class="flex items-center justify-center w-20 h-20 mx-auto mb-6 bg-amber-100 rounded-full">
+                        <svg class="w-10 h-10 text-amber-600" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+
+                    <h3 class="text-2xl font-black text-gray-900 mb-2">Perbarui Email Anda!</h3>
+                    <p class="text-sm text-gray-500 mb-6 px-4">
+                        Ini adalah login pertama Anda menggunakan sistem. Silakan ubah email.
+                    </p>
+
+                    <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl mb-8 text-left">
+                        <p class="text-[10px] text-amber-700 font-black uppercase tracking-widest mb-1">Peringatan
+                            Keamanan</p>
+                        <p class="text-sm text-amber-900 leading-relaxed justify-center text-center">
+                            <strong>Harap  mengganti email bawaan sistem demi keamanan data</strong>
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <a href="{{ route('profile.edit') }}"
+                            class="w-full bg-amber-600 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-amber-700 shadow-lg shadow-amber-200 transition-all flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            Ya, Perbarui Sekarang
+                        </a>
+                        <x-secondary-button x-on:click="$dispatch('close')" class="w-full bg-white text-gray-600 px-6 py-3 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-all text-center justify-center">
+                            Nanti Saja
+                        </x-secondary-button>
+                    </div>
+                </div>
+            </x-modal>
         </div>
 
         {{-- =========================================

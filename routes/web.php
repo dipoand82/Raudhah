@@ -16,6 +16,8 @@ use App\Http\Controllers\GaleriController as PublicGaleri;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Siswa\DashboardController as SiswaDashboard;
 use App\Http\Controllers\Siswa\KeuanganController;
+use App\Http\Controllers\Auth\ForcePasswordChangeController;
+use App\Http\Middleware\EnsurePasswordIsChanged;
 use App\Models\ProfilSekolah;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -25,13 +27,13 @@ use Illuminate\Support\Facades\Route;
 | PUBLIC ROUTES
 |--------------------------------------------------------------------------
 */
-// Tambahkan Route Webhook di sini (di luar middleware apapun)
+// Route Webhook Midtrans
 Route::post('/webhook/midtrans', [\App\Http\Controllers\MidtransWebhookController::class, 'handle'])
     ->name('webhook.midtrans');
+
 Route::get('/', function () {
     $profil_sekolah = ProfilSekolah::first();
     $galeri = \App\Models\Galeri::latest()->take(4)->get();
-
     return view('welcome', compact('profil_sekolah', 'galeri'));
 });
 
@@ -39,25 +41,36 @@ Route::get('/galeri-kegiatan', [PublicGaleri::class, 'index'])->name('galeri.ind
 Route::get('/galeri-kegiatan/{id}', [PublicGaleri::class, 'show'])->name('galeri.show');
 Route::get('/informasi-sekolah', function () {
     $profil_sekolah = ProfilSekolah::first();
-
     return view('info.index', compact('profil_sekolah'));
 })->name('info.index');
 
+// PUSAT REDIRECT SETELAH LOGIN
+Route::get('/dashboard', function () {
+    $role = Auth::user()->role;
+
+    if ($role === 'siswa') {
+        return redirect()->route('siswa.dashboard');
+    }
+
+    // PERBAIKAN: Guru sekarang diarahkan ke dashboard admin
+    if ($role === 'guru' || $role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    }
+
+    abort(403);
+})->middleware(['auth', 'verified'])->name('dashboard');
+
 /*
 |--------------------------------------------------------------------------
-| AUTH ROUTES
+| AUTH & PROFILE ROUTES
 |--------------------------------------------------------------------------
 */
 require __DIR__.'/auth.php';
 
-Route::get('/dashboard', function () {
-    if (Auth::user()->role === 'siswa') {
-        return redirect()->route('siswa.dashboard');
-    }
-
-    return redirect()->route('admin.dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 Route::middleware('auth')->group(function () {
+    Route::get('/force-password-change', [ForcePasswordChangeController::class, 'index'])->name('force.password.change');
+    Route::post('/force-password-change', [ForcePasswordChangeController::class, 'update'])->name('force.password.update');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -66,42 +79,16 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| ADMIN AREA (PUSAT KONTROL)
+| ADMIN & GURU AREA (SATU PINTU)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () {
+// Keduanya bisa masuk ke awalan /admin
+Route::middleware(['auth', 'verified', 'role:admin,guru'])->prefix('admin')->name('admin.')->group(function () {
 
+    // 1. DASHBOARD (Bersama)
     Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
-    // 1. MANAJEMEN USER (TAB SISWA & GURU)
-    Route::prefix('manajemen-user')->name('manajemen-user.')->group(function () {
 
-        // SATU-SATUNYA rute GET Utama (Pusat Search Guru & Siswa)
-        Route::get('/', [ManajemenUserController::class, 'index'])->name('index');
-
-        // RUTE GURU (Proses)
-        Route::prefix('gurus')->name('gurus.')->controller(GuruController::class)->group(function () {
-            Route::post('/store', 'store')->name('store');
-            Route::post('/import', 'import')->name('import');
-            Route::put('/{id}', 'update')->name('update');
-            Route::get('/template', 'downloadTemplate')->name('template');
-        });
-
-        // RUTE SISWA (Proses & Bulk Action)
-        Route::controller(ManajemenUserController::class)->group(function () {
-            Route::post('/siswa/store', 'storeSiswa')->name('siswa.store');
-            Route::post('/siswa/import', 'importSiswa')->name('siswa.import');
-            Route::post('/siswa/{id}/reset', 'resetPasswordSiswa')->name('siswa.reset');
-            Route::delete('/{id}', 'destroy')->name('destroy');
-            Route::put('/password', 'updatePassword')->name('password.update');
-        });
-
-        // RUTE BULK & TEMPLATE SISWA (Arahkan ke SiswaController agar fungsi JS kamu jalan)
-        Route::get('/siswa/template', [SiswaController::class, 'downloadTemplate'])->name('siswa.template');
-        Route::delete('/siswa/bulk-delete', [SiswaController::class, 'bulkDestroy'])->name('siswa.bulk_delete');
-        Route::patch('/siswa/bulk-reset', [SiswaController::class, 'bulkResetPassword'])->name('siswa.bulk_reset');
-    });
-
-    // 2. DATA SISWA (DETAIL AKADEMIK)
+    // 2. DATA SISWA (Bersama)
     Route::controller(SiswaController::class)->prefix('data-siswa')->name('siswas.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/create', 'create')->name('create');
@@ -110,89 +97,100 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(
         Route::get('/export', 'export')->name('export');
         Route::get('/{id}/edit', 'edit')->name('edit');
         Route::put('/{id}', 'update')->name('update');
-        Route::delete('/bulk-delete', 'bulkDestroy')->name('bulk_delete'); // Bulk delete versi Akademik
+        Route::delete('/bulk-delete', 'bulkDestroy')->name('bulk_delete');
         Route::delete('/{id}', 'destroy')->name('destroy');
     });
 
-    // 3. FITUR PENUNJANG
-    Route::resource('galeri', AdminGaleri::class);
-
-    Route::controller(ProfilSekolahController::class)->prefix('profil')->name('profil.')->group(function () {
-        Route::get('/', 'edit')->name('edit');
-        Route::patch('/', 'update')->name('update');
-    });
-
-    Route::controller(TahunAjaranController::class)->prefix('tahun-ajaran')->name('tahun-ajaran.')->group(function () {
-        Route::get('/', 'index')->name('index');
-        Route::post('/', 'store')->name('store');
-        Route::put('/{id}', 'update')->name('update');
-        Route::delete('/{id}', 'destroy')->name('destroy');
-        Route::post('/{id}/activate', 'activate')->name('activate');
-        Route::post('/graduation', 'graduation')->name('graduation');
-    });
-
-    Route::controller(KelasController::class)->prefix('kelas')->name('kelas.')->group(function () {
-        Route::get('/', 'index')->name('index');
-        Route::post('/', 'store')->name('store');
-        Route::put('/{id}', 'update')->name('update');
-        Route::delete('/{id}', 'destroy')->name('destroy');
-    });
-
-    // 4. KEUANGAN & PEMBAYARAN (Grup Tunggal - JANGAN DIDUPLIKASI)
-    // 4. KEUANGAN & PEMBAYARAN (Grup Tunggal)
-    // 4. KEUANGAN & PEMBAYARAN (Grup Tunggal)
-    // Note: Kita hapus .admin. di name rute grup ini karena sudah ada di pembungkus luar
-    // Pastikan ini berada di dalam Route::middleware(['auth', 'verified'])->prefix('admin')->name('admin.')->group(function () { ...
-
+    // 3. LAPORAN KEUANGAN (Bersama)
     Route::prefix('keuangan')->name('keuangan.')->group(function () {
-
-        // A. Master Tagihan (Step 1)
-        // Jika tetap pakai names('master'), maka di Blade panggil: admin.keuangan.master.index / .store
-        Route::resource('master-tagihan', MasterTagihanController::class)->names('master');
-
-        // B. Tagihan Siswa (Step 2)
-        Route::get('tagihan/create-bulk', [TagihanSiswaController::class, 'createBulk'])->name('tagihan.create-bulk');
-        Route::post('tagihan/store-bulk', [TagihanSiswaController::class, 'storeBulk'])->name('tagihan.store-bulk');
-        Route::delete('tagihan/destroy-bulk', [TagihanSiswaController::class, 'destroyBulk'])->name('tagihan.destroy-bulk');
-        Route::resource('tagihan', TagihanSiswaController::class);
-
-        // C. Pembayaran (Step 3)
-        Route::get('pembayaran/search', [PembayaranController::class, 'search'])->name('pembayaran.search');
-        Route::get('pembayaran/{id}/cetak', [PembayaranController::class, 'cetakKuitansi'])->name('pembayaran.cetak');
-        Route::resource('pembayaran', PembayaranController::class)->only(['index', 'store']);
-        // D. Laporan (Step Akhir)
         Route::get('laporan', [LaporanController::class, 'index'])->name('laporan.index');
         Route::get('laporan/export', [LaporanController::class, 'export'])->name('laporan.export');
-        // Route::get('laporan',         [LaporanController::class, 'index'])->name('admin.keuangan.laporan.index');
-        // Route::get('laporan/export',  [LaporanController::class, 'export'])->name('admin.keuangan.laporan.export');
+    });
 
+    /*
+    |--------------------------------------------------------------------------
+    | KHUSUS ADMIN (GURU DIBLOKIR DI SINI)
+    |--------------------------------------------------------------------------
+    */
+    // Sub-grup ini menggunakan middleware khusus role:admin
+    Route::middleware(['role:admin'])->group(function () {
+
+        // 1. Manajemen User
+        Route::prefix('manajemen-user')->name('manajemen-user.')->group(function () {
+            Route::get('/', [ManajemenUserController::class, 'index'])->name('index');
+
+            // Guru
+            Route::prefix('gurus')->name('gurus.')->controller(GuruController::class)->group(function () {
+                Route::post('/store', 'store')->name('store');
+                Route::post('/import', 'import')->name('import');
+                Route::put('/{id}', 'update')->name('update');
+                Route::get('/template', 'downloadTemplate')->name('template');
+            });
+
+            // Siswa (Manajemen Akun)
+            Route::controller(ManajemenUserController::class)->group(function () {
+                Route::post('/siswa/store', 'storeSiswa')->name('siswa.store');
+                Route::post('/siswa/import', 'importSiswa')->name('siswa.import');
+                Route::post('/siswa/{id}/reset', 'resetPasswordSiswa')->name('siswa.reset');
+                Route::delete('/{id}', 'destroy')->name('destroy');
+                Route::put('/password', 'updatePassword')->name('password.update');
+            });
+
+            // Bulk Action & Template Siswa
+            Route::get('/siswa/template', [SiswaController::class, 'downloadTemplate'])->name('siswa.template');
+            Route::delete('/siswa/bulk-delete', [SiswaController::class, 'bulkDestroy'])->name('siswa.bulk_delete');
+            Route::patch('/siswa/bulk-reset', [SiswaController::class, 'bulkResetPassword'])->name('siswa.bulk_reset');
+        });
+
+        // 2. Pengaturan Sistem & Fitur Penunjang
+        Route::resource('galeri', AdminGaleri::class);
+
+        Route::controller(ProfilSekolahController::class)->prefix('profil')->name('profil.')->group(function () {
+            Route::get('/', 'edit')->name('edit');
+            Route::patch('/', 'update')->name('update');
+        });
+
+        Route::resource('tahun-ajaran', TahunAjaranController::class);
+        Route::post('tahun-ajaran/{id}/activate', [TahunAjaranController::class, 'activate'])->name('tahun-ajaran.activate');
+        Route::post('tahun-ajaran/graduation', [TahunAjaranController::class, 'graduation'])->name('tahun-ajaran.graduation');
+
+        Route::resource('kelas', KelasController::class);
+
+        // 3. Transaksi Keuangan (Selain Laporan)
+        Route::prefix('keuangan')->name('keuangan.')->group(function () {
+            Route::resource('master-tagihan', MasterTagihanController::class)->names('master');
+
+            Route::get('tagihan/create-bulk', [TagihanSiswaController::class, 'createBulk'])->name('tagihan.create-bulk');
+            Route::post('tagihan/store-bulk', [TagihanSiswaController::class, 'storeBulk'])->name('tagihan.store-bulk');
+            Route::delete('tagihan/destroy-bulk', [TagihanSiswaController::class, 'destroyBulk'])->name('tagihan.destroy-bulk');
+            Route::resource('tagihan', TagihanSiswaController::class);
+
+            Route::get('pembayaran/search', [PembayaranController::class, 'search'])->name('pembayaran.search');
+            Route::get('pembayaran/{id}/cetak', [PembayaranController::class, 'cetakKuitansi'])->name('pembayaran.cetak');
+            Route::resource('pembayaran', PembayaranController::class)->only(['index', 'store']);
+        });
     });
 });
+
 /*
 |--------------------------------------------------------------------------
 | SISWA AREA
 |--------------------------------------------------------------------------
 */
-use App\Http\Middleware\EnsurePasswordIsChanged;
-
 Route::middleware([
     'auth',
     'verified',
     'role:siswa',
-    EnsurePasswordIsChanged::class // 🔥 INI YANG DITAMBAH
+    EnsurePasswordIsChanged::class
 ])
 ->prefix('siswa')
 ->name('siswa.')
 ->group(function () {
-
     Route::get('/dashboard', [SiswaDashboard::class, 'index'])->name('dashboard');
 
     Route::prefix('keuangan')->name('keuangan.')->group(function () {
-
         Route::get('/riwayat', [KeuanganController::class, 'riwayat'])->name('riwayat');
-
         Route::post('/snap-token/{tagihan}', [KeuanganController::class, 'getSnapToken'])->name('snap-token');
-
         Route::get('/pembayaran/detail-sukses', [KeuanganController::class, 'getDetailSukses'])->name('detail-sukses');
     });
 });
