@@ -413,15 +413,15 @@
                                                 <div class="text-xs text-gray-400">{{ $u->email }}</div>
                                             </td>
                                             </td>
-<td class="px-6 py-4 text-sm font-mono text-gray-600">
-    @if($u->dataSiswa && $u->dataSiswa->nisn)
-        {{ $u->dataSiswa->nisn }}
-    @else
-        <span class="text-red-600 font-semibold italic text-center ">
-            NISN Ganda (Cek Excel & Import Ulang Data Ini!)
-        </span>
-    @endif
-</td>
+                                            <td class="px-6 py-4 text-sm font-mono text-gray-600">
+                                                @if ($u->dataSiswa && $u->dataSiswa->nisn)
+                                                    {{ $u->dataSiswa->nisn }}
+                                                @else
+                                                    <span class="text-red-600 font-semibold italic text-center ">
+                                                        NISN Ganda, Cek Excel & Import Ulang Data Ini!
+                                                    </span>
+                                                @endif
+                                            </td>
                                             <td class="text-center px-6 py-4 whitespace-nowrap">
                                                 <span
                                                     class="text-center px-2.5 py-1 inline-flex text-sm font-semibold rounded-full bg-blue-50 text-blue-700 border border-blue-100 capitalize">
@@ -603,9 +603,9 @@
 
                                 <div class="flex items-center gap-2">
                                     <span class="text-sm text-gray-500">Total Siswa:</span>
-                                <div class="text-sm text-gray-600">
-                                    <strong>{{ $totalSiswa }}</strong>, Show:
-                                </div>
+                                    <div class="text-sm text-gray-600">
+                                        <strong>{{ $totalSiswa }}</strong>, Show:
+                                    </div>
                                     <select name="per_page" onchange="this.form.submit()"
                                         class="text-sm border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 py-1 pl-2 pr-8">
                                         <option value="30" {{ request('per_page') == 30 ? 'selected' : '' }}>30
@@ -926,32 +926,37 @@
                                                 d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                                         </svg>
                                     </div>
-                                    <h3 class="font-bold text-amber-900 text-base">Pertama Sistem dijalankan & Update Data
+                                    <h3 class="font-bold text-amber-900 text-base">Pertama Sistem dijalankan & Update
+                                        Data
                                     </h3>
                                 </div>
                                 <ul class="text-sm text-amber-800 space-y-3"> {{-- Jarak antar poin dirapatkan --}}
                                     <li class="flex gap-3">
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">1</span>
-                                        <p><strong>Tahun Ajaran:</strong> Buat Tahun Ajaran baru dan Set status Tahun Ajaran terbaru menjadi
+                                        <p><strong>Tahun Ajaran:</strong> Buat Tahun Ajaran baru dan Set status Tahun
+                                            Ajaran terbaru menjadi
                                             <strong>"Aktif"</strong>.
                                         </p>
                                     </li>
                                     <li class="flex gap-3">
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">2</span>
-                                        <p><strong>Kelas Tersedia:</strong> Buat semua daftar kelas baru yang diperlukan.</p>
+                                        <p><strong>Kelas Tersedia:</strong> Buat semua daftar kelas baru yang
+                                            diperlukan.</p>
                                     </li>
                                     <li class="flex gap-3">
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">3</span>
-                                        <p><strong>Import Data Siswa:</strong> Buat Nama sekaligus Akun Siswa di Menu Manajemen User Siswa .
+                                        <p><strong>Import Data Siswa:</strong> Buat Nama sekaligus Akun Siswa di Menu
+                                            Manajemen User Siswa .
                                         </p>
                                     </li>
                                     <li class="flex gap-3">
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">4</span>
-                                        <p><strong>Verifikasi Import Akun:</strong> Bandingkan data Excel dengan sistem sebelum upload data Excel siswa.</p>
+                                        <p><strong>Verifikasi Import Akun:</strong> Bandingkan data Excel dengan sistem
+                                            sebelum upload data Excel siswa.</p>
                                     </li>
                                 </ul>
                             </div>
@@ -966,30 +971,35 @@
                                                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                     </div>
-                                    <h3 class="font-bold text-blue-900 text-base">Panduan Alur Update Data Siswa & Kenaikan Kelas</h3>
+                                    <h3 class="font-bold text-blue-900 text-base">Panduan Alur Update Data Siswa &
+                                        Kenaikan Kelas</h3>
                                 </div>
                                 <ul class="text-sm text-blue-800 space-y-3">
                                     <li class="flex gap-3">
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">1</span>
-                                        <p><strong>Kelulusan:</strong> Proses lulus kelas 9 di Kelola Tahun Ajaran, Proses Kelulusan (siswa kelas 9 yang lulus otomatis kelas jadi null).</p>
+                                        <p><strong>Kelulusan:</strong> Proses lulus kelas 9 di Kelola Tahun Ajaran,
+                                            Proses Kelulusan (siswa kelas 9 yang lulus otomatis kelas jadi null).</p>
                                     </li>
                                     <li class="flex gap-3">
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">2</span>
-                                        <p><strong>Tahun Ajaran:</strong> Buat Tahun Ajaran baru  jika diperlukan & Atur Tahun Ajaran baru ke
+                                        <p><strong>Tahun Ajaran:</strong> Buat Tahun Ajaran baru jika diperlukan & Atur
+                                            Tahun Ajaran baru ke
                                             <strong>"Aktif"</strong>.
                                         </p>
                                     </li>
                                     <li class="flex gap-3">
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">3</span>
-                                        <p><strong>Import Data Siswa:</strong> Import Kembali data siswa dengan update data <strong>Kelas</strong> masing" siswa di Excel .</p>
+                                        <p><strong>Import Data Siswa:</strong> Import Kembali data siswa dengan update
+                                            data <strong>Kelas</strong> masing" siswa di Excel .</p>
                                     </li>
                                     <li class="flex gap-3">
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-blue-200 text-blue-800 rounded-full flex items-center justify-center font-bold text-xs">4</span>
-                                        <p><strong> Panduan ini dilakukan biasanya disaat terjadi Kenaikan Kelas dan Tahun Ajaran Berubah</strong></p>
+                                        <p><strong> Panduan ini dilakukan biasanya disaat terjadi Kenaikan Kelas dan
+                                                Tahun Ajaran Berubah</strong></p>
                                     </li>
                                 </ul>
                             </div>
