@@ -637,33 +637,68 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($transaksiTerbaru as $p)
+@forelse($transaksiTerbaru as $p)
                                         @php
-                                            $kelas = $p->detailPembayaran->first()?->tagihanSpp?->riwayatAkademik
-                                                ?->kelas;
+                                            $kelas = $p->detailPembayaran->first()?->tagihanSpp?->riwayatAkademik?->kelas;
+
+                                            // 1. Ambil Nama Tagihan (Misal: "SPP Bulanan")
                                             $namaTagihan = $p->detailPembayaran
                                                 ->map(fn($d) => $d->tagihanSpp?->masterTagihan?->nama_tagihan)
                                                 ->filter()
                                                 ->unique()
-                                                ->first();
+                                                ->implode(', ');
+
+                                            // 2. Ambil Periode Bulan & Tahun (Misal: "Januari 2026, Februari 2026")
+                                            $listPeriode = $p->detailPembayaran
+                                                ->map(fn($d) => $d->tagihanSpp?->bulan ? $d->tagihanSpp->bulan . ' ' . $d->tagihanSpp->tahun : null)
+                                                ->filter()
+                                                ->unique()
+                                                ->implode(', ');
+
+                                            $jumlahItem = $p->detailPembayaran->count();
                                         @endphp
                                         <tr>
+                                            {{-- Kolom Siswa (Nama & NISN) --}}
                                             <td>
                                                 <div class="student-name">{{ $p->siswa->nama_lengkap }}</div>
                                                 <div class="student-nisn">{{ $p->siswa->nisn ?? '-' }}</div>
                                             </td>
+
+                                            {{-- Kolom Kelas --}}
                                             <td>
                                                 @if ($kelas)
-                                                    <span
-                                                        class="kelas-badge">{{ $kelas->tingkat }}{{ $kelas->nama_kelas }}</span>
+                                                    <span class="kelas-badge">{{ $kelas->tingkat }}{{ $kelas->nama_kelas }}</span>
                                                 @else
                                                     <span class="text-gray-300 text-xs">-</span>
                                                 @endif
                                             </td>
-                                            <td class="text-xs text-gray-600">{{ $namaTagihan ?? '-' }}</td>
-                                            <td><span class="amount">Rp
-                                                    {{ number_format($p->total_bayar, 0, ',', '.') }}</span></td>
-                                            <td><span class="status-badge status-lunas">✓ Lunas</span></td>
+
+                                            {{-- Kolom Tagihan (Desain mirip Nama & NISN) --}}
+                                            <td>
+                                                <div class="student-name truncate max-w-[150px]" title="{{ $namaTagihan }}">
+                                                    {{ $namaTagihan ?: 'Tagihan' }}
+                                                </div>
+                                                <div class="student-nisn truncate max-w-[150px] mt-0.5" title="{{ $listPeriode }}">
+                                                    {{ $listPeriode ?: '-' }}
+                                                </div>
+
+                                                {{-- Badge Item Gabungan (Tetap ditampilkan jika bulk payment) --}}
+                                                @if($jumlahItem > 1)
+                                                    <span class="inline-block mt-1 text-[9px] font-bold bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">
+                                                        {{ $jumlahItem }} Item
+                                                    </span>
+                                                @endif
+                                            </td>
+
+                                            {{-- Kolom Nominal --}}
+                                            <td>
+                                                <span class="amount">Rp {{ number_format($p->total_bayar, 0, ',', '.') }}</span>
+                                            </td>
+
+                                            {{-- Kolom Status --}}
+                                            <td>
+                                                <span class="status-badge status-lunas">✓ Lunas</span>
+                                            </td>
                                         </tr>
                                     @empty
                                         <tr>
