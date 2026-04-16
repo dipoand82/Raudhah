@@ -955,8 +955,8 @@
                                     <li class="flex gap-3">
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">4</span>
-                                        <p><strong>Verifikasi Import Akun:</strong> Bandingkan data Excel dengan sistem
-                                            sebelum upload data Excel siswa.</p>
+                                        <p><strong>Verifikasi Import Akun:</strong> Bandingkan data Excel dengan data di sistem lama yang ada
+                                            sebelum upload data Excel siswa untuk update data.</p>
                                     </li>
                                 </ul>
                             </div>

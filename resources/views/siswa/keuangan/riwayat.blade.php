@@ -91,7 +91,7 @@
                         </div>
 
                         {{-- CETAK BUTTON --}}
-                        <a href="{{ route('admin.keuangan.pembayaran.cetak', $p->id) }}" target="_blank"
+                        <a href="{{ route('siswa.keuangan.pembayaran.cetak', $p->id) }}" target="_blank"
                             class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold border-2 transition hover:opacity-80"
                             style="border-color:#1072B8; color:#1072B8; background: #e8f2fb;">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

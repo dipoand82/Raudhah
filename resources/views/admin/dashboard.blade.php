@@ -477,36 +477,58 @@
                     </p>
                 </div>
             </div>
-            @can('admin')
-                <a href="{{ route('admin.manajemen-user.index', ['tab' => 'panduan']) }}"
-                    class="inline-flex items-center gap-2 px-4 py-1.5 mb-3 text-xs font-extrabold uppercase tracking-widest text-yellow-900 bg-gradient-to-r from-yellow-300 to-yellow-500 border border-yellow-300 rounded-full shadow-lg shadow-yellow-500/50 hover:shadow-xl hover:shadow-yellow-500/80 hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer">
+            {{-- Container Tombol dengan Flex Wrap dan Gap --}}
+            <div class="flex flex-wrap items-center gap-3 mb-6">
+                @can('admin')
+                    <a href="{{ route('admin.manajemen-user.index', ['tab' => 'panduan']) }}"
+                        class="inline-flex items-center gap-2 px-4 py-2 text-xs font-extrabold uppercase tracking-widest text-yellow-900 bg-gradient-to-r from-yellow-300 to-yellow-500 border border-yellow-300 rounded-full shadow-lg shadow-yellow-500/50 hover:shadow-xl hover:shadow-yellow-500/80 hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer w-full sm:w-auto justify-center sm:justify-start">
+                        <span class="relative flex h-2.5 w-2.5">
+                            <span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-yellow-100"></span>
+                        </span>
+                        Lihat Panduan
+                    </a>
 
-                    {{-- Titik Putih Berkedip (Menarik Perhatian) --}}
-                    <span class="relative flex h-2.5 w-2.5">
-                        <span
-                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-yellow-100"></span>
-                    </span>
+                    <a href="{{ route('admin.keuangan.tagihan.index') }}"
+                        class="inline-flex items-center gap-3 px-5 py-2 text-white bg-gradient-to-r from-blue-500 to-blue-700 border border-blue-400 rounded-full shadow-lg shadow-blue-500/50 hover:shadow-xl hover:shadow-blue-500/80 hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer group w-full sm:w-auto justify-center sm:justify-start">
+                        <span class="relative flex h-2.5 w-2.5 flex-shrink-0">
+                            <span
+                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-200"></span>
+                        </span>
+                        <span class="text-xs font-extrabold uppercase tracking-wider">Proses Bayar & Generate Tagihan</span>
+                    </a>
+                @endcan
 
-                    Lihat Panduan
-                </a>
-                <a href="{{ route('admin.keuangan.tagihan.index') }}"
-                    class="inline-flex items-center gap-3 px-5 py-2 mb-3 text-white bg-gradient-to-r from-blue-500 to-blue-700 border border-blue-400 rounded-full shadow-lg shadow-blue-500/50 hover:shadow-xl hover:shadow-blue-500/80 hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer group">
+                {{-- Tombol Export Laporan (Hijau Muda/Soft) --}}
+                <a href="{{ route('admin.keuangan.laporan.export', request()->query()) }}"
+                    class="inline-flex items-center gap-3 px-5 py-2 text-emerald-700 bg-gradient-to-r from-emerald-100 to-emerald-200 border border-emerald-300 rounded-full shadow-md shadow-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer group w-full sm:w-auto justify-center sm:justify-start">
 
-                    {{-- Titik Berkedip (Menarik Perhatian) --}}
+                    {{-- Titik Putih Bulat Selaras --}}
                     <span class="relative flex h-2.5 w-2.5 flex-shrink-0">
                         <span
                             class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-200"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5  bg-emerald-300"></span>
                     </span>
 
-                    {{-- Teks Utama & Subteks --}}
-                    <div class="flex flex-col text-left justify-center">
-                        <span class="text-xs font-extrabold uppercase tracking-wider leading-none">Proses Bayar & Generate Tagihan</span>
-                    </div>
+                    <span class="text-xs font-extrabold uppercase tracking-wider">Export Laporan</span>
                 </a>
-            @endcan
 
+                {{-- Tombol Lihat Laporan (Hijau Tua/Solid) --}}
+                <a href="{{ route('admin.keuangan.laporan.index') }}"
+                    class="inline-flex items-center gap-3 px-5 py-2 text-white bg-gradient-to-r from-emerald-600 to-emerald-700 border border-emerald-500 rounded-full shadow-lg shadow-emerald-600/30 hover:shadow-xl hover:shadow-emerald-600/50 hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer group w-full sm:w-auto justify-center sm:justify-start">
+
+                    {{-- Titik Putih Bulat Selaras --}}
+                    <span class="relative flex h-2.5 w-2.5 flex-shrink-0">
+                        <span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+
+                    <span class="text-xs font-extrabold uppercase tracking-wider">Lihat Laporan</span>
+                </a>
+            </div>
 
             {{-- ══ STAT CARDS ══ --}}
             <div class="stats-grid">
@@ -596,192 +618,125 @@
                                 <p>Pembayaran yang baru diproses</p>
                             </div>
                             @can('admin')
-                            <a href="{{ route('admin.keuangan.pembayaran.index') }}" class="btn-outline-sm">
-                                Lihat Semua
-                            </a>
+                                <a href="{{ route('admin.keuangan.pembayaran.index') }}" class="btn-outline-sm">
+                                    Lihat Semua
+                                </a>
                             @endcan
 
                         </div>
 
-
-                        <table class="dash-table">
-                            <thead>
-                                <tr>
-                                    <th>Siswa</th>
-                                    <th>Kelas</th>
-                                    <th>Tagihan</th>
-                                    <th>Nominal</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($transaksiTerbaru as $p)
-                                    @php
-                                        $kelas = $p->detailPembayaran->first()?->tagihanSpp?->riwayatAkademik?->kelas;
-                                        $namaTagihan = $p->detailPembayaran
-                                            ->map(fn($d) => $d->tagihanSpp?->masterTagihan?->nama_tagihan)
-                                            ->filter()
-                                            ->unique()
-                                            ->first();
-                                    @endphp
+                        <div class="overflow-x-auto">
+                            <table class="dash-table">
+                                <thead>
                                     <tr>
-                                        <td>
-                                            <div class="student-name">{{ $p->siswa->nama_lengkap }}</div>
-                                            <div class="student-nisn">{{ $p->siswa->nisn ?? '-' }}</div>
-                                        </td>
-                                        <td>
-                                            @if ($kelas)
-                                                <span
-                                                    class="kelas-badge">{{ $kelas->tingkat }}{{ $kelas->nama_kelas }}</span>
-                                            @else
-                                                <span class="text-gray-300 text-xs">-</span>
-                                            @endif
-                                        </td>
-                                        <td class="text-xs text-gray-600">{{ $namaTagihan ?? '-' }}</td>
-                                        <td><span class="amount">Rp
-                                                {{ number_format($p->total_bayar, 0, ',', '.') }}</span></td>
-                                        <td><span class="status-badge status-lunas">✓ Lunas</span></td>
+                                        <th>Siswa</th>
+                                        <th>Kelas</th>
+                                        <th>Tagihan</th>
+                                        <th>Nominal</th>
+                                        <th>Status</th>
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5" class="px-6 py-12 text-center text-gray-400 italic text-sm">
-                                            Belum ada transaksi hari ini.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @forelse($transaksiTerbaru as $p)
+                                        @php
+                                            $kelas = $p->detailPembayaran->first()?->tagihanSpp?->riwayatAkademik
+                                                ?->kelas;
+                                            $namaTagihan = $p->detailPembayaran
+                                                ->map(fn($d) => $d->tagihanSpp?->masterTagihan?->nama_tagihan)
+                                                ->filter()
+                                                ->unique()
+                                                ->first();
+                                        @endphp
+                                        <tr>
+                                            <td>
+                                                <div class="student-name">{{ $p->siswa->nama_lengkap }}</div>
+                                                <div class="student-nisn">{{ $p->siswa->nisn ?? '-' }}</div>
+                                            </td>
+                                            <td>
+                                                @if ($kelas)
+                                                    <span
+                                                        class="kelas-badge">{{ $kelas->tingkat }}{{ $kelas->nama_kelas }}</span>
+                                                @else
+                                                    <span class="text-gray-300 text-xs">-</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-xs text-gray-600">{{ $namaTagihan ?? '-' }}</td>
+                                            <td><span class="amount">Rp
+                                                    {{ number_format($p->total_bayar, 0, ',', '.') }}</span></td>
+                                            <td><span class="status-badge status-lunas">✓ Lunas</span></td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5"
+                                                class="px-6 py-12 text-center text-gray-400 italic text-sm">
+                                                Belum ada transaksi hari ini.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
-                {{-- KANAN: Progress + Quick Actions --}}
+                {{-- KANAN: Progress SPP Per Kelas --}}
                 <div>
-
-                    {{-- Progress SPP per Kelas --}}
                     <div class="dash-card">
                         <div class="dash-card-header">
                             <div>
-                                <h3>Progres SPP {{ now()->translatedFormat('F') }}</h3>
-                                <p>Persentase lunas per kelas</p>
+                                <h3>Progres SPP Bulan {{ now()->translatedFormat('F') }}</h3>
+                                <p>Status pelunasan siswa per tingkat kelas</p>
                             </div>
                         </div>
-                        <div class="prog-section">
+
+                        <div class="prog-section" style="padding-top: 10px;">
                             @foreach ($progressPerKelas as $prog)
-                                <div class="prog-row">
-                                    <div class="prog-label">Kelas {{ $prog['tingkat'] }}</div>
-                                    <div class="prog-bar">
-                                        <div class="prog-fill {{ $loop->iteration == 1 ? 'blue' : ($loop->iteration == 2 ? 'green' : 'gold') }}"
-                                            style="width: {{ $prog['persen'] }}%"></div>
+                                <div class="prog-row" style="margin-bottom: 20px;">
+                                    {{-- Label & Info Angka --}}
+                                    <div class="flex justify-between items-end mb-2">
+                                        <div>
+                                            <span
+                                                class="text-xs font-bold text-gray-500 uppercase tracking-wider">Kelas
+                                                {{ $prog['tingkat'] }}</span>
+                                            <div class="flex items-baseline gap-1">
+                                                <span
+                                                    class="text-lg font-bold text-gray-800">{{ $prog['sudah_lunas'] }}</span>
+                                                <span class="text-xs text-gray-400">/ {{ $prog['jumlah_siswa'] }}
+                                                    Siswa</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <span
+                                                class="text-sm font-black {{ $prog['persen'] == 100 ? 'text-green-500' : 'text-blue-600' }}">
+                                                {{ $prog['persen'] }}%
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div class="prog-pct">{{ $prog['persen'] }}%</div>
+
+                                    {{-- Progress Bar Container --}}
+                                    <div class="prog-bar"
+                                        style="width: 100%; height: 10px; background-color: #f3f4f6; border-radius: 20px; overflow: hidden; border: 1px solid #e5e7eb;">
+                                        {{-- Isi Bar (Warna Dinamis) --}}
+                                        <div class="prog-fill {{ $loop->iteration == 1 ? 'blue' : ($loop->iteration == 2 ? 'green' : 'gold') }}"
+                                            style="width: {{ $prog['persen'] }}%; height: 100%; border-radius: 20px; transition: width 0.8s ease-out;">
+                                        </div>
+                                    </div>
                                 </div>
                             @endforeach
 
-                            {{-- Overall --}}
-                            <div style="margin-top:16px; padding-top:14px; border-top:1px solid #f3f4f6;">
-                                <div
-                                    style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; margin-bottom:6px;">
-                                    <span style="color:#4b5563;">Overall Keseluruhan</span>
-                                    <span style="color:var(--blue);">{{ $overallPersen }}%</span>
-                                </div>
-                                <div class="prog-bar" style="height:12px;">
-                                    <div class="prog-fill blue" style="width: {{ $overallPersen }}%"></div>
-                                </div>
-                                <div
-                                    style="display:flex; justify-content:space-between; font-size:10px; color:#9ca3af; margin-top:6px;">
-                                    <span>{{ $totalLunas }} / {{ $totalSiswa }} siswa lunas</span>
-                                    <span>{{ $totalSiswa - $totalLunas }} belum bayar</span>
-                                </div>
+                            {{-- Footer Info --}}
+                            <div style="margin-top: 10px; padding-top: 12px; border-top: 1px solid #f3f4f6;">
+                                <p style="font-size: 10px; color: #9ca3af; line-height: 1.4;">
+                                    <i class="fas fa-info-circle mr-1"></i> Data di atas menunjukkan jumlah siswa yang
+                                    memiliki setidaknya satu tagihan SPP berstatus <strong>Lunas</strong> pada bulan
+                                    {{ now()->translatedFormat('F Y') }}.
+                                </p>
                             </div>
                         </div>
                     </div>
-
-                    {{-- Quick Actions — beda isi berdasar role --}}
-                    @can('admin')
-                        <div class="dash-card">
-                            <div class="dash-card-header">
-                                <div>
-                                    <h3>Aksi Cepat</h3>
-                                </div>
-                            </div>
-                            <div class="quick-grid">
-
-                                @if ($role === 'admin')
-                                    {{-- ADMIN: semua aksi tersedia --}}
-                                    <a href="{{ route('admin.keuangan.tagihan.index') }}" class="quick-btn">
-                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 4v16m8-8H4" />
-                                        </svg>
-                                        <div>Generate Tagihan<span class="sub">Buat otomatis massal</span></div>
-                                    </a>
-
-                                    <a href="{{ route('admin.keuangan.tagihan.index') }}" class="quick-btn">
-                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                                        </svg>
-                                        <div>Proses Bayar<span class="sub">Input pembayaran</span></div>
-                                    </a>
-
-                                    <a href="{{ route('admin.keuangan.laporan.export', request()->query()) }}"
-                                        class="quick-btn">
-                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        <div>Export Excel<span class="sub">Unduh laporan</span></div>
-                                    </a>
-
-                                    <a href="{{ route('admin.keuangan.laporan.index') }}" class="quick-btn">
-                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        <div>Rekapitulasi<span class="sub">Lihat laporan</span></div>
-                                    </a>
-                                @else
-                                    {{-- GURU: hanya aksi yang diizinkan --}}
-                                    <a href="{{ route('admin.siswas.index') }}" class="quick-btn">
-                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                        </svg>
-                                        <div>Data Siswa<span class="sub">Lihat daftar siswa</span></div>
-                                    </a>
-
-                                    <a href="{{ route('admin.keuangan.laporan.index') }}" class="quick-btn">
-                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        <div>Laporan SPP<span class="sub">Rekap pembayaran</span></div>
-                                    </a>
-
-                                    <a href="{{ route('admin.keuangan.pembayaran.index') }}" class="quick-btn">
-                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                        </svg>
-                                        <div>Riwayat Bayar<span class="sub">Log transaksi</span></div>
-                                    </a>
-
-                                    <a href="{{ route('profile.edit') }}" class="quick-btn">
-                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                        </svg>
-                                        <div>Ubah Password<span class="sub">Keamanan akun</span></div>
-                                    </a>
-                                @endif
-
-                            </div>
-                        </div>
-
-                    </div>
-                @endcan
+                </div>
             </div>
-
         </div>
+    </div>
     </div>
 </x-app-layout>

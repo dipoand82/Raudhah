@@ -194,9 +194,9 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                                 <div>
                                     <x-input-label for="info_penting" :value="__('Info Penting')"
-                                        class="text-md font-bold text-gray-600 capitalize" />
+                                        class="text-md font-bold text-gray-600 capitalize"  />
                                     <x-text-input id="info_penting" class="block mt-1 w-full rounded-lg bg-gray-50"
-                                        type="text" name="info_penting" :value="old('info_penting', $profil->info_penting)" />
+                                        type="text" name="info_penting" :value="old('info_penting', $profil->info_penting)" placeholder="Masukkan Judul Info" />
                                 </div>
                                 <div>
                                     <x-input-label for="brosur_info" :value="__('Gambar Brosur Info Penting')"

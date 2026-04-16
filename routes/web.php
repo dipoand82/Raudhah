@@ -192,5 +192,6 @@ Route::middleware([
         Route::get('/riwayat', [KeuanganController::class, 'riwayat'])->name('riwayat');
         Route::post('/snap-token/{tagihan}', [KeuanganController::class, 'getSnapToken'])->name('snap-token');
         Route::get('/pembayaran/detail-sukses', [KeuanganController::class, 'getDetailSukses'])->name('detail-sukses');
+        Route::get('pembayaran/{id}/cetak', [PembayaranController::class, 'cetakKuitansi'])->name('pembayaran.cetak');
     });
 });

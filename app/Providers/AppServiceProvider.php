@@ -25,11 +25,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // PERBAIKAN: Cek host yang sedang diakses secara langsung, bukan cuma config
-        if (str_contains(request()->getHost(), 'ngrok-free.dev')) {
-            URL::forceScheme('https');
-        }
-        if (str_contains(env('APP_URL'), 'ngrok')) {
+        // Cek apakah diakses lewat ngrok (baik dari domain .app atau .dev)
+        // atau jika APP_URL di .env memang sedang diset ke ngrok
+        if (str_contains(request()->getHost(), 'ngrok-free') || str_contains(config('app.url'), 'ngrok')) {
             URL::forceScheme('https');
         }
 
@@ -48,7 +46,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('guru', function (User $user) {
             return $user->role === 'guru';
         });
-
         // Opsional: Gunakan Bootstrap untuk Pagination
         // Paginator::useBootstrapFour();
     }
