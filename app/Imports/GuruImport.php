@@ -13,6 +13,7 @@ public function model(array $row)
 {
     // 1. Ambil Nama Lengkap, hilangkan spasi dan karakter aneh
     $namaLengkap = trim($row['nama']);
+    // Variabel $username ini yang akan kita gunakan sebagai dasar password
     $username = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $namaLengkap));
 
     // 2. Generate email: namapanjang@raudhah.com
@@ -22,11 +23,15 @@ public function model(array $row)
     $existingUser = \App\Models\User::where('email', $email)->first();
     if ($existingUser) return null;
 
+    // 4. Buat password baru: nama (tanpa spasi) + 12345
+    $passwordBaru = $username . '12345.';
+
     return new \App\Models\User([
         'name'     => $namaLengkap,
         'email'    => $email,
         'role'     => 'guru',
-        'password' => \Illuminate\Support\Facades\Hash::make('12345678'),
+        // Menggunakan Hash untuk password baru
+        'password' => \Illuminate\Support\Facades\Hash::make($passwordBaru),
         'must_change_password' => false,
     ]);
 }

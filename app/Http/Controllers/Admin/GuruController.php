@@ -50,29 +50,34 @@ public function store(Request $request)
 
     $email = $request->email;
 
+    // 1. Buat username bersih (tanpa spasi/simbol) untuk email & password
+    $username = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $request->name));
+
     // Logika Otomatis jika email kosong
     if (!$email) {
-        // Hapus spasi dan simbol dari seluruh nama
-        $username = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $request->name));
         $email = $username . '@raudhah.com';
 
-        // Cek jika email sudah terpakai (karena nama mirip)
+        // Cek jika email sudah terpakai
         $count = \App\Models\User::where('email', 'like', $username . '%')->count();
         if ($count > 0) {
             $email = $username . ($count + 1) . '@raudhah.com';
         }
     }
 
+    // 2. Gabungkan username dengan '12345'
+    $passwordBaru = $username . '12345.';
+
     \App\Models\User::create([
         'name' => $request->name,
         'email' => $email,
         'role' => 'guru',
-        'password' => \Illuminate\Support\Facades\Hash::make('12345678'),
-        'must_change_password' => false, // Set false agar bisa langsung login cek laporan
+        // 3. Gunakan password baru yang sudah dibuat
+        'password' => \Illuminate\Support\Facades\Hash::make($passwordBaru),
+        'must_change_password' => false,
     ]);
 
     return redirect()->route('admin.manajemen-user.index', ['tab' => 'guru'])
-                     ->with('success', "Akun Guru {$request->name} berhasil dibuat! Email: {$email}");
+                     ->with('success', "Akun Guru {$request->name} berhasil dibuat! Email: {$email} | Password: {$passwordBaru}");
 }
 
     /**

@@ -3,13 +3,13 @@
     <div class="w-full max-w-sm text-center mb-6">
         <div class="flex justify-center mb-4">
             <div class="p-2 bg-white rounded-2xl shadow-sm border border-gray-100">
-                <img src="{{ asset('storage/logos/logo_smp_raudhah.png') }}" 
-                     alt="Logo Raudhah" 
+                <img src="{{ asset('storage/logos/logo_smp_raudhah.png') }}"
+                     alt="Logo Raudhah"
                      class="h-16 w-auto object-contain">
             </div>
         </div>
-        <h1 class="text-2xl font-extrabold text-gray-900 leading-tight mb-1">Lupa Password</h1>
-        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">SMP IT Raudhah</p>
+        <h1 class="text-2xl font-extrabold text-gray-900 leading-tight mb-1">SMP IT Raudhah</h1>
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">Lupa Password</p>
     </div>
 
     {{-- CARD FORGOT PASSWORD --}}
@@ -28,13 +28,13 @@
             {{-- Input Email --}}
             <div class="w-full text-left">
                 <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 px-1">Alamat Email</label>
-                <input id="email" 
-                       class="block w-full px-4 py-3 bg-gray-50 border-gray-200 border rounded-xl focus:ring-2 focus:ring-[#1072B8] focus:border-transparent outline-none text-sm font-medium transition-all" 
-                       type="email" 
-                       name="email" 
-                       value="{{ old('email') }}" 
+                <input id="email"
+                       class="block w-full px-4 py-3 bg-gray-50 border-gray-200 border rounded-xl focus:ring-2 focus:ring-[#1072B8] focus:border-transparent outline-none text-sm font-medium transition-all"
+                       type="email"
+                       name="email"
+                       value="{{ old('email') }}"
                        placeholder=" "
-                       required 
+                       required
                        autofocus />
                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
             </div>

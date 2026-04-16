@@ -185,21 +185,28 @@ class ManajemenUserController extends Controller
         return Excel::download(new TemplateSiswaExport, 'template_import_siswa.xlsx');
     }
 
-    // === 5. SIMPAN GURU ===
-    public function storeGuru(Request $request)
-    {
-        $request->validate(['name' => 'required', 'email' => 'required|email|unique:users']);
+// === 5. SIMPAN GURU ===
+public function storeGuru(Request $request)
+{
+    $request->validate(['name' => 'required', 'email' => 'required|email|unique:users']);
 
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'role' => 'guru',
-            'password' => Hash::make('123456'),
-            'must_change_password' => false,
-        ]);
+    // 1. Bersihkan nama dari spasi dan simbol, ubah ke huruf kecil
+    $namaClean = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $request->name));
 
-        return back()->with('success', 'Akun Guru berhasil dibuat!');
-    }
+    // 2. Gabungkan dengan '12345'
+    $passwordBaru = $namaClean . '12345.';
+
+    User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'role' => 'guru',
+        // 3. Gunakan password yang sudah dibuat
+        'password' => Hash::make($passwordBaru),
+        'must_change_password' => false,
+    ]);
+
+    return back()->with('success', "Akun Guru berhasil dibuat dengan Password: {$passwordBaru}");
+}
 
     // === 6. IMPORT GURU ===
     public function importGuru(Request $request)
