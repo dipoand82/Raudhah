@@ -47,7 +47,7 @@ class PembayaranController extends Controller
         return view('admin.keuangan.pembayaran.index', compact('pembayarans', 'kelasList'));
     }
 
-    public function store(Request $request)
+public function store(Request $request)
     {
         $request->validate([
             'tagihan_ids' => 'required|array|min:1',
@@ -65,24 +65,28 @@ class PembayaranController extends Controller
             $grouped = $tagihans->groupBy(fn ($t) => $t->riwayatAkademik->siswa_id);
             $kodeList = [];
 
+            // 1. TANGKAP UANG GLOBAL DI LUAR LOOPING
+            $sisaBudgetGlobal = (int) $request->jumlah_bayar_total;
+            $useGlobalBudget = $sisaBudgetGlobal > 0;
+
             foreach ($grouped as $siswaId => $tagihanSiswa) {
 
-            $inputBayar = (int) $request->jumlah_bayar_total;
+                // Hitung kewajiban asli khusus siswa ini
+                $kewajibanSiswa = $tagihanSiswa->sum(fn($t) => $t->jumlah_tagihan - $t->terbayar);
 
-                if ($inputBayar <= 0) {
-                    $totalBayarSiswa = $tagihanSiswa->sum(fn($t) => $t->jumlah_tagihan - $t->terbayar);
+                if ($useGlobalBudget) {
+                    if ($sisaBudgetGlobal <= 0) break; // Uang sudah habis
+
+                    // 2. SISWA HANYA BOLEH MENGAMBIL UANG SESUAI KEWAJIBANNYA, ATAU SISA UANG YANG ADA
+                    $totalBayarSiswa = min($kewajibanSiswa, $sisaBudgetGlobal);
+
+                    // 3. UANG KASIR BERKURANG UNTUK SISWA SELANJUTNYA
+                    $sisaBudgetGlobal -= $totalBayarSiswa;
                 } else {
-                    $totalBayarSiswa = $inputBayar;
+                    $totalBayarSiswa = $kewajibanSiswa;
                 }
 
-                if ($totalBayarSiswa <= 0) {
-                    continue;
-                }
-
-                // $totalBayar = (int) $request->jumlah_bayar_total;
-                // if ($totalBayar <= 0) {
-                //     continue;
-                // }
+                if ($totalBayarSiswa <= 0) continue;
 
                 $kode = 'PAY-'.date('YmdHi').'-'.strtoupper(Str::random(4));
 
@@ -90,23 +94,22 @@ class PembayaranController extends Controller
                     'kode_pembayaran' => $kode,
                     'siswa_id' => $siswaId,
                     'user_id_admin' => Auth::id(),
-                    'total_bayar' => $totalBayarSiswa,
+                    'total_bayar' => $totalBayarSiswa, // <-- SEKARANG SUDAH BENAR (Misal: 500rb)
                     'tanggal_bayar' => now(),
                     'metode_pembayaran' => $request->metode,
                     'status_gateway' => $request->metode === 'tunai' ? 'settlement' : 'pending',
                 ]);
 
+                $alokasiDetail = $totalBayarSiswa;
+
                 foreach ($tagihanSiswa as $tagihan) {
                     $sisa = $tagihan->jumlah_tagihan - $tagihan->terbayar;
-                    if ($sisa <= 0) {
-                        continue;
-                    }
-                    if ($totalBayarSiswa <= 0) {
-                        break;
-                    } // uang sudah habis, stop
 
-                    $dibayar = min($sisa, $totalBayarSiswa); // bayar sesuai yang tersedia
-                    $totalBayarSiswa -= $dibayar;            // kurangi sisa budget
+                    if ($sisa <= 0) continue;
+                    if ($alokasiDetail <= 0) break;
+
+                    $dibayar = min($sisa, $alokasiDetail);
+                    $alokasiDetail -= $dibayar;
 
                     PembayaranDetail::create([
                         'pembayaran_id' => $pembayaran->id,

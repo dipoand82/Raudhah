@@ -14,7 +14,7 @@
 
                     <h3 class="text-2xl font-black text-gray-900 mb-2">Perbarui Email Anda!</h3>
                     <p class="text-sm text-gray-500 mb-6 px-4">
-                        Demi keamanan, mohon masukkan email pribadi Anda. Email ini berfungsi untuk memulihkan akun jika
+                        Demi keamanan, Masukkan email pribadi Anda. Email ini berfungsi untuk memulihkan akun jika
                         Anda lupa password.
                     </p>
 

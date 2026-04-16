@@ -702,7 +702,7 @@
                                                 <span
                                                     class="text-lg font-bold text-gray-800">{{ $prog['sudah_lunas'] }}</span>
                                                 <span class="text-xs text-gray-400">/ {{ $prog['jumlah_siswa'] }}
-                                                    Siswa</span>
+                                                    Siswa_</span>
                                             </div>
                                         </div>
                                         <div class="text-right">
