@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Pembayaran;
-use App\Models\RiwayatAkademik;
-use App\Models\Siswa;
-use App\Models\TagihanSpp;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Siswa;
+use App\Models\Pembayaran;
+use App\Models\TagihanSpp;
+use App\Models\RiwayatAkademik;
 
 class DashboardController extends Controller
 {
@@ -15,8 +15,8 @@ class DashboardController extends Controller
     {
         $bulanIni = now()->month;
         $tahunIni = now()->year;
-        $kemarin = now()->subDay();
-        $role = Auth::user()->role; // 'admin' | 'guru'
+        $kemarin  = now()->subDay();
+        $role     = Auth::user()->role; // 'admin' | 'guru'
 
         // ── 1. TOTAL SISWA AKTIF ─────────────────────────────────────
         $totalSiswa = Siswa::where('status', 'aktif')->count();
@@ -41,52 +41,52 @@ class DashboardController extends Controller
 
         // ── 5. TRANSAKSI TERBARU (10 data) ───────────────────────────
         $transaksiTerbaru = Pembayaran::with([
-            'siswa',
-            'detailPembayaran.tagihanSpp.masterTagihan',
-            'detailPembayaran.tagihanSpp.riwayatAkademik.kelas',
-        ])
+                'siswa',
+                'detailPembayaran.tagihanSpp.masterTagihan',
+                'detailPembayaran.tagihanSpp.riwayatAkademik.kelas',
+            ])
             ->latest()
             ->limit(10)
             ->get();
 
-        // ── 6. PROGRESS SPP PER KELAS (Hanya Bulan Berjalan) ────────────────
-        $progressPerKelas = [];
-        foreach ([7, 8, 9] as $tingkat) {
-            // 1. Hitung total siswa aktif di tingkat tersebut
-            $jumlahSiswa = RiwayatAkademik::whereHas('kelas', fn ($q) => $q->where('tingkat', $tingkat))
-                ->whereHas('tahunAjaran', fn ($q) => $q->where('is_active', true))
-                ->count();
+// ── 6. PROGRESS SPP PER KELAS (Hanya Bulan Berjalan) ────────────────
+$progressPerKelas = [];
+foreach ([7, 8, 9] as $tingkat) {
+    // 1. Hitung total siswa aktif di tingkat tersebut
+    $jumlahSiswa = RiwayatAkademik::whereHas('kelas', fn($q) => $q->where('tingkat', $tingkat))
+        ->whereHas('tahunAjaran', fn($q) => $q->where('is_active', true))
+        ->count();
 
-            // 2. Hitung berapa siswa yang SUDAH bayar SPP di bulan berjalan (April)
-            $sudahLunas = TagihanSpp::where('status', 'lunas')
-                ->whereMonth('created_at', $bulanIni)
-                ->whereYear('created_at', $tahunIni)
-                ->whereHas('masterTagihan', fn ($q) => $q->whereRaw('LOWER(nama_tagihan) LIKE ?', ['%spp%']))
-                ->whereHas('riwayatAkademik.kelas', fn ($q) => $q->where('tingkat', $tingkat))
-                ->distinct('riwayat_akademik_id') // WAJIB: Supaya 1 siswa dihitung 1 kali
-                ->count('riwayat_akademik_id');
+    // 2. Hitung berapa siswa yang SUDAH bayar SPP di bulan berjalan (April)
+    $sudahLunas = TagihanSpp::where('status', 'lunas')
+        ->whereMonth('created_at', $bulanIni)
+        ->whereYear('created_at', $tahunIni)
+        ->whereHas('masterTagihan', fn($q) => $q->whereRaw('LOWER(nama_tagihan) LIKE ?', ['%spp%']))
+        ->whereHas('riwayatAkademik.kelas', fn($q) => $q->where('tingkat', $tingkat))
+        ->distinct('riwayat_akademik_id') // WAJIB: Supaya 1 siswa dihitung 1 kali
+        ->count('riwayat_akademik_id');
 
-            $progressPerKelas[] = [
-                'tingkat' => $tingkat,
-                'jumlah_siswa' => $jumlahSiswa,
-                'sudah_lunas' => $sudahLunas,
-                'persen' => $jumlahSiswa > 0
-                    ? (int) min(round(($sudahLunas / $jumlahSiswa) * 100), 100) // Tambahkan min(x, 100) untuk keamanan
-                    : 0,
-            ];
+    $progressPerKelas[] = [
+        'tingkat'      => $tingkat,
+        'jumlah_siswa' => $jumlahSiswa,
+        'sudah_lunas'  => $sudahLunas,
+        'persen'       => $jumlahSiswa > 0
+            ? (int) min(round(($sudahLunas / $jumlahSiswa) * 100), 100) // Tambahkan min(x, 100) untuk keamanan
+            : 0,
+    ];
         }
 
-        // ── 7. OVERALL PROGRESS ──────────────────────────────────────
-        $totalLunas = TagihanSpp::where('status', 'lunas')
-            ->whereMonth('created_at', $bulanIni)
-            ->whereYear('created_at', $tahunIni)
-            ->whereHas('masterTagihan', fn ($q) => $q->whereRaw('LOWER(nama_tagihan) LIKE ?', ['%spp%']))
-            ->distinct('riwayat_akademik_id')
-            ->count('riwayat_akademik_id');
+// ── 7. OVERALL PROGRESS ──────────────────────────────────────
+$totalLunas = TagihanSpp::where('status', 'lunas')
+    ->whereMonth('created_at', $bulanIni)
+    ->whereYear('created_at', $tahunIni)
+    ->whereHas('masterTagihan', fn($q) => $q->whereRaw('LOWER(nama_tagihan) LIKE ?', ['%spp%']))
+    ->distinct('riwayat_akademik_id')
+    ->count('riwayat_akademik_id');
 
-        $overallPersen = $totalSiswa > 0
-            ? (int) round(($totalLunas / $totalSiswa) * 100)
-            : 0;
+$overallPersen = $totalSiswa > 0
+    ? (int) min(round(($totalLunas / $totalSiswa) * 100), 100)
+    : 0;
 
         // View: resources/views/admin/dashboard.blade.php
         return view('admin.dashboard', compact(
