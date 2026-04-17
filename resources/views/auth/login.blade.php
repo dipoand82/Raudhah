@@ -2,11 +2,12 @@
     {{-- Hapus pembungkus min-h-screen di sini agar tidak double --}}
 
     {{-- HEADER --}}
-    <div class="w-full max-w-sm text-center mb-6">
-        <div class="flex justify-center mb-4">
-            <a href="{{ url('/') }}"class="p-2 bg-white rounded-2xl shadow-sm border border-gray-100">
+    <div class="w-full max-w-sm text-center mb-6 mx-auto">
+        <div class="flex justify-center w-full mb-4">
+            <a href="{{ url('/') }}"
+                class="inline-flex justify-center items-center p-2 bg-white rounded-2xl shadow-sm border border-gray-100">
                 <img src="{{ asset('storage/logos/logo_smp_raudhah.png') }}" alt="Logo Raudhah"
-                    class="h-16 w-auto object-contain flex items-center gap-3 z-10 hover:opacity-80 transition-opacity min-w-max">
+                    class="h-16 w-auto object-contain z-10 hover:opacity-80 transition-opacity">
             </a>
         </div>
         <h1 class="text-2xl font-extrabold text-gray-900 leading-tight mb-1">SMP IT Raudhah</h1>
