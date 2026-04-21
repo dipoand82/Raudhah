@@ -42,7 +42,7 @@
                             <i class="fas fa-map-marker-alt text-blue-600 mt-1"></i>
                             <div>
                                 <p class="text-xs text-gray-400 uppercase font-bold">Alamat</p>
-                                <p class="text-sm text-gray-700">{{ $profil_sekolah->alamat ?? 'Bandar Lampung' }}</p>
+                                <p class="text-sm text-gray-700">{{ $profil_sekolah->alamat ?? 'Lubuk Basung' }}</p>
                             </div>
                         </li>
                         <li class="flex gap-3">

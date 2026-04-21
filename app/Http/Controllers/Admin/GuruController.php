@@ -127,7 +127,7 @@ public function downloadTemplate()
     // Memanggil Class Export yang sudah ada kolom 'No'-nya
     return \Maatwebsite\Excel\Facades\Excel::download(
         new \App\Exports\TemplateGuruExport,
-        'template_import_guru_raudhah.xlsx'
+        'template_import_guru.xlsx'
     );
 }
 }

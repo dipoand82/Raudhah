@@ -28,11 +28,7 @@
                 @endforeach
             @endif
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-2xl p-8 border border-gray-100">
-                <div class="flex items-center justify-between mb-8">
-                    <div>
-                        <h2 class="text-2xl font-bold text-blue-900">Perbarui Galeri</h2>
-                        <p class="text-gray-500">Ubah informasi atau ganti foto kegiatan SMP IT Raudhah.</p>
-                    </div>
+                <div class="flex items-center justify-between mb-6">
                     <a href="{{ route('admin.profil.edit') }}" class="text-gray-400 hover:text-gray-600">
                         <i class="fas fa-times text-xl"></i>
                     </a>

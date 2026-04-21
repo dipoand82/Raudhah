@@ -322,7 +322,7 @@ class SiswaController extends Controller
     // === 8. DOWNLOAD TEMPLATE IMPORT ===
     public function downloadTemplate()
     {
-        return Excel::download(new TemplateSiswaExport, 'template_siswa.xlsx');
+        return Excel::download(new TemplateSiswaExport, 'template_import_siswa.xlsx');
     }
 
     // === 9. PROSES IMPORT (TRAIT) ===
