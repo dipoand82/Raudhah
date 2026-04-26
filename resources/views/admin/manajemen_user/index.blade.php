@@ -6,28 +6,11 @@
     <div class="py-12" x-data="{ activeTab: '{{ session('active_tab', request('tab', 'siswa')) }}' }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6">
 
-            {{-- ALERT ERROR --}}
-            {{-- @if ($errors->any())
-                <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative shadow-sm">
-                    <strong class="font-bold flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Ada Kesalahan!
-                    </strong>
-                    <ul class="mt-2 list-disc list-inside text-sm">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif --}}
-
-            {{-- ALERT SUCCESS --}}
             @if (session('success'))
                 <x-alert-success>
                     {{ session('success') }}
                 </x-alert-success>
             @endif
-            {{-- Tampilkan Alert Gagal (Misal dari Session Error) --}}
             @if (session('error'))
                 <x-alert-danger>
                     {{ session('error') }}
@@ -36,7 +19,7 @@
 
             @if ($errors->any())
                 @foreach ($errors->all() as $error)
-                    <x-alert-danger timeout="8000"> {{-- Waktu 8 detik agar sempat dibaca --}}
+                    <x-alert-danger timeout="8000">
                         {{ $error }}
                     </x-alert-danger>
                 @endforeach
@@ -44,7 +27,6 @@
 
             <div class="bg-gray-100 p-6 rounded-lg shadow-sm border border-gray-200">
 
-                {{-- TAB NAVIGATION --}}
                 <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6">
                     <div class="flex space-x-6">
                         <button @click="activeTab = 'siswa'"
@@ -62,12 +44,9 @@
                 <div class="min-h-0">
 
 
-                    {{-- ================= KONTEN TAB SISWA ================= --}}
                     <div x-show="activeTab === 'siswa'" x-transition>
 
-                        {{-- 1. TOOLBAR FILTER & SEARCH --}}
                         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
-                            {{-- Form Filter --}}
                             <form method="GET" action="{{ route('admin.manajemen-user.index') }}"
                                 class="w-full lg:w-3/4 flex flex-col md:flex-row gap-2" x-data="{
                                     status: '{{ request('status', '') }}',
@@ -76,7 +55,6 @@
                                 <input type="hidden" name="tab" value="siswa">
                                 <input type="hidden" name="per_page" value="{{ request('per_page', 10) }}">
 
-                                {{-- Search --}}
                                 <div class="relative w-full md:w-1/3">
                                     <input type="text" name="search" value="{{ request('search') }}"
                                         placeholder="Cari Nama / NISN..."
@@ -90,12 +68,9 @@
                                     </button>
                                 </div>
 
-                                {{-- Filter Kelas --}}
                                 <div class="w-full md:w-1/4">
                                     <select name="kelas_id" x-model="kelas" onchange="this.form.submit()"
-                                        {{-- LOGIKA: Jika milih kelas spesifik, status otomatis jadi Aktif --}}
                                         @change="if(kelas !== '') { status = 'Aktif' }; $nextTick(() => $el.form.submit())"
-                                        {{-- Dropdown terkunci jika status dipilih dan bukan Aktif --}}
                                         :disabled="status !== '' && status !== 'Aktif'"
                                         :class="status !== '' && status !== 'Aktif' ?
                                             'bg-gray-100 cursor-not-allowed opacity-60' : ''"
@@ -110,7 +85,6 @@
                                     </select>
                                 </div>
 
-                                {{-- Filter Status --}}
                                 <div class="w-full md:w-1/4">
                                     @php
                                         $selectedStatus = request('status');
@@ -124,10 +98,8 @@
                                         };
                                     @endphp
                                     <select name="status" x-model="status" onchange="this.form.submit()"
-                                        {{-- LOGIKA GABUNGAN: Reset kelas jika milih default (kosong) ATAU status selain Aktif --}}
                                         @change="if(status === '' || status !== 'Aktif') { kelas = '' }; $nextTick(() => $el.form.submit())"
                                         class="w-full rounded-full py-2 pl-4 pr-8 shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42] cursor-pointer text-sm border">
-                                        {{-- {{ $filterStatusClass }}"> --}}
                                         <option value="" class="bg-white text-gray-700">-- Semua Status --
                                         </option>
                                         @foreach (['Aktif', 'Cuti', 'Lulus', 'Pindah', 'Keluar'] as $st)
@@ -141,7 +113,6 @@
                                 </div>
                             </form>
 
-                            {{-- Tombol Aksi Kanan --}}
                             <div class="flex flex-col sm:flex-row items-center gap-3 mb-2 w-full lg:w-auto justify-end">
                                 <button x-data="" x-on:click="$dispatch('open-modal', 'import-siswa')"
                                     class="inline-flex w-full items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
@@ -163,7 +134,6 @@
                             </div>
                         </div>
 
-                        {{-- MODAL IMPORT SISWA --}}
                         <x-modal name="import-siswa" focusable>
                             <form method="POST" action="{{ route('admin.manajemen-user.siswa.import') }}"
                                 enctype="multipart/form-data" class="p-6" x-data="{ fileName: '', isLoading: false }"
@@ -180,7 +150,6 @@
                                         </svg>
                                     </button>
                                 </div>
-                                {{-- Alert Syarat Import --}}
 
                                 <div class="bg-red-50 border-2 border-red-500 p-4 rounded-lg mb-4">
                                     <div class="flex">
@@ -230,14 +199,12 @@
                                             'border-green-500 bg-green-50' :
                                             'border-gray-300 bg-gray-50 hover:border-[#3B3E42]'">
 
-                                        {{-- Input File Utama --}}
                                         <input type="file" name="file"
                                             class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                             required accept=".xlsx, .xls, .csv"
                                             @change="fileName = $event.target.files[0] ? $event.target.files[0].name : ''"
                                             x-ref="fileInput">
 
-                                        {{-- Tombol Silang (X) di Pojok Kanan Atas --}}
                                         <template x-if="fileName">
                                             <button type="button" @click="fileName = ''; $refs.fileInput.value = ''"
                                                 class="absolute top-2 right-2 z-20 p-1 rounded-full bg-white shadow-sm border border-green-200 text-green-600 hover:bg-green-100 transition-colors">
@@ -252,7 +219,6 @@
                                         <div
                                             class="pointer-events-none space-y-2 flex flex-col items-center justify-center">
                                             <div class="mb-2">
-                                                {{-- Logo Awan Panah Bawah (Cloud Download) --}}
                                                 <svg class="w-12 h-12 transition-colors duration-300"
                                                     :class="fileName ? 'text-green-500' : 'text-gray-400'"
                                                     fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -284,8 +250,6 @@
                             </form>
                         </x-modal>
 
-                        {{-- Notifikasi Informasi Fallback Kelas --}}
-                        {{-- NOTIFIKASI MERAH (Error Database/Format) --}}
                         @if (session()->has('import_errors'))
                             <div x-data="{ open: true }" x-show="open"
                                 class="relative mb-4 p-4 bg-red-50  border-red-500 rounded shadow-sm border-2 border-red-500 p-4 rounded-lg mb-4">
@@ -295,7 +259,6 @@
                                         <li>Baris {{ $failure->row() }}: {{ $failure->errors()[0] }}</li>
                                     @endforeach
                                 </ul>
-                                {{-- Tombol Silang --}}
                                 <button @click="open = false"
                                     class="absolute top-2 right-2 text-red-400 hover:text-red-600 transition-colors">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
@@ -307,7 +270,6 @@
                             </div>
                         @endif
 
-                        {{-- NOTIFIKASI BIRU (Informasi Update Kelas) --}}
                         @if (session()->has('fallback_info'))
                             <div x-data="{ open: true }" x-show="open"
                                 class="relative mb-4 p-4 bg-blue-50 border-blue-500 rounded shadow-sm border-2 border-blue-500 p-4 rounded-lg mb-4">
@@ -320,7 +282,6 @@
                                         </li>
                                     @endforeach
                                 </ul>
-                                {{-- Tombol Silang --}}
                                 <button @click="open = false"
                                     class="absolute top-2 right-2 text-blue-400 hover:text-blue-600 transition-colors">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
@@ -332,21 +293,15 @@
                             </div>
                         @endif
 
-                        {{-- 2. TABEL SISWA --}}
-
-                        {{-- PERUBAHAN 1: FORM BULK DELETE DIPISAH KELUAR (Standalone) --}}
-                        {{-- Form ini kosong, hanya sebagai wadah untuk submit DELETE massal --}}
                         <form id="bulkDeleteForm" action="{{ route('admin.siswas.bulk_delete') }}" method="POST">
                             @csrf @method('DELETE')
                         </form>
 
-                        {{-- TAMBAHKAN INI: FORM BULK RESET PASSWORD --}}
                         <form id="bulkResetForm" action="{{ route('admin.manajemen-user.siswa.bulk_reset') }}"
                             method="POST">
                             @csrf @method('PATCH')
                         </form>
 
-                        {{-- Tombol Bulk Delete (Muncul via JS) --}}
                         <div id="bulkDeleteContainer"
                             class="hidden mb-3 bg-indigo-50 p-2 rounded flex justify-between items-center border border-indigo-200">
                             <span class="text-indigo-700 text-sm font-semibold ml-2">
@@ -354,14 +309,12 @@
                             </span>
 
                             <div class="flex gap-2">
-                                {{-- TOMBOL RESET PASSWORD --}}
                                 <button type="button" x-data=""
                                     x-on:click="$dispatch('open-modal', 'bulk-reset-confirm')"
                                     class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded text-xs font-bold transition shadow-sm">
                                     Reset Password
                                 </button>
 
-                                {{-- TOMBOL HAPUS (Sudah Ada) --}}
                                 <x-danger-button type="button" x-data=""
                                     x-on:click="$dispatch('open-modal', 'bulk-delete-confirm')" class="text-xs">
                                     Hapus Terpilih
@@ -369,7 +322,6 @@
                             </div>
                         </div>
 
-                        {{-- Tabel Tidak Lagi Dibungkus Form --}}
                         <div class="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-[#3B3E42]">
@@ -466,13 +418,6 @@
                                             <td
                                                 class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium flex justify-end items-center gap-3">
                                                 @if ($u->dataSiswa)
-                                                    {{-- <form action="{{ route('admin.manajemen-user.siswa.reset', $u->dataSiswa->id) }}" method="POST" onsubmit="return confirm('Yakin reset password?');" class="inline-flex">
-                                                        @csrf
-                                                        <button type="submit" class="text-yellow-600 hover:text-yellow-700 p-1" title="Reset Password">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
-                                                        </button>
-                                                    </form> --}}
-                                                    {{-- MODAL RESET PASSWORD (MENGGUNAKAN GLOBAL MODAL) --}}
                                                     <x-modal-delete-global trigger="reset-pw-{{ $u->id }}"
                                                         :action="route(
                                                             'admin.manajemen-user.siswa.reset',
@@ -490,14 +435,12 @@
                                                             </svg>
                                                         </x-slot>
 
-                                                        {{-- Slot default (Isi Modal) - Ini membuat method otomatis jadi POST --}}
                                                         <div class=" border-yellow-400 text-yellow-800 text-xs">
                                                             Password akan dikembalikan ke <strong>NISN
                                                                 Siswa</strong>.<br>
                                                         </div>
                                                     </x-modal-delete-global>
-                                                    {{-- Pisah tombol edit & delete agar rapi --}}
-                                                    {{-- MODAL EDIT DI BAGIAN KEYWORD EDIT --}}
+
                                                     <button type="button" x-data
                                                         x-on:click="$dispatch('open-modal', 'edit-siswa-{{ $u->id }}')"
                                                         class="text-indigo-600 hover:text-indigo-900 font-semibold">Edit</button>
@@ -553,7 +496,6 @@
                             </table>
                         </div>
 
-                        {{-- TAMBAHKAN KODE INI: --}}
                         <x-modal name="bulk-delete-confirm" focusable>
                             <div class="p-6">
                                 <h2 class="text-lg font-bold text-gray-900">Konfirmasi Hapus Massal</h2>
@@ -565,8 +507,6 @@
                                 </p>
                                 <div class="mt-6 flex justify-end gap-3">
                                     <x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button>
-
-                                    {{-- Perhatikan: Tombol ini yang "menekan" form hidden di atas via ID form --}}
                                     <x-danger-button type="submit" form="bulkDeleteForm">
                                         Ya, Hapus Semua
                                     </x-danger-button>
@@ -593,7 +533,6 @@
                             </div>
                         </x-modal>
 
-                        {{-- 3. PAGINATION & SHOW ENTRIES --}}
                         <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
                             <form method="GET" action="{{ route('admin.manajemen-user.index') }}">
                                 <input type="hidden" name="tab" value="siswa">
@@ -625,9 +564,7 @@
 
                     </div>
 
-                    {{-- ================= KONTEN TAB GURU ================= --}}
                     <div x-show="activeTab === 'guru'" x-transition>
-                        {{-- TOOLBAR GURU --}}
                         <div class="flex flex-col lg:flex-row justify-between items-center mb-6 gap-4">
                             <form method="GET" action="{{ route('admin.manajemen-user.index') }}"
                                 class="w-full lg:w-1/2 flex gap-2">
@@ -672,7 +609,6 @@
                             </div>
                         </div>
 
-                        {{-- TABEL GURU --}}
                         <div class="overflow-x-auto bg-white rounded-xl shadow border border-gray-200">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-[#3B3E42]">
@@ -739,7 +675,6 @@
                             </table>
                         </div>
 
-                        {{-- FOOTER GURU (Show Entries & Pagination) --}}
                         <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
                             <form method="GET" action="{{ route('admin.manajemen-user.index') }}">
                                 <input type="hidden" name="tab" value="guru">
@@ -762,7 +697,6 @@
                             </div>
                         </div>
                     </div>
-                    {{-- MODAL TAMBAH & EDIT DI LUAR TAB AGAR TIDAK DUPLIKAT --}}
 
                     <x-modal name="add-guru" focusable>
                         <form method="POST" action="{{ route('admin.manajemen-user.gurus.store') }}"
@@ -814,7 +748,6 @@
                         </x-modal>
                     @endforeach
 
-                    {{-- MODAL IMPORT GURU --}}
                     <x-modal name="import-guru" focusable>
                         <form method="POST" action="{{ route('admin.manajemen-user.gurus.import') }}"
                             enctype="multipart/form-data" class="p-6" x-data="{ fileName: '', isLoading: false }"
@@ -901,9 +834,7 @@
                                 <x-secondary-button x-on:click="$dispatch('close')" type="button">
                                     Batal
                                 </x-secondary-button>
-                                {{-- <x-primary-button ::disabled="isLoading || !fileName">
-                                    <span x-text="isLoading ? 'Memproses...' : 'Proses Import'"></span>
-                                </x-primary-button> --}}
+
                                 <x-primary-button ::disabled="isLoading"><span
                                         x-text="isLoading ? 'Memproses...' : 'Proses Import'"></span></x-primary-button>
                             </div>
@@ -911,14 +842,12 @@
                     </x-modal>
                 </div>
 
-                {{-- ================= KONTEN TAB PANDUAN ================= --}}
                 <div x-show="activeTab === 'panduan'" x-transition>
-                    <div class="p-4"> {{-- Padding dikurangi agar tidak terlalu jauh dari tab --}}
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start"> {{-- Pakai Grid lebih rapi untuk 2 kolom --}}
+                    <div class="p-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
 
-                            {{-- KOTAK INFORMASI ALUR (Kiri - Kuning/Amber) --}}
                             <div class="bg-amber-50 border border-amber-200 rounded-lg p-5 shadow-sm">
-                                <div class="flex items-center gap-3 mb-4"> {{-- mb-6 dikurangi jadi mb-4 --}}
+                                <div class="flex items-center gap-3 mb-4">
                                     <div class="text-amber-600 flex-shrink-0">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor">
@@ -955,13 +884,13 @@
                                     <li class="flex gap-3">
                                         <span
                                             class="flex-shrink-0 w-6 h-6 bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">4</span>
-                                        <p><strong>Verifikasi Import Akun:</strong> Bandingkan data Excel dengan data di sistem lama yang ada
+                                        <p><strong>Verifikasi Import Akun:</strong> Bandingkan data Excel dengan data di
+                                            sistem lama yang ada
                                             sebelum upload data Excel siswa untuk update data.</p>
                                     </li>
                                 </ul>
                             </div>
 
-                            {{-- KOTAK INFORMASI ALUR (Kanan - Biru) --}}
                             <div class="bg-blue-50 border border-blue-200 rounded-lg p-5 shadow-sm">
                                 <div class="flex items-center gap-3 mb-4">
                                     <div class="text-blue-600 flex-shrink-0">
@@ -1008,10 +937,8 @@
                     </div>
                 </div>
 
-                {{-- MODAL TAMBAH SISWA (KOMPONEN EKSTERNAL) --}}
                 <x-siswa.add-student-modal :kelas="$kelas" />
 
-                {{-- FORM CADANGAN DELETE (Standalone) --}}
                 <form id="deleteForm" method="POST" class="hidden">@csrf @method('DELETE')</form>
 
             </div>
@@ -1020,16 +947,12 @@
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // === 1. LOGIKA AUTO-TAB (Siswa/Guru) ===
-            // Menggunakan session dari Laravel untuk otomatis membuka tab tertentu setelah reload
+
             const activeTabSession = "{{ session('active_tab') }}";
             if (activeTabSession) {
-                // Karena kita menggunakan Alpine.js (x-data="{ activeTab: '...' }"),
-                // kita harus mengubah state Alpine-nya secara manual jika diperlukan.
-                // Namun, karena di HTML sudah kita set defaultnya via request('tab'), ini sudah aman.
+
             }
 
-            // === 2. LOGIKA BULK ACTION SISWA ===
             const selectAllSiswa = document.getElementById('selectAll');
             const itemsSiswa = document.querySelectorAll('.select-item');
             const bulkSiswaContainer = document.getElementById('bulkDeleteContainer');
@@ -1045,9 +968,21 @@
                     bulkSiswaContainer?.classList.add('hidden');
                 }
 
-
+                document.querySelectorAll('.dynamic-siswa-id').forEach(el => el.remove());
+                checked.forEach(item => {
+                    ['bulkDeleteForm', 'bulkResetForm'].forEach(formId => {
+                        const form = document.getElementById(formId);
+                        if (form) {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'ids[]';
+                            input.value = item.value;
+                            input.className = 'dynamic-siswa-id';
+                            form.appendChild(input);
+                        }
+                    });
+                });
             }
-
             if (selectAllSiswa) {
                 selectAllSiswa.addEventListener('change', () => {
                     itemsSiswa.forEach(i => i.checked = selectAllSiswa.checked);
@@ -1056,8 +991,6 @@
             }
             itemsSiswa.forEach(i => i.addEventListener('change', toggleSiswaBulk));
 
-
-            // === 3. LOGIKA BULK ACTION GURU ===
             const selectAllGuru = document.getElementById('selectAllGuru');
             const itemsGuru = document.querySelectorAll('.select-item-guru');
             const bulkGuruContainer = document.getElementById('bulkGuruContainer');
@@ -1073,7 +1006,6 @@
                     bulkGuruContainer?.classList.add('hidden');
                 }
 
-                // Bersihkan input lama & sinkronisasi ID ke form bulk guru
                 document.querySelectorAll('.dynamic-guru-id').forEach(el => el.remove());
                 checked.forEach(item => {
                     ['bulkDeleteGuruForm', 'bulkResetGuruForm'].forEach(formId => {
@@ -1099,7 +1031,6 @@
             itemsGuru.forEach(i => i.addEventListener('change', toggleGuruBulk));
         });
 
-        // === 4. SCRIPT HAPUS SATUAN (Global) ===
         function confirmDelete(url, name) {
             if (confirm('Yakin ingin menghapus data ' + name + ' secara permanen?')) {
                 const form = document.getElementById('deleteForm');

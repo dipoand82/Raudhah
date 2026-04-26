@@ -11,13 +11,10 @@ class Kelas extends Model
 
     protected $table = 'kelas';
     protected $fillable = ['nama_kelas', 'tingkat', 'kode_kelas'];
-
-    // Relasi ke Siswa (Nanti dipakai)
     public function siswas()
     {
         return $this->hasMany(Siswa::class);
     }
-    // Relasi ke Riwayat Akademik (Nanti dipakai)
     public function riwayat_akademiks()
     {
         return $this->hasMany(RiwayatAkademik::class);

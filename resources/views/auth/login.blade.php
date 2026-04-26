@@ -1,7 +1,4 @@
 <x-guest-layout>
-    {{-- Hapus pembungkus min-h-screen di sini agar tidak double --}}
-
-    {{-- HEADER --}}
     <div class="w-full max-w-sm text-center mb-6 mx-auto">
         <div class="flex justify-center w-full mb-4">
             <a href="{{ url('/') }}"
@@ -14,7 +11,6 @@
         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">Masuk Ke Sistem Pembayaran SPP</p>
     </div>
 
-    {{-- TABEL LOGIN --}}
     <div class="w-full max-w-sm bg-white rounded-[2rem] shadow-xl border border-gray-100 p-6">
         <x-auth-session-status class="mb-4" :status="session('status')" />
 
@@ -22,7 +18,7 @@
             @csrf
 
             {{-- Input Email --}}
-            <div class="w-full text-left"> {{-- Tambahkan text-left --}}
+            <div class="w-full text-left">
                 <label
                     class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 px-1">Email</label>
                 <input id="email"
@@ -31,7 +27,6 @@
                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
             </div>
 
-            {{-- Input Password dengan Icon Mata --}}
             <div class="w-full text-left">
                 <label
                     class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 px-1">Password</label>
@@ -40,12 +35,9 @@
                         class="block w-full px-4 py-3 bg-gray-50 border-gray-200 border rounded-xl focus:ring-2 focus:ring-[#1072B8] outline-none text-sm font-medium pr-12"
                         type="password" name="password" required />
 
-                    {{-- Tombol Toggle --}}
-                    {{-- Ubah class right-0 pr-4 menjadi right-2 px-3 --}}
                     <button type="button" id="togglePassword"
                         class="absolute inset-y-0 right-2 px-3 flex items-center text-gray-400 hover:text-[#1072B8] transition-colors focus:outline-none">
 
-                        {{-- Icon Mata Terbuka (Sembunyi by default) --}}
                         <svg id="eyeOpen" class="w-5 h-5 hidden" fill="none" stroke="currentColor"
                             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -55,7 +47,6 @@
                             </path>
                         </svg>
 
-                        {{-- Icon Mata Tertutup (Tampil by default) --}}
                         <svg id="eyeClosed" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -68,7 +59,6 @@
                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
             </div>
 
-            {{-- Tombol & Fitur Lainnya --}}
             <div class="flex items-center justify-between px-1">
                 <label class="inline-flex items-center cursor-pointer">
                     <input id="remember_me" type="checkbox"
@@ -99,7 +89,6 @@
         </div>
     </div>
 
-    {{-- Script untuk Toggle Password --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const togglePassword = document.querySelector('#togglePassword');
@@ -108,11 +97,9 @@
             const eyeClosed = document.querySelector('#eyeClosed');
 
             togglePassword.addEventListener('click', function() {
-                // Toggle tipe atribut (password <-> text)
                 const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
                 password.setAttribute('type', type);
 
-                // Toggle logo mata terbuka/tertutup
                 eyeOpen.classList.toggle('hidden');
                 eyeClosed.classList.toggle('hidden');
             });

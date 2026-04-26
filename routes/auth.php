@@ -59,12 +59,10 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    
-    // Group Route untuk Ganti Password Wajib
     Route::name('password.change.')->group(function () {
         Route::get('/force-change-password', [App\Http\Controllers\Auth\ForcePasswordChangeController::class, 'index'])
             ->name('notice');
-        
+
         Route::post('/force-change-password', [App\Http\Controllers\Auth\ForcePasswordChangeController::class, 'update'])
             ->name('update');
     });

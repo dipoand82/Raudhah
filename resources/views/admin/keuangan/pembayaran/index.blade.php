@@ -11,18 +11,15 @@
             <div class="bg-white overflow-hidden shadow-sm rounded-xl border border-gray-200">
                 <div class="p-6 text-gray-900">
 
-                    {{-- HEADER --}}
                     <div class="mb-4">
                         <h3 class="text-lg font-bold text-gray-900">Log Transaksi Pembayaran</h3>
                         <p class="text-sm text-gray-500">Daftar seluruh transaksi pembayaran yang telah berhasil
                             diproses.</p>
                     </div>
 
-                    {{-- FILTER --}}
                     <form method="GET" action="{{ route('admin.keuangan.pembayaran.index') }}"
                         class="p-5 rounded-xl border border-gray-100 mb-6 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
 
-                        {{-- Pencarian --}}
                         <div class="relative md:col-span-3">
                             <input type="text" name="search" value="{{ request('search') }}"
                                 placeholder="Cari Nama / NISN / Kode Bayar..."
@@ -35,7 +32,6 @@
                             </button>
                         </div>
 
-                        {{-- Filter Kelas --}}
                         <div>
                             <select name="kelas_id" onchange="this.form.submit()"
                                 class="w-full border-gray-300 rounded-full text-sm">
@@ -50,7 +46,6 @@
                         </div>
                     </form>
 
-                    {{-- TABEL --}}
                     <div class="overflow-hidden border border-gray-200 rounded-xl shadow-sm">
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
@@ -187,7 +182,6 @@
                         </div>
                     </div>
 
-                    {{-- PAGINATION & SHOW --}}
                     <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
                         <form method="GET" action="{{ route('admin.keuangan.pembayaran.index') }}"
                             class="flex items-center gap-2">

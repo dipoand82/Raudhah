@@ -16,12 +16,10 @@ class ProfileUpdateRequest extends FormRequest
 public function rules(): array
     {
         return [
-            // Cukup 'sometimes', agar tidak terlalu ketat menolak nama dummy
             'name' => ['sometimes', 'string', 'max:255'],
             'email' => [
                 'required',
                 'string',
-                // 'lowercase', // <-- PASTIKAN INI DIHAPUS ATAU DIKOMENTAR (//)
                 'email',
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),

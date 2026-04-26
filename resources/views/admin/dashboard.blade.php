@@ -459,7 +459,6 @@
     <div class="py-6">
         <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
 
-            {{-- ══ GREETING ══ --}}
             <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div>
                     <div class="flex items-center gap-3 mb-1">
@@ -477,7 +476,6 @@
                     </p>
                 </div>
             </div>
-            {{-- Container Tombol dengan Flex Wrap dan Gap --}}
             <div class="flex flex-wrap items-center gap-3 mb-6">
                 @can('admin')
                     <a href="{{ route('admin.manajemen-user.index', ['tab' => 'panduan']) }}"
@@ -501,11 +499,9 @@
                     </a>
                 @endcan
 
-                {{-- Tombol Export Laporan (Hijau Muda/Soft) --}}
                 <a href="{{ route('admin.keuangan.laporan.export', request()->query()) }}"
                     class="inline-flex items-center gap-3 px-5 py-2 text-emerald-700 bg-gradient-to-r from-emerald-100 to-emerald-200 border border-emerald-300 rounded-full shadow-md shadow-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer group w-full sm:w-auto justify-center sm:justify-start">
 
-                    {{-- Titik Putih Bulat Selaras --}}
                     <span class="relative flex h-2.5 w-2.5 flex-shrink-0">
                         <span
                             class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
@@ -515,11 +511,9 @@
                     <span class="text-xs font-extrabold uppercase tracking-wider">Export Laporan</span>
                 </a>
 
-                {{-- Tombol Lihat Laporan (Hijau Tua/Solid) --}}
                 <a href="{{ route('admin.keuangan.laporan.index') }}"
                     class="inline-flex items-center gap-3 px-5 py-2 text-white bg-gradient-to-r from-emerald-600 to-emerald-700 border border-emerald-500 rounded-full shadow-lg shadow-emerald-600/30 hover:shadow-xl hover:shadow-emerald-600/50 hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer group w-full sm:w-auto justify-center sm:justify-start">
 
-                    {{-- Titik Putih Bulat Selaras --}}
                     <span class="relative flex h-2.5 w-2.5 flex-shrink-0">
                         <span
                             class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
@@ -530,10 +524,8 @@
                 </a>
             </div>
 
-            {{-- ══ STAT CARDS ══ --}}
             <div class="stats-grid">
 
-                {{-- Total Siswa (semua role lihat) --}}
                 <div class="stat-card">
                     <div>
                         <div class="stat-label">Total Siswa</div>
@@ -547,11 +539,6 @@
                         </svg>
                     </div>
                 </div>
-
-
-
-                {{-- Total Terkumpul (semua role lihat) --}}
-                @can('admin')
                     <div class="stat-card blue">
                         <div>
                             <div class="stat-label">Total Terkumpul</div>
@@ -565,9 +552,6 @@
                             </svg>
                         </div>
                     </div>
-                @endcan
-
-                {{-- Belum Bayar (semua role lihat) --}}
                 <div class="stat-card gold">
                     <div>
                         <div class="stat-label">Belum Bayar</div>
@@ -582,7 +566,6 @@
                     </div>
                 </div>
 
-                {{-- Transaksi Hari Ini (semua role lihat) --}}
                 <div class="stat-card">
                     <div>
                         <div class="stat-label">Transaksi Hari Ini</div>
@@ -605,10 +588,8 @@
 
             </div>
 
-            {{-- ══ BOTTOM GRID ══ --}}
             <div class="dash-bottom">
 
-                {{-- KIRI: Tabel Transaksi Terbaru --}}
                 <div>
                     <div class="dash-card">
 
@@ -637,20 +618,23 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-@forelse($transaksiTerbaru as $p)
+                                    @forelse($transaksiTerbaru as $p)
                                         @php
-                                            $kelas = $p->detailPembayaran->first()?->tagihanSpp?->riwayatAkademik?->kelas;
+                                            $kelas = $p->detailPembayaran->first()?->tagihanSpp?->riwayatAkademik
+                                                ?->kelas;
 
-                                            // 1. Ambil Nama Tagihan (Misal: "SPP Bulanan")
                                             $namaTagihan = $p->detailPembayaran
                                                 ->map(fn($d) => $d->tagihanSpp?->masterTagihan?->nama_tagihan)
                                                 ->filter()
                                                 ->unique()
                                                 ->implode(', ');
 
-                                            // 2. Ambil Periode Bulan & Tahun (Misal: "Januari 2026, Februari 2026")
                                             $listPeriode = $p->detailPembayaran
-                                                ->map(fn($d) => $d->tagihanSpp?->bulan ? $d->tagihanSpp->bulan . ' ' . $d->tagihanSpp->tahun : null)
+                                                ->map(
+                                                    fn($d) => $d->tagihanSpp?->bulan
+                                                        ? $d->tagihanSpp->bulan . ' ' . $d->tagihanSpp->tahun
+                                                        : null,
+                                                )
                                                 ->filter()
                                                 ->unique()
                                                 ->implode(', ');
@@ -658,46 +642,71 @@
                                             $jumlahItem = $p->detailPembayaran->count();
                                         @endphp
                                         <tr>
-                                            {{-- Kolom Siswa (Nama & NISN) --}}
                                             <td>
                                                 <div class="student-name">{{ $p->siswa->nama_lengkap }}</div>
                                                 <div class="student-nisn">{{ $p->siswa->nisn ?? '-' }}</div>
                                             </td>
 
-                                            {{-- Kolom Kelas --}}
                                             <td>
                                                 @if ($kelas)
-                                                    <span class="kelas-badge">{{ $kelas->tingkat }}{{ $kelas->nama_kelas }}</span>
+                                                    <span
+                                                        class="kelas-badge">{{ $kelas->tingkat }}{{ $kelas->nama_kelas }}</span>
                                                 @else
                                                     <span class="text-gray-300 text-xs">-</span>
                                                 @endif
                                             </td>
 
-                                            {{-- Kolom Tagihan (Desain mirip Nama & NISN) --}}
                                             <td>
-                                                <div class="student-name truncate max-w-[150px]" title="{{ $namaTagihan }}">
+                                                <div class="student-name truncate max-w-[150px]"
+                                                    title="{{ $namaTagihan }}">
                                                     {{ $namaTagihan ?: 'Tagihan' }}
                                                 </div>
-                                                <div class="student-nisn truncate max-w-[150px] mt-0.5" title="{{ $listPeriode }}">
+                                                <div class="student-nisn truncate max-w-[150px] mt-0.5"
+                                                    title="{{ $listPeriode }}">
                                                     {{ $listPeriode ?: '-' }}
                                                 </div>
 
-                                                {{-- Badge Item Gabungan (Tetap ditampilkan jika bulk payment) --}}
-                                                @if($jumlahItem > 1)
-                                                    <span class="inline-block mt-1 text-[9px] font-bold bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">
+                                                @if ($jumlahItem > 1)
+                                                    <span
+                                                        class="inline-block mt-1 text-[9px] font-bold bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">
                                                         {{ $jumlahItem }} Item
                                                     </span>
                                                 @endif
                                             </td>
 
-                                            {{-- Kolom Nominal --}}
                                             <td>
-                                                <span class="amount">Rp {{ number_format($p->total_bayar, 0, ',', '.') }}</span>
+                                                <span class="amount">Rp
+                                                    {{ number_format($p->total_bayar, 0, ',', '.') }}</span>
                                             </td>
 
-                                            {{-- Kolom Status --}}
                                             <td>
-                                                <span class="status-badge status-lunas">✓ Lunas</span>
+                                                @php
+                                                    $adaCicilan = $p->detailPembayaran->contains(
+                                                        fn($d) => $d->tagihanSpp?->status === 'cicilan',
+                                                    );
+                                                    $adaBelumLunas = $p->detailPembayaran->contains(
+                                                        fn($d) => $d->tagihanSpp?->status === 'belum_lunas',
+                                                    );
+                                                    $totalSisa = $p->detailPembayaran->sum(function ($d) {
+                                                        $tagihan = $d->tagihanSpp;
+                                                        if (!$tagihan) {
+                                                            return 0;
+                                                        }
+                                                        return max(0, $tagihan->jumlah_tagihan - $tagihan->terbayar);
+                                                    });
+                                                @endphp
+
+                                                @if ($adaCicilan || $adaBelumLunas)
+                                                    <span class="status-badge status-cicilan">⏳ Cicilan</span>
+                                                    @if ($totalSisa > 0)
+                                                        <div
+                                                            style="font-size:10px; color:#92400e; font-weight:700; margin-top:3px;">
+                                                            Sisa: Rp {{ number_format($totalSisa, 0, ',', '.') }}
+                                                        </div>
+                                                    @endif
+                                                @else
+                                                    <span class="status-badge status-lunas">✓ Lunas</span>
+                                                @endif
                                             </td>
                                         </tr>
                                     @empty
@@ -714,7 +723,6 @@
                     </div>
                 </div>
 
-                {{-- KANAN: Progress SPP Per Kelas --}}
                 <div>
                     <div class="dash-card">
                         <div class="dash-card-header">
@@ -727,7 +735,6 @@
                         <div class="prog-section" style="padding-top: 10px;">
                             @foreach ($progressPerKelas as $prog)
                                 <div class="prog-row" style="margin-bottom: 20px;">
-                                    {{-- Label & Info Angka --}}
                                     <div class="flex justify-between items-end mb-2">
                                         <div>
                                             <span
@@ -748,7 +755,6 @@
                                         </div>
                                     </div>
 
-                                    {{-- Progress Bar Container --}}
                                     <div class="prog-bar"
                                         style="width: 100%; height: 10px; background-color: #f3f4f6; border-radius: 20px; overflow: hidden; border: 1px solid #e5e7eb;">
                                         {{-- Isi Bar (Warna Dinamis) --}}
@@ -759,7 +765,6 @@
                                 </div>
                             @endforeach
 
-                            {{-- Footer Info --}}
                             <div style="margin-top: 10px; padding-top: 12px; border-top: 1px solid #f3f4f6;">
                                 <p style="font-size: 10px; color: #9ca3af; line-height: 1.4;">
                                     <i class="fas fa-info-circle mr-1"></i> Data di atas menunjukkan jumlah siswa yang

@@ -29,8 +29,7 @@ class TagihanSiswaController extends Controller
         $query = TagihanSpp::with(['riwayatAkademik.siswa', 'riwayatAkademik.kelas', 'masterTagihan'])
             ->join('riwayat_akademiks', 'tagihan_spps.riwayat_akademik_id', '=', 'riwayat_akademiks.id')
             ->join('kelas', 'riwayat_akademiks.kelas_id', '=', 'kelas.id')
-            ->select('tagihan_spps.*'); // ← penting agar tidak bentrok kolom
-        // --- Filter Pencarian ---
+            ->select('tagihan_spps.*');
         if ($request->filled('search')) {
             $search = $request->search;
             $query->whereHas('riwayatAkademik.siswa', function ($q) use ($search) {
@@ -38,27 +37,21 @@ class TagihanSiswaController extends Controller
                     ->orWhere('nisn', 'LIKE', "%{$search}%");
             });
         }
-
         if ($request->filled('kelas_id')) {
             $query->whereHas('riwayatAkademik', function ($q) use ($request) {
                 $q->where('kelas_id', $request->kelas_id);
             });
         }
-
         if ($request->filled('status')) {
             $query->where('tagihan_spps.status', $request->status);
         }
-
         if ($request->filled('periode')) {
             [$bulan, $tahun] = explode('|', $request->periode);
             $query->where('tagihan_spps.bulan', trim($bulan))->where('tagihan_spps.tahun', trim($tahun));
         }
-
         if ($request->filled('master_tagihan_id')) {
             $query->where('tagihan_spps.master_tagihan_id', $request->master_tagihan_id);
         }
-
-        // --- Logika Urutan ---
         if ($request->filled('selected_ids')) {
             $selectedIds = array_filter(explode(',', $request->selected_ids));
             $selectedIds = array_map('intval', array_filter($selectedIds));
@@ -76,7 +69,6 @@ class TagihanSiswaController extends Controller
                 ->orderBy('kelas.nama_kelas', 'asc');
         }
         $perPage = $request->input('per_page', 30);
-
         $tagihans = $query->paginate($perPage)->through(function ($item) {
             $item->sisa_tagihan = $item->jumlah_tagihan - $item->terbayar;
 
@@ -128,17 +120,13 @@ class TagihanSiswaController extends Controller
                 $query->where('kelas_id', $request->target_kelas);
             }
         }
-
         $targets = $query->get();
-
         if ($targets->isEmpty()) {
             return back()->with('error', 'Gagal: Tidak ada siswa aktif yang ditemukan pada kriteria tersebut.');
         }
-
         return DB::transaction(function () use ($targets, $master, $request) {
             $count = 0;
             $skipped = 0;
-
             foreach ($targets as $siswa) {
                 $riwayat = RiwayatAkademik::firstOrCreate([
                     'siswa_id' => $siswa->id,
@@ -146,14 +134,12 @@ class TagihanSiswaController extends Controller
                 ], [
                     'kelas_id' => $siswa->kelas_id,
                 ]);
-
                 $exists = TagihanSpp::where([
                     'master_tagihan_id' => $master->id,
                     'riwayat_akademik_id' => $riwayat->id,
                     'bulan' => $request->bulan,
                     'tahun' => $request->tahun,
                 ])->exists();
-
                 if (! $exists) {
                     TagihanSpp::create([
                         'master_tagihan_id' => $master->id,
@@ -169,48 +155,43 @@ class TagihanSiswaController extends Controller
                     $skipped++;
                 }
             }
-
             $pesan = "$count Tagihan berhasil dibuat secara massal!";
             if ($skipped > 0) {
                 $pesan .= " Sebanyak $skipped siswa dilewati karena sudah memiliki tagihan yang sama.";
             }
-
             return back()->with('success', $pesan);
         });
     }
 
-public function destroyBulk(Request $request)
-{
-    $request->validate([
-        'tagihan_ids'   => 'required|array',
-        'tagihan_ids.*' => 'exists:tagihan_spps,id',
-    ], [
-        'tagihan_ids.required'  => 'Pilih setidaknya satu tagihan untuk dihapus.',
-        'tagihan_ids.*.exists'  => 'Salah satu tagihan tidak ditemukan atau sudah dihapus.',
-    ]);
+    public function destroyBulk(Request $request)
+    {
+        $request->validate([
+            'tagihan_ids' => 'required|array',
+            'tagihan_ids.*' => 'exists:tagihan_spps,id',
+        ], [
+            'tagihan_ids.required' => 'Pilih setidaknya satu tagihan untuk dihapus.',
+            'tagihan_ids.*.exists' => 'Salah satu tagihan tidak ditemukan atau sudah dihapus.',
+        ]);
+        try {
+            $deletedCount = TagihanSpp::whereIn('id', $request->tagihan_ids)
+                ->where('status', 'belum_lunas')
+                ->delete();
 
-    try {
-        $deletedCount = TagihanSpp::whereIn('id', $request->tagihan_ids)
-            ->where('status', 'belum_lunas')
-            ->delete();
-
-        if ($deletedCount === 0) {
+            if ($deletedCount === 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal. Hanya tagihan berstatus BELUM LUNAS yang bisa dihapus.',
+                ], 422);
+            }
+            return response()->json([
+                'success' => true,
+                'message' => "{$deletedCount} tagihan berhasil dihapus dari sistem.",
+            ]);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal. Hanya tagihan berstatus BELUM LUNAS yang bisa dihapus.',
-            ], 422);
+                'message' => 'Terjadi kesalahan sistem: '.$e->getMessage(),
+            ], 500);
         }
-
-        return response()->json([
-            'success' => true,
-            'message' => "{$deletedCount} tagihan berhasil dihapus dari sistem.",
-        ]);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage(),
-        ], 500);
     }
-}
 }

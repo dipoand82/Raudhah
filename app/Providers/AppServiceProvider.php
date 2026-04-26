@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use App\Models\ProfilSekolah;
 use App\Models\User;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL; // Tambahkan ini di atas
 use Illuminate\Support\Facades\View;
@@ -25,28 +24,22 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Cek apakah diakses lewat ngrok (baik dari domain .app atau .dev)
-        // atau jika APP_URL di .env memang sedang diset ke ngrok
         if (str_contains(request()->getHost(), 'ngrok-free') || str_contains(config('app.url'), 'ngrok')) {
             URL::forceScheme('https');
         }
 
-        // 1. Sharing data profil ke semua view
         View::composer('*', function ($view) {
             $profil = ProfilSekolah::first();
             $view->with('profil_sekolah', $profil);
         });
 
-        // 2. Registrasi Gate Admin
         Gate::define('admin', function (User $user) {
             return $user->role === 'admin';
         });
 
-        // 3. Registrasi Gate Guru
         Gate::define('guru', function (User $user) {
             return $user->role === 'guru';
         });
-        // Opsional: Gunakan Bootstrap untuk Pagination
-        // Paginator::useBootstrapFour();
+
     }
 }

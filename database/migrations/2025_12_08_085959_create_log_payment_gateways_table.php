@@ -15,7 +15,7 @@ public function up(): void
         $table->id();
         $table->foreignId('pembayaran_id')->nullable()->constrained('pembayarans')->onDelete('set null');
         $table->string('order_id_gateway')->nullable();
-        $table->text('request_body'); // Data mentah Midtrans
+        $table->text('request_body');
         $table->text('response_body')->nullable();
         $table->timestamps();
     });

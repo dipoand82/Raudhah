@@ -9,13 +9,11 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-8">
 
-                {{-- ALERT SUCCESS --}}
                 @if (session('success'))
                     <x-alert-success>
                         {{ session('success') }}
                     </x-alert-success>
                 @endif
-                {{-- Tampilkan Alert Gagal (Misal dari Session Error) --}}
                 @if (session('error'))
                     <x-alert-danger>
                         {{ session('error') }}
@@ -24,7 +22,7 @@
 
                 @if ($errors->any())
                     @foreach ($errors->all() as $error)
-                        <x-alert-danger timeout="8000"> {{-- Waktu 8 detik agar sempat dibaca --}}
+                        <x-alert-danger timeout="8000">
                             {{ $error }}
                         </x-alert-danger>
                     @endforeach

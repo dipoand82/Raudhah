@@ -65,11 +65,7 @@
 
 
         <div class="flex items-center gap-4">
-            {{-- Tombol Simpan --}}
             <x-primary-button>{{ __('Simpan Perubahan') }}</x-primary-button>
-
-            {{-- Notifikasi Sukses --}}
-
         </div>
     </form>
 </section>

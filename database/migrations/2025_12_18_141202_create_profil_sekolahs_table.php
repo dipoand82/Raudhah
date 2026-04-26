@@ -13,35 +13,22 @@ return new class extends Migration
     {
         Schema::create('profil_sekolahs', function (Blueprint $table) {
             $table->id();
-
-            // Data Utama
             $table->string('nama_sekolah')->default('SMP IT Raudhah');
-            $table->text('deskripsi_singkat')->nullable(); // Intro sekolah
-
-            // Visi Misi
+            $table->text('deskripsi_singkat')->nullable();
             $table->text('visi')->nullable();
             $table->text('misi')->nullable();
-
-            // Konten Tambahan
-            $table->text('alasan_memilih')->nullable(); // Poin-poin alasan
-            $table->text('program_unggulan')->nullable(); // Daftar program
-            $table->text('info_penting')->nullable(); // Untuk info tambahan
-
-            // Kontak
+            $table->text('alasan_memilih')->nullable();
+            $table->text('program_unggulan')->nullable();
+            $table->text('info_penting')->nullable();
             $table->text('alamat')->nullable();
             $table->string('email')->nullable();
             $table->string('telepon', 20)->nullable();
-
-            // Media (Gambar)
-            $table->string('logo_path')->nullable(); // Logo
-            $table->string('banner_path')->nullable(); // Banner (Ditaruh di bawah logo)
-            $table->string('brosur_info')->nullable(); // Banner (Ditaruh di bawah logo)
-
-            // Media Sosial
+            $table->string('logo_path')->nullable();
+            $table->string('banner_path')->nullable();
+            $table->string('brosur_info')->nullable();
             $table->string('instagram')->nullable();
             $table->string('tiktok')->nullable();
-            $table->text('info_footer')->nullable(); // Untuk info tambahan
-
+            $table->text('info_footer')->nullable();
             $table->timestamps();
         });
     }
@@ -51,7 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Karena up() membuat tabel, maka down() harus menghapus tabel
         Schema::dropIfExists('profil_sekolahs');
     }
 };

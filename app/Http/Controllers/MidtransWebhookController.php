@@ -11,39 +11,36 @@ use Illuminate\Support\Facades\Log;
 
 class MidtransWebhookController extends Controller
 {
-
     public function handle(Request $request)
-    {   Log::info('Midtrans webhook diterima', $request->all());
-        // 1. Verifikasi signature dari Midtrans (Keamanan Utama)
-        $serverKey   = config('services.midtrans.server_key');
-        $orderId     = $request->order_id;
-        $statusCode  = $request->status_code;
+    {
+        Log::info('Midtrans webhook diterima', $request->all());
+        $serverKey = config('services.midtrans.server_key');
+        $orderId = $request->order_id;
+        $statusCode = $request->status_code;
         $grossAmount = $request->gross_amount;
 
-        $signatureKey = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
+        $signatureKey = hash('sha512', $orderId.$statusCode.$grossAmount.$serverKey);
 
         if ($signatureKey !== $request->signature_key) {
             Log::warning('Midtrans webhook: signature tidak valid', ['order_id' => $orderId]);
+
             return response()->json(['message' => 'Invalid signature'], 403);
         }
 
-        // 2. Cari tagihan berdasarkan order_id
         $tagihan = TagihanSpp::where('midtrans_order_id', $orderId)->first();
 
-        if (!$tagihan) {
+        if (! $tagihan) {
             Log::warning('Midtrans webhook: tagihan tidak ditemukan', ['order_id' => $orderId]);
+
             return response()->json(['message' => 'Tagihan tidak ditemukan'], 404);
         }
 
-        // 3. Logika Perubahan Status
         $transactionStatus = $request->transaction_status;
-        $fraudStatus       = $request->fraud_status ?? 'accept';
+        $fraudStatus = $request->fraud_status ?? 'accept';
 
-        // PROSES JIKA BERHASIL
         if ($transactionStatus == 'settlement' || $transactionStatus == 'capture') {
             if ($fraudStatus == 'accept') {
 
-                // Cek apakah sudah lunas (Idempotency)
                 if ($tagihan->status === 'lunas') {
                     return response()->json(['message' => 'Already processed']);
                 }
@@ -52,39 +49,34 @@ class MidtransWebhookController extends Controller
                     $sisaTagihan = $tagihan->jumlah_tagihan - $tagihan->terbayar;
                     $siswaId = $tagihan->riwayatAkademik->siswa_id;
 
-                    // Buat header pembayaran
                     $pembayaran = Pembayaran::create([
-                        'kode_pembayaran'   => $orderId,
-                        'siswa_id'          => $siswaId,
-                        'user_id_admin'     => null,
-                        'total_bayar'       => $sisaTagihan,
-                        'tanggal_bayar'     => now(),
+                        'kode_pembayaran' => $orderId,
+                        'siswa_id' => $siswaId,
+                        'user_id_admin' => null,
+                        'total_bayar' => $sisaTagihan,
+                        'tanggal_bayar' => now(),
                         'metode_pembayaran' => 'qris',
-                        'status_gateway'    => 'settlement',
+                        'status_gateway' => 'settlement',
                     ]);
 
-                    // Buat detail pembayaran
                     PembayaranDetail::create([
-                        'pembayaran_id'   => $pembayaran->id,
-                        'tagihan_spp_id'  => $tagihan->id,
+                        'pembayaran_id' => $pembayaran->id,
+                        'tagihan_spp_id' => $tagihan->id,
                         'nominal_dibayar' => $sisaTagihan,
                     ]);
 
-                    // Update status tagihan & BERSIHKAN snap_token
                     $tagihan->update([
-                        'terbayar'   => $tagihan->terbayar + $sisaTagihan,
-                        'status'     => 'lunas',
-                        'snap_token' => null // Token dihapus karena transaksi sudah selesai
+                        'terbayar' => $tagihan->terbayar + $sisaTagihan,
+                        'status' => 'lunas',
+                        'snap_token' => null,
                     ]);
                 });
             }
-        }
-        // PROSES JIKA GAGAL/EXPIRED
-        elseif ($transactionStatus == 'expire' || $transactionStatus == 'cancel' || $transactionStatus == 'deny') {
+        } elseif ($transactionStatus == 'expire' || $transactionStatus == 'cancel' || $transactionStatus == 'deny') {
             $tagihan->update([
-                'status'            => 'belum_lunas',
-                'snap_token'        => null, // Hapus agar bisa generate baru nanti
-                'midtrans_order_id' => null
+                'status' => 'belum_lunas',
+                'snap_token' => null,
+                'midtrans_order_id' => null,
             ]);
             Log::info("Tagihan $orderId dibatalkan/expired.");
         }

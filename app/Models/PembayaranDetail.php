@@ -17,15 +17,13 @@ class PembayaranDetail extends Model
         'nominal_dibayar'
     ];
 
-    // Relasi balik ke header pembayaran (Struk Induk)
     public function pembayaran()
     {
         return $this->belongsTo(Pembayaran::class, 'pembayaran_id', 'id');
     }
 
-    // Relasi ke tagihan SPP yang dibayar
     public function tagihanSpp()
     {
         return $this->belongsTo(TagihanSpp::class, 'tagihan_spp_id', 'id');
-    }    
+    }
 }

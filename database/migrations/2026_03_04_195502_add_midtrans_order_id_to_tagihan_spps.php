@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tagihan_spps', function (Blueprint $table) {
-            // Menambahkan kolom midtrans_order_id setelah kolom id
             $table->string('midtrans_order_id')->nullable()->after('id');
         });
     }
@@ -23,7 +22,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('tagihan_spps', function (Blueprint $table) {
-            // Menghapus kolom jika di-rollback
             $table->dropColumn('midtrans_order_id');
         });
     }

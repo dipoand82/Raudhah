@@ -17,7 +17,6 @@ class DashboardController extends Controller
             abort(403, 'Data siswa tidak ditemukan untuk akun ini.');
         }
 
-        // Logika pengambilan tagihan Anda...
         $semuaTagihan = TagihanSpp::whereHas('riwayatAkademik', function ($q) use ($siswa) {
             $q->where('siswa_id', $siswa->id);
         })
@@ -29,9 +28,8 @@ class DashboardController extends Controller
         $belumLunas = $semuaTagihan->whereIn('status', ['belum_lunas', 'cicilan', 'pending'])->count();
         $tagihanBelumLunas = $semuaTagihan->whereIn('status', ['belum_lunas', 'cicilan', 'pending'])->values();
 
-        // Tambahkan variabel 'user' ke compact agar view bisa mengecek must_change_password
         return view('siswa.dashboard', compact(
-            'user', // Penting untuk pengecekan modal
+            'user',
             'siswa',
             'totalTagihan',
             'sudahLunas',

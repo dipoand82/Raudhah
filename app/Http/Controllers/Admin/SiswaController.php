@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Exports\SiswaExport;
 use App\Exports\TemplateSiswaExport;
 use App\Http\Controllers\Controller;
 use App\Imports\SiswaImport;
 use App\Models\Kelas;
 use App\Models\Siswa;
 use App\Models\TahunAjaran;
-use App\Models\User; // <-- TAMBAHAN: Untuk Export Data Real
+use App\Models\User;
 use App\Traits\HandlesExcelImports;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,26 +19,13 @@ class SiswaController extends Controller
 {
     use HandlesExcelImports;
 
-    // === 1. HALAMAN UTAMA (FILTER + SEARCH) ===
     public function index(Request $request)
     {
-        // Dapatkan limit pagination (Kode Lama)
         $limit = $request->input('per_page', 30);
-
-        // ==========================================================
-        // A. Query Dasar dengan JOIN
-        // ==========================================================
         $query = Siswa::query()
-            // 1. Join ke Users (untuk sorting berdasarkan Nama)
             ->join('users', 'siswas.user_id', '=', 'users.id')
-            // 2. Left Join (Tetap gunakan Left Join dari kode lama agar siswa tanpa kelas tetap muncul)
             ->leftJoin('kelas', 'siswas.kelas_id', '=', 'kelas.id')
-            // 3. Select siswas.* agar output tetap berupa model Siswa
             ->select('siswas.*');
-
-        // ==========================================================
-        // B. Logika Search (Nama / NISN) - (DIPERTAHANKAN)
-        // ==========================================================
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -47,63 +33,31 @@ class SiswaController extends Controller
                     ->orWhere('users.name', 'like', "%{$search}%");
             });
         }
-
-        // ==========================================================
-        // C. Logika Filter Tambahan - (DIPERTAHANKAN)
-        // ==========================================================
-
-        // Filter Kelas
         if ($request->filled('kelas_id')) {
             $query->where('siswas.kelas_id', $request->kelas_id);
         }
-
-        // Filter Status
         if ($request->filled('status')) {
             $query->where('siswas.status', $request->status);
         }
-
-        // ==========================================================
-        // D. Logika Pengurutan
-        // ==========================================================
         $siswas = $query
-            // --- [BARU DITAMBAHKAN] ---
-            // Logika: Urutkan status dulu (Aktif -> Cuti -> Lulus -> Keluar -> Pindah)
             ->orderByRaw("FIELD(siswas.status, 'Aktif', 'Cuti', 'Lulus', 'Pindah', 'Keluar') ASC")
-            // --------------------------
-
-            // --- [LOGIKA LAMA DIPERTAHANKAN SEBAGAI CADANGAN] ---
-            ->orderBy('kelas.tingkat', 'asc')     // 1. Kelas 7, 8, 9
-            ->orderBy('kelas.nama_kelas', 'asc')  // 2. Kelas A, B, C
-            ->orderBy('users.name', 'asc')        // 3. Nama Ahmad, Budi, dst
-
-            // Load relasi (Tetap dipertahankan)
+            ->orderBy('kelas.tingkat', 'asc')
+            ->orderBy('kelas.nama_kelas', 'asc')
+            ->orderBy('users.name', 'asc')
             ->with(['user', 'kelas', 'tahunAjaran'])
             ->paginate($limit);
-
         $totalSiswa = $siswas->total();
-
-        // ==========================================================
-        // E. Data Pendukung (Modal) - (DIPERTAHANKAN)
-        // ==========================================================
         $kelas = Kelas::orderBy('tingkat')->orderBy('nama_kelas')->get();
-
-        // Untuk modal EDIT (ambil semua untuk dropdown)
-
         $tahunAjaranList = TahunAjaran::orderBy('tahun', 'desc')->get();
 
-        // F. Kirim ke View - (DIPERTAHANKAN)
-        return view('admin.data_siswa.index', compact('siswas', 'kelas', 'tahunAjaranList','totalSiswa'));
+        return view('admin.data_siswa.index', compact('siswas', 'kelas', 'tahunAjaranList', 'totalSiswa'));
     }
 
-    // === 2. EXPORT DATA (FITUR BARU UNTUK ROUND-TRIP EXCEL) ===
     public function export(Request $request)
     {
-        // Ambil nilai asli dari request (bisa null jika tidak dipilih)
         $kelasId = $request->get('kelas_id');
         $status = $request->get('status');
-        $search = $request->get('search'); // Tambahkan search jika ingin filter kata kunci juga
-
-        // Logika untuk LABEL Nama File saja
+        $search = $request->get('search');
         $labelStatus = $status ?: 'Semua-Status';
         $labelKelas = 'Semua-Kelas';
 
@@ -114,14 +68,11 @@ class SiswaController extends Controller
             }
         }
 
-        // Susun nama file
         $fileName = "Data-Siswa-{$labelKelas} & Status-{$labelStatus} ".'.xlsx';
 
-        // Kirim $status yang asli (null/isi) agar query database di SiswaExport benar
         return Excel::download(new \App\Exports\SiswaExport($kelasId, $status, $search), $fileName);
     }
 
-    // === 3. HALAMAN EDIT DETAIL ===
     public function edit($id)
     {
         $siswa = Siswa::findOrFail($id);
@@ -131,12 +82,10 @@ class SiswaController extends Controller
         return view('admin.data_siswa.edit', compact('siswa', 'kelas', 'tahunAjaran'));
     }
 
-    // === 4. PROSES UPDATE ===
     public function update(Request $request, $id)
     {
         $siswa = Siswa::findOrFail($id);
 
-        // 1. VALIDASI: Menambahkan aturan status/kelas dan pesan error kustom
         $request->validate([
             'email' => 'required|email|unique:users,email,'.$siswa->user_id,
             'nisn' => 'required|numeric|unique:siswas,nisn,'.$siswa->id,
@@ -144,31 +93,23 @@ class SiswaController extends Controller
             'status' => 'required|in:Aktif,Cuti,Lulus,Keluar,Pindah',
             'kelas_id' => [
                 'nullable',
-                'required_if:status,Aktif', // Jika status Aktif, kelas WAJIB diisi
+                'required_if:status,Aktif',
                 'exists:kelas,id',
             ],
         ], [
-            // --- BARU: Pesan Error Kustom agar Admin tidak bingung ---
             'kelas_id.required_if' => 'Siswa dengan status Aktif wajib memiliki kelas!',
             'email.unique' => 'Email ini sudah digunakan oleh pengguna lain.',
-            // 'nisn.unique' => 'NISN sudah terdaftar.',
         ]);
 
         return DB::transaction(function () use ($request, $siswa) {
 
-            // 2. LOGIKA KONSISTENSI
             $kelasId = $request->kelas_id;
             $tahunAjaranId = $request->tahun_ajaran_id;
 
-            // Jika status TIDAK Aktif, maka Kelas dan Tahun Ajaran dipaksa NULL
             if ($request->status !== 'Aktif') {
                 $kelasId = null;
-                // Optional: Biasanya siswa lulus/pindah tahun ajarannya tetap disimpan
-                // untuk arsip, tapi jika ingin null juga, aktifkan baris bawah ini:
-                // $tahunAjaranId = null;
             }
 
-            // 3. Update data User
             if ($siswa->user) {
                 $siswa->user->update([
                     'name' => $request->name,
@@ -176,11 +117,10 @@ class SiswaController extends Controller
                 ]);
             }
 
-            // 4. Update data Siswa
             $siswa->update([
                 'nisn' => $request->nisn,
                 'nama_lengkap' => $request->name,
-                'kelas_id' => $kelasId, // Menggunakan variabel yang sudah difilter IF di atas
+                'kelas_id' => $kelasId,
                 'jenis_kelamin' => $request->jenis_kelamin,
                 'tahun_ajaran_id' => $tahunAjaranId,
                 'status' => $request->status,
@@ -190,12 +130,10 @@ class SiswaController extends Controller
         });
     }
 
-    // === 5. HAPUS SISWA ===
     public function destroy($id)
     {
         $siswa = Siswa::findOrFail($id);
 
-        // Hapus User-nya juga agar bersih
         if ($siswa->user) {
             $siswa->user->delete();
         } else {
@@ -207,28 +145,20 @@ class SiswaController extends Controller
 
     public function bulkDestroy(Request $request)
     {
-        // 1. Validasi
         $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'exists:siswas,id',
         ]);
-
-        // 2. Eksekusi Hapus
         $siswas = Siswa::whereIn('id', $request->ids)->with('user')->get();
-
         foreach ($siswas as $siswa) {
             if ($siswa->user) {
-                // Menggunakan forceDelete jika Anda ingin benar-benar menghapus dari database (bukan soft delete)
                 $siswa->user->forceDelete();
             }
-            // Jika tabel 'siswas' tidak diset cascade di database, aktifkan ini:
-            // $siswa->delete();
         }
 
-        // 3. Kembalikan dengan info tab 'siswa'
         return redirect()->back()->with([
             'success' => count($request->ids).' data siswa terpilih berhasil dihapus!',
-            'active_tab' => 'siswa', // Kunci agar kembali ke tab siswa
+            'active_tab' => 'siswa',
         ]);
     }
 
@@ -238,9 +168,7 @@ class SiswaController extends Controller
             'ids' => 'required|array',
             'ids.*' => 'exists:siswas,id',
         ]);
-
         $siswas = Siswa::whereIn('id', $request->ids)->with('user')->get();
-
         $berhasil = 0;
         foreach ($siswas as $siswa) {
             if ($siswa && $siswa->user) {
@@ -254,7 +182,6 @@ class SiswaController extends Controller
         return redirect()->back()->with('success', $berhasil.' password siswa berhasil direset ke NISN.');
     }
 
-    // === 6. FORM CREATE (MANUAL) ===
     public function create()
     {
         $kelas = Kelas::orderBy('nama_kelas')->get();
@@ -263,17 +190,13 @@ class SiswaController extends Controller
         return view('admin.data_siswa.create', compact('kelas', 'tahunAjaran'));
     }
 
-    // === 7. PROSES STORE (MANUAL) ===
     public function store(Request $request)
     {
-        // Buat email otomatis jika input email kosong
         if (! $request->filled('email')) {
-            // Ganti spasi jadi titik dan kecilkan semua huruf
             $cleanName = strtolower(str_replace(' ', '.', $request->name));
             $generatedEmail = $cleanName.'.'.$request->nisn.'@raudhah.com';
             $request->merge(['email' => $generatedEmail]);
         }
-        // 1. Validasi Input
         $request->validate([
             'nisn' => 'required|numeric|unique:siswas,nisn',
             'nama_lengkap' => 'required|string|max:255',
@@ -282,24 +205,20 @@ class SiswaController extends Controller
             'tingkat' => 'required',
             'email' => 'required|email|unique:users,email',
         ]);
-        // AMBIL TAHUN AKTIF (Inilah obat untuk error "tahunAktif")
         $tahunAktif = TahunAjaran::where('is_active', true)->first();
 
-        // Menggunakan Transaction agar jika salah satu gagal, semua dibatalkan
         return DB::transaction(function () use ($request, $tahunAktif) {
 
-            // 2. BUAT/UPDATE USER (Sama dengan logika Import)
             $user = User::updateOrCreate(
                 ['email' => $request->email],
                 [
                     'name' => $request->nama_lengkap,
-                    'password' => Hash::make($request->nisn), // Password default = NISN
+                    'password' => Hash::make($request->nisn),
                     'role' => 'siswa',
                     'must_change_password' => true,
                 ]
             );
 
-            // 3. BUAT/UPDATE DATA SISWA (Sama dengan logika Import)
             Siswa::updateOrCreate(
                 ['nisn' => $request->nisn],
                 [
@@ -308,7 +227,6 @@ class SiswaController extends Controller
                     'jenis_kelamin' => strtoupper($request->jenis_kelamin),
                     'kelas_id' => $request->kelas_id,
                     'tingkat' => $request->tingkat,
-                    // Pastikan variabel $this->tahunAktif sudah didefinisikan di __construct atau method lain
                     'tahun_ajaran_id' => $tahunAktif ? $tahunAktif->id : null,
                     'status' => 'Aktif',
                 ]
@@ -319,13 +237,11 @@ class SiswaController extends Controller
         });
     }
 
-    // === 8. DOWNLOAD TEMPLATE IMPORT ===
     public function downloadTemplate()
     {
         return Excel::download(new TemplateSiswaExport, 'template_import_siswa.xlsx');
     }
 
-    // === 9. PROSES IMPORT (TRAIT) ===
     public function import(Request $request)
     {
         $request->validate([

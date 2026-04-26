@@ -18,11 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\CheckRole::class,
         ]);
 
-        // ini sesuai dengan URL yang kamu daftarkan di dashboard Midtrans
         $middleware->validateCsrfTokens(except: [
             '/webhook/midtrans',
             'midtrans/webhook',
-            'api/webhook/midtrans', // Tambahkan ini jika route kamu ada di api.php
+            'api/webhook/midtrans',
             'midtrans/*',
         ]);
     })

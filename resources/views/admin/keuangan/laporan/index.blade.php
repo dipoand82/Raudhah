@@ -7,55 +7,51 @@
 
     <div class="py-12 print:py-2">
         <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-6 space-y-4">
-
-            {{-- ============================================================
-                 FILTER — rounded pill style
-                 ============================================================ --}}
             <div class="bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-gray-200 print:hidden">
                 <form method="GET" action="{{ route('admin.keuangan.laporan.index') }}"
                     class="flex flex-wrap gap-3 items-end">
 
                     <div class="flex flex-col gap-1">
-    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1"></label>
-    <div class="relative">
-        <input type="text" name="search" value="{{ request('search') }}"
-            placeholder="Cari nama / NISN..."
-            class="rounded-full border-gray-300 text-sm focus:border-[#1072B8] focus:ring-[#1072B8] py-2 pl-4 pr-10 w-52">
-        <button type="submit"
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#1072B8] transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
-        </button>
-    </div>
-</div>
+                        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1"></label>
+                        <div class="relative">
+                            <input type="text" name="search" value="{{ request('search') }}"
+                                placeholder="Cari nama / NISN..."
+                                class="rounded-full border-gray-300 text-sm focus:border-[#1072B8] focus:ring-[#1072B8] py-2 pl-4 pr-10 w-52">
+                            <button type="submit"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#1072B8] transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
 
-                    {{-- Semester --}}
                     <div class="flex flex-col gap-1">
                         <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1"></label>
                         <select name="periode" onchange="this.form.submit()"
                             class="rounded-full border-gray-300 text-sm focus:border-[#1072B8] focus:ring-[#1072B8] py-2 pl-4 pr-8 ">
                             <option value="ganjil" {{ $periode == 'ganjil' ? 'selected' : '' }}>Ganjil ( Jul–Des )
                             </option>
-                            <option value="genap" {{ $periode == 'genap' ? 'selected' : '' }}>Genap ( Jan–Jun )</option>
+                            <option value="genap" {{ $periode == 'genap' ? 'selected' : '' }}>Genap ( Jan–Jun )
+                            </option>
                         </select>
                     </div>
 
-                    {{-- Tahun --}}
-                    {{-- Tahun --}}
                     <div class="flex flex-col gap-1">
-                        {{-- Tambahkan teks label agar user tahu ini filter apa --}}
                         <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1"></label>
 
                         <select name="tahun" onchange="this.form.submit()"
                             class="rounded-full border-gray-300 text-sm focus:border-[#1072B8] focus:ring-[#1072B8] py-2 pl-4 pr-8 cursor-pointer">
 
-                            {{-- Opsi default atau placeholder --}}
                             <option value="">Pilih Tahun</option>
 
-                            {{-- Loop Tahun: Dimulai dari tahun depan sampai tahun 2027 (sesuai data awal Anda) --}}
-                            @for ($y = date('Y') + 1; $y >= 2026; $y--)
+                            @php
+                                $tahunMulai = 2026;
+                                $tahunTerjauh = date('Y') + 1;
+                            @endphp
+
+                            @for ($y = $tahunTerjauh; $y >= $tahunMulai; $y--)
                                 <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>
                                     {{ $y }}
                                 </option>
@@ -63,7 +59,6 @@
                         </select>
                     </div>
 
-                    {{-- Kelas --}}
                     <div class="flex flex-col gap-1">
                         <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest pl-1"></label>
                         <select name="kelas_id" onchange="this.form.submit()"
@@ -78,10 +73,8 @@
                         </select>
                     </div>
 
-                    {{-- Spacer dorong tombol ke kanan --}}
                     <div class="flex-1"></div>
 
-                    {{-- Tombol Cetak Excel --}}
                     <a href="{{ route('admin.keuangan.laporan.export', request()->query()) }}"
                         class="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition shadow-sm whitespace-nowrap">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -91,23 +84,11 @@
                         Export Laporan
                     </a>
 
-                    {{-- Tombol Cetak PDF
-                    <button type="button" onclick="window.print()"
-                        class="inline-flex items-center gap-2 border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 px-5 py-2 rounded-full text-sm font-bold transition shadow-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                        </svg>
-                        Cetak PDF
-                    </button> --}}
-
-                    {{-- Hidden fields agar per_page & query lain ikut submit --}}
                     <input type="hidden" name="tahun" value="{{ $tahun }}">
                     <input type="hidden" name="per_page" value="{{ $perPage }}">
                 </form>
             </div>
 
-            {{-- JUDUL CETAK --}}
             <div class="hidden print:block text-center mb-4">
                 <h1 class="text-xl font-bold uppercase">Rekapitulasi Pembayaran</h1>
                 <p class="text-sm text-gray-600">
@@ -120,17 +101,12 @@
                 <p class="text-xs text-gray-400 mt-1">Dicetak: {{ now()->format('d/m/Y H:i') }}</p>
             </div>
 
-            {{-- ============================================================
-                 TABEL MATRIKS
-                 ============================================================ --}}
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                 <div class="overflow-x-auto" style="max-height: 72vh; overflow-y: auto;">
                     <table class="min-w-full divide-y divide-gray-200 text-[11px]" id="rekap-table">
 
-                        {{-- THEAD --}}
                         <thead class="bg-[#3B3E42] sticky top-0 z-20">
 
-                            {{-- Baris 1: kelompok jenis tagihan --}}
                             <tr>
                                 <th rowspan="2"
                                     class="px-2 py-3 text-center text-white font-bold uppercase tracking-wider sticky left-0 z-30 bg-[#3B3E42] border-r border-gray-600 w-10">
@@ -162,7 +138,6 @@
                                 </th>
                             </tr>
 
-                            {{-- Baris 2: sub-header bulan / status --}}
                             <tr>
                                 @foreach ($masterTagihans as $master)
                                     @php $isSPP = stripos($master->nama_tagihan, 'spp') !== false; @endphp
@@ -183,7 +158,6 @@
                             </tr>
                         </thead>
 
-                        {{-- TBODY --}}
                         <tbody class="divide-y divide-gray-100 bg-white">
                             @php $grandTotal = 0; @endphp
 
@@ -196,14 +170,12 @@
                                 <tr
                                     class="hover:bg-indigo-50/40 transition {{ $isEven ? 'bg-gray-50/60' : 'bg-white' }}">
 
-                                    {{-- No --}}
                                     <td
                                         class="px-2 py-3 text-center text-gray-500 font-medium sticky left-0 z-10 border-r border-gray-100
                                                {{ $isEven ? 'bg-gray-50' : 'bg-white' }}">
                                         {{ $siswas->firstItem() + $loopIndex }}
                                     </td>
 
-                                    {{-- Nama --}}
                                     <td
                                         class="px-4 py-3 sticky left-10 z-10 border-r border-gray-100 shadow-[2px_0_4px_rgba(0,0,0,0.04)]
            {{ $isEven ? 'bg-gray-50' : 'bg-white' }}">
@@ -219,7 +191,6 @@
                                         </div>
                                     </td>
 
-                                    {{-- Sel per jenis tagihan --}}
                                     @foreach ($masterTagihans as $master)
                                         @php $isSPP = stripos($master->nama_tagihan, 'spp') !== false; @endphp
 
@@ -255,28 +226,41 @@
                                             @endforeach
                                         @else
                                             @php
-                                                $tagihan = collect($tagihans[$siswaId][$master->id] ?? [])->first();
-                                                $terbayar = $tagihan->terbayar ?? 0;
-                                                $totalPerSiswa += $terbayar;
+                                                $dataTagihanNonSpp = collect(
+                                                    $tagihans[$siswaId][$master->id] ?? [],
+                                                )->first();
+                                                $nominalTerbayar = $dataTagihanNonSpp->terbayar ?? 0;
+
+                                                $totalPerSiswa += $nominalTerbayar;
                                             @endphp
                                             <td class="px-2 py-3 text-center border-r border-gray-50">
-                                                @if (!$tagihan)
+                                                @if (!$dataTagihanNonSpp)
                                                     <span class="text-gray-200">—</span>
-                                                @elseif($tagihan->status === 'lunas')
+                                                @elseif($dataTagihanNonSpp->status === 'lunas')
                                                     <span
-                                                        class="inline-flex px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-extrabold text-[8px] border border-green-200">LUNAS</span>
-                                                @elseif($tagihan->status === 'cicilan')
-                                                    <span
-                                                        class="text-orange-500 font-bold font-mono text-[9px]">{{ number_format($terbayar / 1000, 0) }}k</span>
+                                                        class="inline-flex px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-extrabold text-[8px] border border-green-200">
+                                                        LUNAS
+                                                    </span>
+                                                @elseif($dataTagihanNonSpp->status === 'cicilan')
+                                                    <span class="text-orange-500 font-bold font-mono text-[9px]">
+                                                        {{ number_format($nominalTerbayar / 1000, 0) }}k
+                                                    </span>
                                                 @else
-                                                    <span
-                                                        class="inline-flex px-2 py-0.5 rounded-full bg-red-100 text-red-600 font-extrabold text-[8px] border border-red-200">BELUM</span>
+                                                    @if ($nominalTerbayar > 0)
+                                                        <span class="text-orange-500 font-bold font-mono text-[9px]">
+                                                            {{ number_format($nominalTerbayar / 1000, 0) }}k
+                                                        </span>
+                                                    @else
+                                                        <span
+                                                            class="inline-flex px-2 py-0.5 rounded-full bg-red-100 text-red-600 font-extrabold text-[8px] border border-red-200">
+                                                            BELUM
+                                                        </span>
+                                                    @endif
                                                 @endif
                                             </td>
                                         @endif
                                     @endforeach
 
-                                    {{-- Total per siswa --}}
                                     @php $grandTotal += $totalPerSiswa; @endphp
                                     <td
                                         class="px-3 py-3 text-right font-mono font-bold text-[#1072B8] bg-blue-50 border-l border-blue-100 whitespace-nowrap">
@@ -294,7 +278,6 @@
                         </tbody>
 
 
-                        {{-- TFOOT: Grand Total pojok kanan --}}
                         @if ($siswas->count() > 0)
                             <tfoot class="sticky bottom-0 z-20">
                                 <tr class="bg-[#1e2a3a]">
@@ -324,18 +307,13 @@
                 </div>
             </div>
 
-            {{-- ============================================================
-                 FOOTER: Info + Show per page + Pagination
-                 ============================================================ --}}
             <div class="flex flex-col sm:flex-row justify-between items-center gap-4 print:hidden">
 
-                {{-- Kiri: info jumlah & show per page --}}
                 <div class="flex items-center gap-3">
                     <span class="text-sm text-gray-500">Total <strong>{{ $siswas->total() }}</strong> siswa
                     </span>
                     <form method="GET" action="{{ route('admin.keuangan.laporan.index') }}"
                         class="flex items-center gap-2">
-                        {{-- Pertahankan filter aktif --}}
                         <input type="hidden" name="periode" value="{{ $periode }}">
                         <input type="hidden" name="tahun" value="{{ $tahun }}">
                         <input type="hidden" name="kelas_id" value="{{ request('kelas_id') }}">
@@ -350,15 +328,13 @@
                             @endforeach
                         </select>
                     </form>
-                                                                                <div class=" text-left">
-                            <p class="text-xs text-red-500 font-medium">
-                                * Jumlah data yang ditampilkan mempengaruhi jumlah total terbayar
-                            </p>
-                        </div>
+                    <div class=" text-left">
+                        <p class="text-xs text-red-500 font-medium">
+                            * Filter & Jumlah data yang ditampilkan mempengaruhi jumlah total terbayar
+                        </p>
+                    </div>
                 </div>
 
-
-                {{-- Kanan: Pagination links --}}
                 <div>
                     {{ $siswas->appends(request()->query())->links() }}
                 </div>

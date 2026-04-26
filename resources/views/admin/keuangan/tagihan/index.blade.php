@@ -7,7 +7,6 @@
 
     <div class="py-12" x-data="tagihanManager()" x-init="init()">
         <div class="max-w-7xl mx-auto px-4 sm:px-6">
-            {{-- TOAST SUKSES --}}
             <div x-show="toast.show" x-transition:leave="transition ease-in duration-500"
                 x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
                 :class="toast.type === 'success' ?
@@ -15,13 +14,11 @@
                     'bg-red-100 border-red-500 text-red-800'"
                 class="mb-4 flex items-center justify-between border-2 px-4 py-2.5 rounded-lg shadow-md" x-cloak>
                 <div class="flex items-center gap-3">
-                    {{-- Icon success --}}
                     <svg x-show="toast.type === 'success'" class="w-6 h-6 text-green-600 shrink-0" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    {{-- Icon error --}}
                     <svg x-show="toast.type === 'error'" class="w-6 h-6 text-red-600 shrink-0" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -36,7 +33,6 @@
                     <span class="text-3xl leading-none">&times;</span>
                 </button>
             </div>
-            {{-- Form Hapus Massal --}}
             <form id="form-hapus-massal" action="{{ route('admin.keuangan.tagihan.destroy-bulk') }}" method="POST">
                 @csrf
                 @method('DELETE')
@@ -45,13 +41,11 @@
                 </template>
             </form>
 
-            {{-- Alert Notifications --}}
             @if (session('success'))
                 <x-alert-success>
                     {{ session('success') }}
                 </x-alert-success>
             @endif
-            {{-- Tampilkan Alert Gagal (Misal dari Session Error) --}}
             @if (session('error'))
                 <x-alert-danger>
                     {{ session('error') }}
@@ -60,7 +54,7 @@
 
             @if ($errors->any())
                 @foreach ($errors->all() as $error)
-                    <x-alert-danger timeout="8000"> {{-- Waktu 8 detik agar sempat dibaca --}}
+                    <x-alert-danger timeout="8000">
                         {{ $error }}
                     </x-alert-danger>
                 @endforeach
@@ -73,14 +67,12 @@
                         <p class="text-sm text-gray-500">Kelola dan proses pembayaran tagihan secara kolektif.</p>
                     </div>
 
-                    {{-- FILTER BOX UTAMA --}}
                     <form method="GET" action="{{ route('admin.keuangan.tagihan.index') }}" id="filterForm"
                         class="p-5 rounded-xl border border-gray-100 mb-4 grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
 
                         <input type="hidden" name="selected_ids" :value="selectedIds.join(',')">
                         <input type="hidden" name="per_page" value="{{ request('per_page', 30) }}">
 
-                        {{-- Pencarian --}}
                         <div class="relative w-full">
                             <input type="text" name="search" value="{{ request('search') }}"
                                 placeholder="Cari Nama / NISN..."
@@ -93,7 +85,6 @@
                             </button>
                         </div>
 
-                        {{-- Kelas --}}
                         <div>
                             <select name="kelas_id" onchange="this.form.submit()"
                                 class="w-full border-gray-300 rounded-full text-sm">
@@ -107,7 +98,6 @@
                             </select>
                         </div>
 
-                        {{-- Jenis Tagihan --}}
                         <div>
                             <select name="master_tagihan_id" onchange="this.form.submit()"
                                 class="w-full border-gray-300 rounded-full text-sm">
@@ -121,7 +111,6 @@
                             </select>
                         </div>
 
-                        {{-- Periode --}}
                         <div>
                             <select name="periode" onchange="this.form.submit()"
                                 class="w-full border-gray-300 rounded-full text-sm">
@@ -136,7 +125,6 @@
                             </select>
                         </div>
 
-                        {{-- Status --}}
                         <div>
                             <select name="status" onchange="this.form.submit()"
                                 class="w-full border-gray-300 rounded-full text-sm">
@@ -150,12 +138,10 @@
                             </select>
                         </div>
                     </form>
-                    {{-- Info Total Floating --}}
                     <div x-show="selectedIds.length > 0" x-transition class="w-full mb-4">
                         <div
                             class="relative p-5 bg-blue-50 border border-blue-200 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm">
 
-                            {{-- Tombol Silang Kanan Atas --}}
                             <button type="button" @click="clearSelection()"
                                 class="absolute top-3 right-3 p-1.5 rounded-full bg-blue-100 hover:bg-blue-100 text-blue-400 hover:text-blue-500 transition"
                                 title="Batalkan semua pilihan">
@@ -200,7 +186,6 @@
                         </div>
                     </div>
 
-                    {{-- Header & Tombol Generate --}}
                     <div class="flex flex-col lg:flex-row justify-end items-start lg:items-center mb-4 gap-4">
 
                         <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
@@ -214,7 +199,6 @@
                                 Generate Tagihan
                             </button>
 
-                            {{-- 🔴 TOMBOL HAPUS --}}
                             <button type="button" @click="submitHapus()" :disabled="selectedIds.length === 0"
                                 :class="selectedIds.length === 0 ? 'bg-red-300 cursor-not-allowed' :
                                     'bg-red-600 hover:bg-red-700'"
@@ -225,16 +209,6 @@
                                 </svg>
                                 Hapus <span x-text="selectedIds.length">0</span> Tagihan
                             </button>
-
-                            {{-- 🔵 TOMBOL LUNASI --}}
-                            {{-- {{-- <form action="{{ route('admin.keuangan.pembayaran.store') }}" method="POST"
-                                id="form-pembayaran-massal">
-                                @csrf
-                                <template x-for="id in selectedIds" :key="id">
-                                    <input type="hidden" name="tagihan_ids[]" :value="id">
-                                </template>
-                                <input type="hidden" name="jumlah_bayar_total" :value="totalTagihan">
-                                <input type="hidden" name="metode" value="tunai"> --}}
 
                             <button type="button" @click="submitPembayaran()" :disabled="selectedIds.length === 0"
                                 :class="selectedIds.length === 0 ?
@@ -248,13 +222,9 @@
                                 Lunasi <span x-text="totalSiswa">0</span> Siswa (<span
                                     x-text="selectedIds.length">0</span> Tagihan )
                             </button>
-                            {{-- </form> --}}
                         </div>
                     </div>
 
-
-
-                    {{-- TABEL DATA --}}
                     <div class="overflow-hidden border border-gray-200 rounded-xl shadow-sm">
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
@@ -296,7 +266,6 @@
                                                     <input type="checkbox" value="{{ $tagihan->id }}"
                                                         data-nominal="{{ $tagihan->jumlah_tagihan - $tagihan->terbayar }}"
                                                         data-siswa-id="{{ $tagihan->riwayatAkademik->siswa->id }}"
-                                                        {{-- Perbaikan: Gunakan .toString() agar perbandingan ID selalu akurat --}}
                                                         :checked="selectedIds.map(id => id.toString()).includes(
                                                             '{{ $tagihan->id }}')"
                                                         @change="updateSelection($event)"
@@ -318,9 +287,6 @@
                                                     {{ $tagihan->riwayatAkademik->siswa->nama_lengkap ?? 'N/A' }}</div>
                                                 <div class="text-[11px] text-gray-400 mt-1 font-mono">
                                                     {{ $tagihan->riwayatAkademik->siswa->nisn ?? '-' }}</div>
-                                                {{-- <div class="text-[11px] text-blue-500 font-bold mt-0.5">
-                                                    Kelas {{ $tagihan->riwayatAkademik->kelas->tingkat ?? '' }}
-                                                    {{ $tagihan->riwayatAkademik->kelas->nama_kelas ?? '-' }}</div> --}}
                                             </td>
                                             <td class="px-4 py-4 text-center">
                                                 <span
@@ -375,7 +341,6 @@
                         </div>
                     </div>
 
-                    {{-- PAGINATION & LIMIT --}}
                     <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
                         <form method="GET" action="{{ route('admin.keuangan.tagihan.index') }}"
                             class="flex items-center gap-2">
@@ -405,20 +370,17 @@
                 </div>
             </div>
         </div>
-        {{-- MODAL GENERATE TAGIHAN --}}
         <x-modal name="modal-generate-tagihan" focusable>
             <form action="{{ route('admin.keuangan.tagihan.store-bulk') }}" method="POST" class="p-5 text-left"
                 id="form-generate-massal">
                 @csrf
 
-                {{-- Header: Dibuat lebih ringkas --}}
                 <div class="mb-4">
                     <h2 class="text-lg font-bold text-gray-900">Generate Tagihan Massal</h2>
                     <p class="text-xs text-gray-500">Buat tagihan otomatis untuk banyak siswa sekaligus.</p>
                 </div>
 
                 <div class="space-y-3.5">
-                    {{-- Baris 1: Jenis Tagihan (Full Width karena teks biasanya panjang) --}}
                     <div class="space-y-1">
                         <x-input-label value="Jenis Tagihan *" class="text-xs font-bold text-gray-700" />
                         <select name="master_tagihan_id"
@@ -434,7 +396,6 @@
                         </p>
                     </div>
 
-                    {{-- Baris 2: Tahun Ajaran & Tahun Tagihan (Dibuat sejajar agar hemat tempat) --}}
                     <div class="grid grid-cols-2 gap-3">
                         <div class="space-y-1">
                             <x-input-label value="Tahun Ajaran *" class="text-xs font-bold text-gray-700" />
@@ -446,15 +407,30 @@
                                 @endforeach
                             </select>
                         </div>
+
                         <div class="space-y-1">
                             <x-input-label value="Tahun Tagihan *" class="text-xs font-bold text-gray-700" />
-                            <input type="number" name="tahun" value="{{ date('Y') }}"
-                                class="block w-full border-gray-300 focus:border-amber-500 focus:ring-amber-500 rounded-lg shadow-sm text-sm px-3 py-2 transition"
-                                required min="{{ date('Y') }}" max="{{ date('Y') + 1 }}">
+
+                            <select name="tahun"
+                                class="block w-full border-gray-300 focus:border-amber-500 focus:ring-amber-500 rounded-lg shadow-sm bg-gray-50 text-sm px-3 py-2 transition"
+                                required>
+                                @php
+                                    $tahunSekarang = date('Y');
+                                    $tahunMinimal = 2026;
+                                @endphp
+
+                                @for ($y = $tahunSekarang + 1; $y >= $tahunMinimal; $y--)
+                                    <option value="{{ $y }}" {{ $y == $tahunSekarang ? 'selected' : '' }}>
+                                        {{ $y }}
+                                    </option>
+                                @endfor
+                            </select>
+
+                            <p class="text-[10px] text-gray-500 mt-1">* Pilih tahun untuk periode tagihan yang akan
+                                dibuat</p>
                         </div>
                     </div>
 
-                    {{-- Baris 3: Bulan & Target Siswa (Sejajar) --}}
                     <div class="grid grid-cols-2 gap-3">
                         <div class="space-y-1">
                             <x-input-label value="Bulan (Khusus SPP)" class="text-xs font-bold text-gray-700" />
@@ -485,23 +461,23 @@
                                     @endforeach
                                 </optgroup>
                             </select>
-                            <p class="text-[10px] text-red-500 font-medium">* Pastikan Siswa sudah memiliki <strong>Kelas</strong>
+                            <p class="text-[10px] text-red-500 font-medium">* Pastikan Siswa sudah memiliki
+                                <strong>Kelas</strong>
                             </p>
                         </div>
                     </div>
 
-                    {{-- Baris 4: Warning (Lebih compact) --}}
                     <div class="flex items-center gap-2 bg-orange-50 p-2.5 rounded-lg border border-orange-100">
                         <svg class="w-4 h-4 text-orange-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd"
                                 d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
                                 clip-rule="evenodd"></path>
                         </svg>
-                        <p class="text-[11px] text-orange-800 leading-tight">Data Ganda dan Siswa yang tidak memiliki Kelas otomatis dilewati sistem.</p>
+                        <p class="text-[11px] text-orange-800 leading-tight">Data Ganda dan Siswa yang tidak memiliki
+                            Kelas otomatis dilewati sistem.</p>
                     </div>
                 </div>
 
-                {{-- Footer: Jarak dikurangi (mt-6) --}}
                 <div class="mt-6 flex justify-end gap-2 border-t pt-4">
                     <x-secondary-button x-on:click="$dispatch('close')" class="text-xs">
                         Batal
@@ -519,21 +495,12 @@
         </x-modal>
         <x-modal name="modal-konfirmasi-generate" maxWidth="md" focusable>
             <div class="p-6 text-center">
-
-                {{-- Icon --}}
-                {{-- <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-amber-100 rounded-full">
-                    <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                </div> --}}
-
                 <h3 class="text-xl font-bold text-gray-900 mb-1">Generate Tagihan Massal?</h3>
                 <p class="text-sm text-gray-500 mb-6">
                     Sistem akan membuat tagihan baru untuk semua siswa sesuai kriteria yang dipilih.
                     Data ganda otomatis dilewati.
                 </p>
 
-                {{-- Info Box --}}
                 <div class="p-3 bg-amber-50 border border-amber-100 rounded-lg mb-6">
                     <p class="text-xs text-amber-700 font-bold uppercase tracking-wider mb-1">Perhatian</p>
                     <p class="text-sm text-amber-800">Proses ini tidak dapat dibatalkan setelah dijalankan.</p>
@@ -556,7 +523,6 @@
         </x-modal>
 
 
-        {{-- MODAL KONFIRMASI --}}
         <div x-show="showModal" class="fixed inset-0 z-50 overflow-y-auto" x-cloak>
             <div class="flex items-center justify-center min-h-screen px-4">
                 <div class="fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity" @click="showModal = false">
@@ -575,7 +541,6 @@
                                 x-text="'Rp ' + new Intl.NumberFormat('id-ID').format(totalTagihan)">
                             </p>
                         </div>
-                        {{-- Ganti bagian input Jumlah Bayar di modal --}}
                         <div>
                             <x-input-label class="font-bold text-gray-700">Jumlah Bayar (Rp)</x-input-label>
                             <div class="relative mt-2">
@@ -591,7 +556,6 @@
                                     class="pl-10 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-[#1072B8] focus:border-[#1072B8] sm:text-sm transition">
                             </div>
 
-                            {{-- Pesan dinamis --}}
                             <p class="text-[10px] mt-2 font-medium italic"
                                 :class="selectedIds.length > 1 ? 'text-red-400' : 'text-gray-500'">
                                 <span x-show="selectedIds.length <= 1">*Ubah jika bayar dicicil (kurang dari
@@ -643,12 +607,10 @@
             </div>
         </div>
 
-        {{-- MODAL KONFIRMASI HAPUS --}}
-        {{-- MODAL KONFIRMASI HAPUS (pakai x-modal component) --}}
+
         <x-modal name="modal-hapus-tagihan" maxWidth="md" focusable>
             <div class="p-6 text-center">
 
-                {{-- Icon Warning --}}
                 <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full">
                     <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -663,7 +625,6 @@
                     tagihan secara permanen. Tindakan ini tidak dapat dibatalkan.
                 </p>
 
-                {{-- Info Box --}}
                 <div class="p-3 bg-red-50 border border-red-100 rounded-lg mb-6">
                     <p class="text-xs text-red-600 font-bold uppercase tracking-wider mb-1">Total Tagihan Dihapus</p>
                     <p class="text-xl font-mono font-extrabold text-red-700"
@@ -689,13 +650,11 @@
 
     </div>
     <script>
-        // Auto scroll ke atas setiap kali halaman load
         window.scrollTo({
             top: 0,
             behavior: 'instant'
         });
 
-        // Bersihkan localStorage jika ada response dari server
         @if (session('success') || session('error') || $errors->any())
             localStorage.removeItem('selected_tagihan_ids');
             localStorage.removeItem('tagihan_siswa_map');
@@ -720,7 +679,6 @@
                 metodePembayaran: 'tunai',
                 isLoading: false,
 
-                // ── Toast (object tunggal, meniru style komponen blade) ──
                 toast: {
                     show: false,
                     message: '',
@@ -742,12 +700,10 @@
                     }, duration);
                 },
 
-                // ── Init ────────────────────────────────────────────────
                 init() {
                     this.calculateTotalSiswa();
                     this.jumlahBayarInput = this.totalTagihan;
 
-                    // Baca toast yang disimpan sebelum reload (lunasi / hapus AJAX)
                     const saved = sessionStorage.getItem('toast_data');
                     if (saved) {
                         sessionStorage.removeItem('toast_data');
@@ -759,7 +715,6 @@
                     }
                 },
 
-                // ── Helpers ─────────────────────────────────────────────
                 calculateTotalSiswa() {
                     this.totalSiswa = new Set(Object.values(this.tagihanToSiswaMap)).size;
                 },
@@ -859,7 +814,6 @@
                     this.updatePaginationLinks();
                 },
 
-                // ── LUNASI (AJAX) ────────────────────────────────────────
                 submitPembayaran() {
                     this.jumlahBayarInput = this.totalTagihan;
                     this.showModal = true;
@@ -887,7 +841,6 @@
                         const result = await response.json();
                         this.showModal = false;
 
-                        // Bersihkan pilihan lalu simpan pesan → reload
                         localStorage.removeItem('selected_tagihan_ids');
                         localStorage.removeItem('tagihan_siswa_map');
                         localStorage.removeItem('selected_total_nominal');
@@ -912,7 +865,6 @@
                     }
                 },
 
-                // ── HAPUS MASSAL (AJAX) ──────────────────────────────────
                 submitHapus() {
                     if (this.selectedIds.length === 0) return;
                     Alpine.store('hapusInfo', {

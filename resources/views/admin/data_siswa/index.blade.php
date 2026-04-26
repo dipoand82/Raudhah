@@ -8,7 +8,6 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-6">
 
-            {{-- ALERT SUCCESS --}}
             @if (session('success'))
                 <x-alert-success>
                     {{ session('success') }}
@@ -17,10 +16,8 @@
 
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
 
-                {{-- [BAGIAN 1: TOOLBAR ATAS] --}}
                 <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
 
-                    {{-- FORM PENCARIAN & FILTER --}}
                     <form method="GET" action="{{ route('admin.siswas.index') }}"
                         class="w-full lg:w-2/3 flex flex-col md:flex-row gap-3" x-data="{
                             status: '{{ request('status', '') }}',
@@ -41,8 +38,6 @@
                         <div class="w-full md:w-1/4">
                             <select name="kelas_id" x-model="kelas" onchange="this.form.submit()" {{-- LOGIKA 1: Jika pilih kelas (bukan kosong), otomatis status jadi Aktif --}}
                                 @change="if(kelas !== '') { status = 'Aktif' }; $nextTick(() => $el.form.submit())"
-                                {{-- LOGIKA 2: Mati jika status dipilih DAN status itu bukan Aktif --}} :disabled="status !== '' && status !== 'Aktif'"
-                                {{-- LOGIKA 3: Beri warna abu-abu jika mati --}}
                                 :class="status !== '' && status !== 'Aktif' ?
                                     'bg-gray-100 cursor-not-allowed opacity-60' : ''"
                                 class="w-full rounded-full border-gray-300 py-2 pl-4 pr-8 shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42] cursor-pointer text-gray-700">
@@ -57,7 +52,6 @@
                         </div>
                         <div class="w-full md:w-1/4">
                             <select name="status" x-model="status" onchange="this.form.submit()" {{-- LOGIKA: Jika status diubah ke selain Aktif/Kosong, reset dropdown Kelas ke Semua Kelas --}}
-                                {{-- @change="if(status !== '' && status !== 'Aktif') { kelas = '' }; $nextTick(() => $el.form.submit())" --}} {{-- LOGIKA GABUNGAN: Reset kelas jika milih 'Semua Status' ATAU status selain 'Aktif' --}}
                                 @change="if(status === '' || status !== 'Aktif') { kelas = '' }; $nextTick(() => $el.form.submit())"
                                 class="w-full rounded-full border-gray-300 py-2 pl-4 pr-8 shadow-sm focus:border-[#3B3E42] focus:ring-[#3B3E42] cursor-pointer text-gray-700">
                                 <option value="">-- Semua Status --</option>
@@ -71,7 +65,6 @@
                         </div>
                     </form>
 
-                    {{-- TOMBOL AKSI KANAN --}}
                     <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto justify-end">
                         <a href="{{ route('admin.siswas.export', ['kelas_id' => request('kelas_id'), 'search' => request('search'), 'status' => request('status')]) }}"
                             @click="$dispatch('loading'); setTimeout(() => $dispatch('loaded'), 3000)"
@@ -84,7 +77,6 @@
                             Export Data Siswa
                         </a>
 
-                        {{-- Tombol Tambah (Trigger Modal) --}}
                         @can('admin')
                             <button x-data="" x-on:click.prevent="$dispatch('open-modal', 'add-siswa')"
                                 type="button"
@@ -99,21 +91,17 @@
                     </div>
                 </div>
 
-                {{-- [BAGIAN 2: TABEL DATA] --}}
                 @can('admin')
-                    {{-- A. FORM BULK DELETE (Tanpa Onsubmit Confirm lagi, karena sudah pakai modal) --}}
                     <form action="{{ route('admin.siswas.bulk_delete') }}" method="POST" id="bulkDeleteForm">
                         @csrf
                         @method('DELETE')
                     </form>
 
-                    {{-- B. TOMBOL TRIGGER BULK DELETE --}}
                     <div id="bulkDeleteContainer"
                         class="hidden mb-3 bg-red-50 p-2 rounded flex justify-between items-center border border-red-200">
                         <span class="text-red-700 text-sm font-semibold ml-2">
                             <span id="selectedCount">0</span> Siswa dipilih
                         </span>
-                        {{-- Tombol ini membuka Modal Konfirmasi --}}
                         <x-danger-button type="button" x-data=""
                             x-on:click="$dispatch('open-modal', 'bulk-delete-confirm')"
                             class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-bold transition">
@@ -121,7 +109,6 @@
                         </x-danger-button>
                     </div>
 
-                    {{-- C. MODAL KONFIRMASI BULK DELETE --}}
                     <x-modal name="bulk-delete-confirm" focusable>
                         <div class="p-6">
                             <h2 class="text-lg font-bold text-gray-900">Konfirmasi Hapus Massal</h2>
@@ -134,7 +121,6 @@
                             <div class="mt-6 flex justify-end gap-3">
                                 <x-secondary-button x-on:click="$dispatch('close')">Batal</x-secondary-button>
 
-                                {{-- Tombol ini menekan form ID 'bulkDeleteForm' di atas --}}
                                 <x-danger-button type="submit" form="bulkDeleteForm">
                                     Ya, Hapus Semua
                                 </x-danger-button>
@@ -171,7 +157,6 @@
                                 <tr class="hover:bg-indigo-50/50 transition even:bg-gray-50">
                                     @can('admin')
                                         <td class="px-4 py-4 text-center">
-                                            {{-- Checkbox terhubung ke form bulk delete --}}
                                             <input type="checkbox" name="ids[]" form="bulkDeleteForm"
                                                 value="{{ $siswa->id }}"
                                                 class="select-item rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 cursor-pointer">
@@ -224,16 +209,13 @@
                                         <td
                                             class="px-6 py-4 text-right text-sm font-medium flex justify-end items-center gap-2">
 
-                                            {{-- 1. TOMBOL PEMICU MODAL --}}
                                             <button type="button" x-data
                                                 x-on:click="$dispatch('open-modal', 'edit-siswa-{{ $siswa->id }}')"
                                                 class="text-indigo-600 hover:text-indigo-900 font-semibold transition">
                                                 Edit
                                             </button>
 
-                                            {{-- 2. STRUKTUR MODAL EDIT --}}
                                             <x-modal name="edit-siswa-{{ $siswa->id }}" focusable>
-                                                {{-- Pastikan ada pembungkus div dengan p-6 agar tidak mepet ke pinggir --}}
                                                 <div class="p-6 text-left">
                                                     <h2 class="text-lg font-bold mb-4 border-b pb-2 text-[#1072B8]">
                                                         Edit Data Siswa: {{ $siswa->user->name ?? $siswa->nama_lengkap }}
@@ -244,7 +226,6 @@
                                                         @csrf
                                                         @method('PUT')
 
-                                                        {{-- Memanggil Komponen Form --}}
                                                         <x-siswa.edit-form :siswa="$siswa" :kelas="$kelas"
                                                             :tahunAjaran="$tahunAjaranList" />
 
@@ -257,23 +238,11 @@
                                                 </div>
                                             </x-modal>
 
-                                            {{-- 3. TOMBOL HAPUS (Tetap) --}}
                                             <x-siswa.delete-modal trigger="delete-siswa-{{ $siswa->id }}"
                                                 action="{{ route('admin.siswas.destroy', $siswa->id) }}"
                                                 message="{{ $siswa->user->name ?? $siswa->nama_lengkap }}" />
                                         </td>
                                     @endcan
-                                    {{-- <td class="px-6 py-4 text-right text-sm font-medium flex justify-end items-center gap-2">
-                                        <a href="{{ route('admin.siswas.edit', $siswa->id) }}"
-                                        class="text-indigo-600 hover:text-indigo-900 font-semibold">Edit</a>
-                                         --}}
-                                    {{-- TOMBOL HAPUS SATUAN (Menggunakan Component) --}}
-                                    {{-- <x-siswa.delete-modal
-                                            trigger="delete-siswa-{{ $siswa->id }}"
-                                            action="{{ route('admin.siswas.destroy', $siswa->id) }}"
-                                            message="{{ $siswa->user->name ?? $siswa->nama_lengkap }}"
-                                        /> --}}
-                                    {{-- </td> --}}
                                 </tr>
                             @empty
                                 <tr>
@@ -286,7 +255,6 @@
                     </table>
                 </div>
 
-                {{-- [BAGIAN 3: PAGINATION & PILIHAN LIMIT] --}}
                 <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
 
                     <form method="GET" action="{{ route('admin.siswas.index') }}">
@@ -323,10 +291,8 @@
         </div>
     </div>
 
-    {{-- MODAL TAMBAH SISWA (Component) --}}
     <x-siswa.add-student-modal :kelas="$kelas" />
 
-    {{-- SCRIPT JS HANYA UNTUK CHECKBOX (Script hapus lama sudah dibuang) --}}
     <script>
         const selectAll = document.getElementById('selectAll');
         const items = document.querySelectorAll('.select-item');

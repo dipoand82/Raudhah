@@ -30,14 +30,12 @@ class PasswordResetLinkController extends Controller
         ]);
         ([
 
-            // Pesan validasi jika input kosong/salah format
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
         ]);
         $status = Password::sendResetLink(
             $request->only('email')
         );
-        // Mengembalikan respon ke pengguna berdasarkan status pengiriman
         return $status == Password::RESET_LINK_SENT
             ? back()->with('status', 'Link reset password telah kami kirimkan ke email Anda!')
             : back()->withInput($request->only('email'))

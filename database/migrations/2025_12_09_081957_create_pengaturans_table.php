@@ -13,8 +13,8 @@ return new class extends Migration
     {
     Schema::create('pengaturans', function (Blueprint $table) {
         $table->id();
-        $table->string('kunci')->unique(); // Contoh: 'nama_sekolah', 'visi', 'logo'
-        $table->text('nilai')->nullable(); // Isi datanya
+        $table->string('kunci')->unique();
+        $table->text('nilai')->nullable(); 
         $table->timestamps();
     });
     }

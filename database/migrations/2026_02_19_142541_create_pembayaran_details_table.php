@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('pembayaran_id')->constrained('pembayarans')->onDelete('cascade');
             $table->foreignId('tagihan_spp_id')->constrained('tagihan_spps')->onDelete('cascade');
-            $table->decimal('nominal_dibayar', 12, 0); // Nominal spesifik untuk tagihan ini
+            $table->decimal('nominal_dibayar', 12, 0);
             $table->timestamps();
         });
     }

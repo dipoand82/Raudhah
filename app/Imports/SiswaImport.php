@@ -19,20 +19,16 @@ class SiswaImport implements SkipsOnFailure, ToModel, WithHeadingRow, WithValida
     use Importable, SkipsFailures;
     use SkipsFailures;
 
-    // Tambahkan properti untuk menyimpan tahun aktif agar tidak query berulang kali
     protected $tahunAktif;
 
     public $fallbackClasses = [];
 
     public function __construct()
     {
-        // Ambil tahun aktif sekali saja saat class dibuat
+        set_time_limit(300);
         $this->tahunAktif = TahunAjaran::where('is_active', true)->first();
     }
 
-    /**
-     * 1. ATURAN VALIDASI DATA EXCEL
-     */
     public function rules(): array
     {
         return [
@@ -49,7 +45,6 @@ class SiswaImport implements SkipsOnFailure, ToModel, WithHeadingRow, WithValida
             'nisn.required' => 'NISN wajib diisi.',
             'nisn.numeric' => 'NISN harus berupa angka.',
             'nisn.digits_between' => 'NISN harus berjumlah 8-12 karakter.',
-            // 'nisn.unique' => 'NISN sudah terdaftar.',
             'jenis_kelamin.required' => 'Jenis kelamin wajib diisi.',
             'nama_lengkap.required' => 'Nama lengkap tidak boleh kosong.',
             'jenis_kelamin.in' => 'Jenis kelamin harus L atau P.',
@@ -59,23 +54,14 @@ class SiswaImport implements SkipsOnFailure, ToModel, WithHeadingRow, WithValida
 
     public function model(array $row)
     {
-        // 1. Bersihkan Data
         $nisn = trim($row['nisn'] ?? '');
         $namaLengkap = trim($row['nama_lengkap'] ?? '');
-
-        // Cek siswa lama untuk fallback
         $siswaLama = Siswa::where('nisn', $nisn)->first();
-
-        // Logika Guard: Jika sudah Lulus/Pindah, abaikan (Silent Skip)
         if ($siswaLama && in_array($siswaLama->status, ['Lulus', 'Keluar', 'Pindah'])) {
             return null;
         }
-
-        // 2. Logika Email
         $namaDepan = strtolower(explode(' ', $namaLengkap)[0]);
         $emailFinal = $namaDepan.'.'.$nisn.'@raudhah.com';
-
-        // 3. Logika Fallback Kelas
         $kelas_id = $siswaLama ? $siswaLama->kelas_id : null;
         $tingkat = $siswaLama ? $siswaLama->tingkat : 7;
 
@@ -93,7 +79,6 @@ class SiswaImport implements SkipsOnFailure, ToModel, WithHeadingRow, WithValida
                 $kelas_id = $dataKelas->id;
                 $tingkat = $dataKelas->tingkat;
             } elseif ($siswaLama) {
-                // JIKA KELAS ZONK: Catat info biru, tapi jangan hentikan proses
                 $this->fallbackClasses[] = [
                     'nama' => $namaLengkap,
                     'input' => $row['kelas'],
@@ -104,26 +89,20 @@ class SiswaImport implements SkipsOnFailure, ToModel, WithHeadingRow, WithValida
             }
         }
 
-        // 4. Buat/Update User
-        // Kita gunakan try-catch kecil agar jika NISN/Nama kosong tidak bikin crash sebelum divalidasi rules()
         try {
             $user = User::where('email', $emailFinal)->first();
 
             if ($user) {
-                // ✅ USER LAMA (NAIK KELAS / UPDATE DATA)
                 $user->update([
                     'name' => $namaLengkap,
-                    // ❌ JANGAN ubah password
-                    // ❌ JANGAN ubah must_change_password
                 ]);
             } else {
-                // ✅ USER BARU
                 $user = User::create([
                     'name' => $namaLengkap,
                     'email' => $emailFinal,
                     'password' => Hash::make($nisn),
                     'role' => 'siswa',
-                    'must_change_password' => true, // 🔥 HANYA DI SINI
+                    'must_change_password' => true,
                 ]);
             }
 
@@ -140,7 +119,6 @@ class SiswaImport implements SkipsOnFailure, ToModel, WithHeadingRow, WithValida
                 ]
             );
         } catch (\Exception $e) {
-            // Biarkan Laravel Excel yang menangani error lewat rules()
             return null;
         }
     }

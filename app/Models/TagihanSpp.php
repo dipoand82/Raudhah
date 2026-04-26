@@ -13,20 +13,17 @@ class TagihanSpp extends Model
 
     protected $fillable = [
         'master_tagihan_id', 'riwayat_akademik_id',
-        'bulan', 'tahun', 'jumlah_tagihan', 'terbayar', 'status','snap_token',        // TAMBAHKAN INI
-        'midtrans_order_id'
+        'bulan', 'tahun', 'jumlah_tagihan', 'terbayar', 'status', 'snap_token',
+        'midtrans_order_id',
     ];
 
-    public function masterTagihan() // Ubah dari master_tagihan menjadi masterTagihan
+    public function masterTagihan()
     {
-        // Tambahkan foreign key 'master_tagihan_id' agar lebih pasti
         return $this->belongsTo(MasterTagihan::class, 'master_tagihan_id');
     }
 
-    // Tagihan nempel ke riwayat (Siswa di kelas X)
     public function riwayatAkademik()
     {
-        // Gunakan riwayat_akademik_id sebagai foreign key sesuai protected $fillable kamu
         return $this->belongsTo(RiwayatAkademik::class, 'riwayat_akademik_id');
     }
 
@@ -34,9 +31,4 @@ class TagihanSpp extends Model
     {
         return $this->hasMany(PembayaranDetail::class, 'tagihan_spp_id');
     }
-
-    // public function pembayarans()
-    // {
-    //     return $this->hasMany(Pembayaran::class);
-    // }
 }

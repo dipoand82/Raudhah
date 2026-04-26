@@ -17,7 +17,7 @@ class TemplateGuruExport implements FromArray, WithHeadings, ShouldAutoSize, Wit
     {
         return [
             ['1', 'Budi Santoso', 'Budisantoso12@gmail.com'],
-            ['2', 'Siti Aminah', ''],// Email dikosongkan agar otomatis
+            ['2', 'Siti Aminah', ''],
         ];
     }
 

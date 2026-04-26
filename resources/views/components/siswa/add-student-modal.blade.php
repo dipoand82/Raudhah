@@ -1,4 +1,4 @@
- @props(['kelas']) {{-- Menerima data kelas sebagai properti --}}
+ @props(['kelas'])
    <x-modal name="add-siswa" focusable>
         <form method="POST" action="{{ route('admin.manajemen-user.siswa.store') }}" class="p-6">
             @csrf

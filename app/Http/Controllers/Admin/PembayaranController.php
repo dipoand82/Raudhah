@@ -10,8 +10,8 @@ use App\Models\TagihanSpp;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB; // <-- Wajib untuk generate random string
-use Illuminate\Support\Str; // Pastikan baris ini ada
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class PembayaranController extends Controller
 {
@@ -47,7 +47,7 @@ class PembayaranController extends Controller
         return view('admin.keuangan.pembayaran.index', compact('pembayarans', 'kelasList'));
     }
 
-public function store(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             'tagihan_ids' => 'required|array|min:1',
@@ -56,72 +56,58 @@ public function store(Request $request)
         ]);
 
         return DB::transaction(function () use ($request) {
-
             $tagihans = TagihanSpp::with('riwayatAkademik')
                 ->lockForUpdate()
                 ->whereIn('id', $request->tagihan_ids)
                 ->get();
-
             $grouped = $tagihans->groupBy(fn ($t) => $t->riwayatAkademik->siswa_id);
             $kodeList = [];
-
-            // 1. TANGKAP UANG GLOBAL DI LUAR LOOPING
             $sisaBudgetGlobal = (int) $request->jumlah_bayar_total;
             $useGlobalBudget = $sisaBudgetGlobal > 0;
-
             foreach ($grouped as $siswaId => $tagihanSiswa) {
-
-                // Hitung kewajiban asli khusus siswa ini
-                $kewajibanSiswa = $tagihanSiswa->sum(fn($t) => $t->jumlah_tagihan - $t->terbayar);
-
+                $kewajibanSiswa = $tagihanSiswa->sum(fn ($t) => $t->jumlah_tagihan - $t->terbayar);
                 if ($useGlobalBudget) {
-                    if ($sisaBudgetGlobal <= 0) break; // Uang sudah habis
-
-                    // 2. SISWA HANYA BOLEH MENGAMBIL UANG SESUAI KEWAJIBANNYA, ATAU SISA UANG YANG ADA
+                    if ($sisaBudgetGlobal <= 0) {
+                        break;
+                    }
                     $totalBayarSiswa = min($kewajibanSiswa, $sisaBudgetGlobal);
-
-                    // 3. UANG KASIR BERKURANG UNTUK SISWA SELANJUTNYA
                     $sisaBudgetGlobal -= $totalBayarSiswa;
                 } else {
                     $totalBayarSiswa = $kewajibanSiswa;
                 }
-
-                if ($totalBayarSiswa <= 0) continue;
-
+                if ($totalBayarSiswa <= 0) {
+                    continue;
+                }
                 $kode = 'PAY-'.date('YmdHi').'-'.strtoupper(Str::random(4));
-
                 $pembayaran = Pembayaran::create([
                     'kode_pembayaran' => $kode,
                     'siswa_id' => $siswaId,
                     'user_id_admin' => Auth::id(),
-                    'total_bayar' => $totalBayarSiswa, // <-- SEKARANG SUDAH BENAR (Misal: 500rb)
+                    'total_bayar' => $totalBayarSiswa,
                     'tanggal_bayar' => now(),
                     'metode_pembayaran' => $request->metode,
                     'status_gateway' => $request->metode === 'tunai' ? 'settlement' : 'pending',
                 ]);
-
                 $alokasiDetail = $totalBayarSiswa;
-
                 foreach ($tagihanSiswa as $tagihan) {
                     $sisa = $tagihan->jumlah_tagihan - $tagihan->terbayar;
-
-                    if ($sisa <= 0) continue;
-                    if ($alokasiDetail <= 0) break;
-
+                    if ($sisa <= 0) {
+                        continue;
+                    }
+                    if ($alokasiDetail <= 0) {
+                        break;
+                    }
                     $dibayar = min($sisa, $alokasiDetail);
                     $alokasiDetail -= $dibayar;
-
                     PembayaranDetail::create([
                         'pembayaran_id' => $pembayaran->id,
                         'tagihan_spp_id' => $tagihan->id,
                         'nominal_dibayar' => $dibayar,
                     ]);
-
                     $tagihan->terbayar += $dibayar;
                     $tagihan->status = $tagihan->terbayar >= $tagihan->jumlah_tagihan ? 'lunas' : 'cicilan';
                     $tagihan->save();
                 }
-
                 $kodeList[] = $kode;
             }
 
@@ -150,7 +136,6 @@ public function store(Request $request)
         return $pdf->stream('Kuitansi-'.$p->kode_pembayaran.'.pdf');
     }
 
-    // Fungsi pembantu untuk mengubah angka menjadi teks
     private function terbilang($angka)
     {
         $angka = abs($angka);

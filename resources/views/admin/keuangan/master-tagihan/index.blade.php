@@ -8,7 +8,6 @@
     <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-6 space-y-6">
 
-            {{-- NOTIFIKASI ALERTS --}}
             <div class="space-y-2">
                 @if (session('success'))
                     <x-alert-success>{{ session('success') }}</x-alert-success>
@@ -25,7 +24,6 @@
                 @endif
             </div>
 
-            {{-- 1. HEADER & TOMBOL TAMBAH --}}
             <div class="bg-white p-5 sm:p-6 rounded-xl shadow-sm border border-gray-200">
                 <div class="mb-5">
                     <h3 class="text-lg font-bold text-gray-900">Master Biaya</h3>
@@ -33,7 +31,8 @@
                         nantinya.</p>
                     <p class="text-xs text-red-500 mt-2 font-medium leading-relaxed italic">* Pastikan <strong>Nama
                             Tagihan</strong> dan <strong>Nominal</strong> sudah benar.</p>
-                    <p class="text-xs text-red-500 mt-2 font-medium leading-relaxed italic">* Pastikan <strong>Tagihan Bulanan SPP</strong> hanya di buat <strong>1 kali</strong> disini.</p>
+                    <p class="text-xs text-red-500 mt-2 font-medium leading-relaxed italic">* Pastikan <strong>Tagihan
+                            Bulanan SPP</strong> hanya di buat <strong>1 kali</strong> disini.</p>
 
                 </div>
 
@@ -47,7 +46,6 @@
                 </x-primary-button>
             </div>
 
-            {{-- 2. TABEL DATA --}}
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -83,7 +81,6 @@
                                     </td>
                                     <td class="px-4 py-4 text-center">
                                         <div class="flex justify-center items-center gap-2 sm:gap-3">
-                                            {{-- TOMBOL EDIT --}}
                                             <button type="button" x-data=""
                                                 x-on:click.prevent="$dispatch('open-modal', 'edit-master-{{ $master->id }}')"
                                                 class="text-indigo-600 hover:text-indigo-900 font-semibold transition">
@@ -97,9 +94,7 @@
                                     </td>
                                 </tr>
 
-                                {{-- MODAL EDIT (HARUS DI DALAM LOOP AGAR ID SESUAI) --}}
                                 <x-modal name="edit-master-{{ $master->id }}" focusable>
-                                    {{-- Tambahkan padding p-6 atau p-8 dan pastikan container memiliki max-width yang pas --}}
                                     <div class="p-6 sm:p-8">
                                         <form method="post"
                                             action="{{ route('admin.keuangan.master.update', $master->id) }}"
@@ -107,7 +102,6 @@
                                             @csrf
                                             @method('PUT')
 
-                                            {{-- Header Modal --}}
                                             <div class="border-b pb-4 mb-6">
                                                 <h2 class="text-xl font-bold text-gray-900 text-[#1072B8]">
                                                     Edit Master Biaya: <span
@@ -118,7 +112,6 @@
                                             </div>
 
                                             <div class="space-y-6">
-                                                {{-- Input Nama Tagihan --}}
                                                 <div>
                                                     <x-input-label for="edit_nama_tagihan_{{ $master->id }}"
                                                         value="Nama Tagihan" class="font-bold text-gray-700" />
@@ -128,7 +121,6 @@
                                                         value="{{ $master->nama_tagihan }}" required />
                                                 </div>
 
-                                                {{-- Input Nominal --}}
                                                 <div>
                                                     <x-input-label for="edit_nominal_{{ $master->id }}"
                                                         value="Nominal (Rp)" class="font-bold text-gray-700" />
@@ -148,7 +140,6 @@
                                                         saja tanpa titik atau koma.</p>
                                                 </div>
 
-                                                {{-- Input Deskripsi --}}
                                                 <div>
                                                     <x-input-label for="edit_deskripsi_{{ $master->id }}"
                                                         value="Deskripsi (Opsional)" class="font-bold text-gray-700" />
@@ -158,7 +149,6 @@
                                                 </div>
                                             </div>
 
-                                            {{-- Action Buttons --}}
                                             <div
                                                 class="mt-8 pt-6 border-t flex flex-col-reverse sm:flex-row justify-end gap-3">
                                                 <x-secondary-button x-on:click="$dispatch('close')"
@@ -188,7 +178,6 @@
         </div>
     </div>
 
-    {{-- MODAL TAMBAH --}}
     <x-modal name="add-master-biaya" focusable>
         <form method="post" action="{{ route('admin.keuangan.master.store') }}" class="p-8 text-left">
             @csrf

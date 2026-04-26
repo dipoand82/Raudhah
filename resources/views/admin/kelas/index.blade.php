@@ -8,13 +8,11 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 ">
 
-            {{-- ALERT SUCCESS --}}
             @if (session('success'))
                 <x-alert-success>
                     {{ session('success') }}
                 </x-alert-success>
             @endif
-            {{-- Tampilkan Alert Gagal (Misal dari Session Error) --}}
             @if (session('error'))
                 <x-alert-danger>
                     {{ session('error') }}
@@ -23,7 +21,7 @@
 
             @if ($errors->any())
                 @foreach ($errors->all() as $error)
-                    <x-alert-danger timeout="8000"> {{-- Waktu 8 detik agar sempat dibaca --}}
+                    <x-alert-danger timeout="8000">
                         {{ $error }}
                     </x-alert-danger>
                 @endforeach
@@ -32,11 +30,9 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 ">
 
-                {{-- FORM TAMBAH (KIRI) --}}
                 <div class="md:col-span-1">
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 sticky top-6">
                         <h3 class="text-lg font-bold mb-4 flex items-center gap-2 text-[#1072B8]">
-                            {{-- Icon disesuaikan warnanya --}}
                             <svg class="w-5 h-5 text-[#1072B8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -48,7 +44,6 @@
                             @csrf
                             <div class="mb-4">
                                 <x-input-label for="tingkat" :value="__('Tingkat')" />
-                                {{-- Input Focus Color disesuaikan --}}
                                 <select name="tingkat" id="tingkat"
                                     class="block mt-1 w-full border-gray-300 rounded-md shadow-sm focus:ring-[#3B3E42] focus:border-[#3B3E42]"
                                     required>
@@ -78,9 +73,6 @@
                         </form>
                     </div>
                 </div>
-
-                {{-- TABEL DATA (KANAN) --}}
-                {{-- TABEL DATA (KANAN) --}}
                 <div class="md:col-span-2">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                         <div class="overflow-x-auto">
@@ -102,12 +94,10 @@
                                 <tbody class="bg-white divide-y divide-gray-100">
                                     @forelse($kelas as $k)
                                         <tr class="hover:bg-gray-50 transition even:bg-gray-50/50">
-                                            {{-- Kolom No --}}
                                             <td class="px-4 py-4 text-center text-sm font-medium text-gray-500">
                                                 {{ $loop->iteration + ($kelas->currentPage() - 1) * $kelas->perPage() }}
                                             </td>
 
-                                            {{-- Kolom Tingkat --}}
                                             <td class="px-4 py-4 whitespace-nowrap text-sm">
                                                 <span
                                                     class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full font-bold border border-gray-200 text-xs">
@@ -115,14 +105,12 @@
                                                 </span>
                                             </td>
 
-                                            {{-- Kolom Nama Kelas --}}
                                             <td class="px-4 py-4 whitespace-nowrap">
                                                 <div class="text-sm font-bold text-[#3B3E42]">
                                                     {{ $k->tingkat }} {{ $k->nama_kelas }}
                                                 </div>
                                             </td>
 
-                                            {{-- BARU: Kolom Jumlah Siswa --}}
                                             <td class="px-4 py-4 whitespace-nowrap text-center">
                                                 <div
                                                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $k->siswas_count > 0 ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800' }}">
@@ -130,7 +118,6 @@
                                                 </div>
                                             </td>
 
-                                            {{-- Kolom Aksi --}}
                                             <td class="px-4 py-4 whitespace-nowrap text-center text-sm font-medium">
                                                 <div class="flex justify-center items-center gap-3">
 
@@ -142,7 +129,6 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            {{-- Colspan diubah menjadi 5 karena ada tambahan kolom --}}
                                             <td colspan="5" class="px-6 py-10 text-center text-gray-400 italic">Belum
                                                 ada data kelas.</td>
                                         </tr>
@@ -151,12 +137,10 @@
                             </table>
                         </div>
 
-                        {{-- PAGINATION --}}
                         <div class="px-4 py-3 bg-white border-t border-gray-100">
                             {{ $kelas->links() }}
                         </div>
 
-                        {{-- FOOTER NOTE --}}
                         <div class="bg-gray-50 border-t border-gray-200 p-4 text-center">
                             <p class="text-xs text-red-500 font-medium">
                                 * Pastikan membuat semua daftar kelas yang ada terlebih dahulu.

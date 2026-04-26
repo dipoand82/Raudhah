@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-    Schema::create('master_tagihans', function (Blueprint $table) {
-        $table->id();
-        $table->string('nama_tagihan'); // Contoh: "SPP"
-        $table->decimal('nominal', 12, 0); // Rp 150.000
-        $table->text('deskripsi')->nullable();
-        $table->timestamps();
-    });
+        Schema::create('master_tagihans', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama_tagihan');
+            $table->decimal('nominal', 12, 0);
+            $table->text('deskripsi')->nullable();
+            $table->timestamps();
+        });
     }
 
     /**

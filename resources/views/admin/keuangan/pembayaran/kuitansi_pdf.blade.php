@@ -23,11 +23,9 @@
             margin: 0 auto;
         }
 
-        /* HEADER & GARIS TENGAH */
         .header-table {
             width: 100%;
             margin-bottom: 5px;
-            /* Kurangi margin bawah karena ada garis tengah */
         }
 
         .header-table td {
@@ -36,7 +34,6 @@
 
         .col-text {
             text-align: center;
-            /* Mengetengahkan tulisan */
         }
 
         .nama-sekolah {
@@ -54,7 +51,6 @@
             color: #555;
         }
 
-        /* Garis Tengah seperti di Header */
         .line-separator {
             border-bottom: 2px solid #000;
             margin: 10px 0;
@@ -123,12 +119,10 @@
 <body>
     <div class="border-box">
 
-        {{-- HEADER --}}
         <table class="header-table">
             <tr>
                 <td width="60">
                     @php
-                        // Prioritas: logo khusus kuitansi → logo web → logo dari DB → fallback teks
                         $logoPath = null;
                         if (file_exists(public_path('storage/logos/logo_kuitansi.PNG'))) {
                             $logoPath = public_path('storage/logos/logo_kuitansi.PNG');
@@ -154,14 +148,12 @@
                     <div class="sub-sekolah">TPQ, TK IT, SD IT, SMP IT Raudhah El Jannah</div>
                     <div class="alamat-sekolah">Jl. Melayu Padang Baru - Lubuk Basung, Kab. Agam</div>
                 </td>
-                <td width="60"></td> {{-- Spacer agar teks benar-benar di tengah --}}
+                <td width="60"></td>
             </tr>
         </table>
 
-        {{-- GARIS TENGAH (SEPARATOR) --}}
         <div class="line-separator"></div>
 
-        {{-- INFO --}}
         <table class="info-table">
             <tr>
                 <td class="label">No. Kuitansi</td>
@@ -181,7 +173,6 @@
             </tr>
         </table>
 
-        {{-- TABEL DETAIL --}}
         <table class="detail-table">
             @foreach ($p->detailPembayaran as $idx => $det)
                 <tr>
@@ -195,7 +186,6 @@
             @endforeach
         </table>
 
-        {{-- TOTAL --}}
         <div class="total-section">
             <div class="total-box">
                 TOTAL: Rp {{ number_format($p->total_bayar, 0, ',', '.') }}
@@ -203,7 +193,6 @@
             </div>
         </div>
 
-        {{-- FOOTER --}}
         <table class="footer-table">
             <tr>
                 <td></td>

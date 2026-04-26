@@ -9,7 +9,7 @@ class ProfilSekolah extends Model
 {
     use HasFactory;
 
-    protected $table = 'profil_sekolahs'; // Pastikan nama tabel benar
+    protected $table = 'profil_sekolahs'; 
 
     protected $fillable = [
         'nama_sekolah',

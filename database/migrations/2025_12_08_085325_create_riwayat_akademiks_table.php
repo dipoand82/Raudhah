@@ -11,19 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-    Schema::create('riwayat_akademiks', function (Blueprint $table) {
-        $table->id();
-        
-        // Menghubungkan 3 Tabel: Siswa + Kelas + Tahun
-        $table->foreignId('siswa_id')->constrained('siswas')->onDelete('cascade');
-        $table->foreignId('kelas_id')->constrained('kelas')->onDelete('cascade');
-        $table->foreignId('tahun_ajaran_id')->constrained('tahun_ajarans')->onDelete('cascade');
-        $table->enum('status_siswa', ['aktif','cuti', 'lulus', 'pindah', 'do'])->default('aktif');
-        $table->timestamps();   
-        
-        // Mencegah duplikasi data riwayat
-        $table->unique(['siswa_id', 'tahun_ajaran_id']);
-    });
+        Schema::create('riwayat_akademiks', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignId('siswa_id')->constrained('siswas')->onDelete('cascade');
+            $table->foreignId('kelas_id')->constrained('kelas')->onDelete('cascade');
+            $table->foreignId('tahun_ajaran_id')->constrained('tahun_ajarans')->onDelete('cascade');
+            $table->enum('status_siswa', ['aktif', 'cuti', 'lulus', 'pindah', 'do'])->default('aktif');
+            $table->timestamps();
+            $table->unique(['siswa_id', 'tahun_ajaran_id']);
+        });
     }
 
     /**

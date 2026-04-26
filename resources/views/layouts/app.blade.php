@@ -1,30 +1,28 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-{{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> --}}
-        <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- Scripts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
-        @stack('styles')
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="font-sans antialiased" x-data="{ sidebarOpen: false }">
-    <div class="min-h-screen bg-gray-100 flex flex-col"> {{-- Tambahkan flex flex-col saja di sini --}}
+    <!-- Scripts -->
 
+    @stack('styles')
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+
+<body class="font-sans antialiased" x-data="{ sidebarOpen: false }">
+    <div class="min-h-screen bg-gray-100 flex flex-col">
         @include('layouts.sidebar')
 
         <div class="md:ml-64 transition-all duration-300 flex-1 flex flex-col">
-            {{-- Navbar Sekarang Tidak Akan Berantakan Lagi --}}
             @include('layouts.navigation')
 
             @isset($header)
@@ -37,20 +35,15 @@
                 </header>
             @endisset
 
-            <main class="flex-1"> {{-- Menambah flex-1 agar konten mengisi sisa layar --}}
+            <main class="flex-1">
                 {{ $slot }}
             </main>
         </div>
     </div>
-    {{-- MODAL LOADING GLOBAL --}}
-    <div x-data="{ isLoading: false }"
-         x-show="isLoading"
-         @loading.window="isLoading = true"
-         @loaded.window="isLoading = false"
-         x-cloak
-         class="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 transition-opacity">
+    <div x-data="{ isLoading: false }" x-show="isLoading" @loading.window="isLoading = true"
+        @loaded.window="isLoading = false" x-cloak
+        class="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50 transition-opacity">
         <div class="bg-white p-6 rounded-xl shadow-xl flex flex-col items-center gap-4">
-            {{-- Spinner --}}
             <div class="w-12 h-12 border-4 border-gray-200 border-t-[#1072B8] rounded-full animate-spin"></div>
             <div class="text-center text-sm font-bold text-gray-700">
                 Sedang Memproses...
@@ -60,35 +53,11 @@
     </div>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-      AOS.init({
-          once: true,
-          duration: 1000,
-      });
+        AOS.init({
+            once: true,
+            duration: 1000,
+        });
     </script>
 </body>
+
 </html>
-
-    {{-- <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
-
-            @include('layouts.sidebar')
-
-        <!-- <div class="ml-64 transition-all duration-300"></div> -->
-        <div class="ml-64 transition-all duration-300 ">
-            @include('layouts.navigation')
-
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
-
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
-        </div>
-    </body> --}}

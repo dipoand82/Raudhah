@@ -11,18 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-    Schema::create('galeris', function (Blueprint $table) {
-        $table->id();
-        
-        // Relasi: Siapa uploader-nya?
-        $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-        
-        $table->string('judul'); // Judul Kegiatan
-        $table->text('deskripsi')->nullable(); // Ket. singkat
-        $table->string('gambar'); // File foto dokumentasi
-        
-        $table->timestamps();
-    });
+        Schema::create('galeris', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('judul');
+            $table->text('deskripsi')->nullable();
+            $table->string('gambar');
+
+            $table->timestamps();
+        });
     }
 
     /**

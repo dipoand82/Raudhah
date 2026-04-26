@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-    Schema::create('tahun_ajarans', function (Blueprint $table) {
-        $table->id();
-        $table->string('tahun')->unique(); // Contoh: "2024/2025"
-        // $table->enum('semester', allowed: ['ganjil', 'genap']);
-        $table->boolean('is_active')->default(false);
-        $table->timestamps();
-    });
+        Schema::create('tahun_ajarans', function (Blueprint $table) {
+            $table->id();
+            $table->string('tahun')->unique();
+            $table->boolean('is_active')->default(false);
+            $table->timestamps();
+        });
     }
+
     /**
      * Reverse the migrations.
      */

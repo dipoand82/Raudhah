@@ -3,48 +3,42 @@
             <div class="flex justify-between h-16 items-center relative">
 
                 <a href="{{ url('/') }}"
-    class="flex items-center gap-3 z-10 hover:opacity-80 transition-opacity min-w-max">
+                    class="flex items-center gap-3 z-10 hover:opacity-80 transition-opacity min-w-max">
 
-    {{-- LOGO SECTION --}}
-@if (file_exists(public_path('storage/logos/logo_smp_raudhah.PNG')))
-    {{-- Ring dihapus, hanya menyisakan ukuran dan object-contain --}}
-    <img src="{{ asset('storage/logos/logo_smp_raudhah.PNG') }}" alt="Logo"
-        class="h-10 w-10 object-contain">
-@elseif($profil_sekolah && $profil_sekolah->logo_path)
-    <img src="{{ asset('storage/' . $profil_sekolah->logo_path) }}" alt="Logo"
-        class="h-10 w-10 object-contain">
-@else
-    {{-- Fallback jika tidak ada file gambar --}}
-    <div class="h-10 w-10 bg-[#1072B8] rounded-full flex-shrink-0 flex items-center justify-center text-white text-xs font-bold">
-        SMP
-    </div>
-@endif
+                    @if (file_exists(public_path('storage/logos/logo_smp_raudhah.PNG')))
+                        <img src="{{ asset('storage/logos/logo_smp_raudhah.PNG') }}" alt="Logo"
+                            class="h-10 w-10 object-contain">
+                    @elseif($profil_sekolah && $profil_sekolah->logo_path)
+                        <img src="{{ asset('storage/' . $profil_sekolah->logo_path) }}" alt="Logo"
+                            class="h-10 w-10 object-contain">
+                    @else
+                        <div
+                            class="h-10 w-10 bg-[#1072B8] rounded-full flex-shrink-0 flex items-center justify-center text-white text-xs font-bold">
+                            SMP
+                        </div>
+                    @endif
 
-    {{-- NAMA SEKOLAH SECTION --}}
-    {{-- Logika: Jika URL adalah '/', gunakan warna biru gelap, jika tidak gunakan biru standar --}}
-    <span class="font-bold text-lg sm:text-xl block transition-colors duration-300 {{ request()->is('/') ? 'text-[#0d5a92]' : 'text-[#1072B8]' }}">
-        {{ $profil_sekolah->nama_sekolah ?? 'SMP IT Raudhah' }}
-    </span>
-</a>
+                    <span
+                        class="font-bold text-lg sm:text-xl block transition-colors duration-300 {{ request()->is('/') ? 'text-[#0d5a92]' : 'text-[#1072B8]' }}">
+                        {{ $profil_sekolah->nama_sekolah ?? 'SMP IT Raudhah' }}
+                    </span>
+                </a>
 
                 <div class="hidden md:flex items-center gap-12 absolute left-1/2 transform -translate-x-1/2">
-{{-- Link Beranda: Menggunakan request()->is('/') karena beranda adalah root --}}
-<a href="{{ url('/') }}"
-    class="px-4 py-2 rounded-full transition-all {{ request()->is('/') ? 'bg-blue-50 text-[#1072B8] font-bold' : 'text-gray-600 hover:text-[#1072B8]' }}">
-    Beranda
-</a>
+                    <a href="{{ url('/') }}"
+                        class="px-4 py-2 rounded-full transition-all {{ request()->is('/') ? 'bg-blue-50 text-[#1072B8] font-bold' : 'text-gray-600 hover:text-[#1072B8]' }}">
+                        Beranda
+                    </a>
 
-{{-- Link Info: Menggunakan request()->routeIs('info.*') agar aktif di semua sub-halaman info --}}
-<a href="{{ route('info.index') }}"
-    class="px-4 py-2 rounded-full transition-all {{ request()->routeIs('info.*') ? 'bg-blue-50 text-[#1072B8] font-bold' : 'text-gray-600 hover:text-[#1072B8]' }}">
-    Info
-</a>
+                    <a href="{{ route('info.index') }}"
+                        class="px-4 py-2 rounded-full transition-all {{ request()->routeIs('info.*') ? 'bg-blue-50 text-[#1072B8] font-bold' : 'text-gray-600 hover:text-[#1072B8]' }}">
+                        Info
+                    </a>
 
-{{-- Link Galeri: Menggunakan request()->routeIs('galeri.*') agar aktif saat melihat daftar maupun detail foto --}}
-<a href="{{ route('galeri.index') }}"
-    class="px-4 py-2 rounded-full transition-all {{ request()->routeIs('galeri.*') ? 'bg-blue-50 text-[#1072B8] font-bold' : 'text-gray-600 hover:text-[#1072B8]' }}">
-    Galeri
-</a>
+                    <a href="{{ route('galeri.index') }}"
+                        class="px-4 py-2 rounded-full transition-all {{ request()->routeIs('galeri.*') ? 'bg-blue-50 text-[#1072B8] font-bold' : 'text-gray-600 hover:text-[#1072B8]' }}">
+                        Galeri
+                    </a>
                 </div>
 
                 <div class="flex items-center gap-4 z-10">

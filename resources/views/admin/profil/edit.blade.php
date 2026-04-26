@@ -7,13 +7,11 @@
 
     <div class="py-12" x-data="{ activeTab: '{{ request()->query('tab', default: 'profil') }}' }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-6">
-            {{-- ALERT SUCCESS --}}
             @if (session('success'))
                 <x-alert-success>
                     {{ session('success') }}
                 </x-alert-success>
             @endif
-            {{-- Tampilkan Alert Gagal (Misal dari Session Error) --}}
             @if (session('error'))
                 <x-alert-danger>
                     {{ session('error') }}
@@ -22,12 +20,11 @@
 
             @if ($errors->any())
                 @foreach ($errors->all() as $error)
-                    <x-alert-danger timeout="8000"> {{-- Waktu 8 detik agar sempat dibaca --}}
+                    <x-alert-danger timeout="8000">
                         {{ $error }}
                     </x-alert-danger>
                 @endforeach
             @endif
-            {{-- TAB NAVIGATION (Clean Style) --}}
             <div class="bg-white px-6 pt-4 rounded-t-2xl border border-gray-200 border-b-0">
                 <div class="flex space-x-8">
                     <button @click="activeTab = 'profil'"
@@ -51,7 +48,6 @@
                 </div>
             </div>
 
-            {{-- KOTAK KONTEN --}}
             <div class="bg-white overflow-hidden shadow-sm rounded-b-2xl border border-gray-200">
                 <div class="p-8 text-gray-900">
 
@@ -63,13 +59,11 @@
                             <input type="hidden" name="current_tab" value="profil">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
 
-                                {{-- KOLOM KIRI: IDENTITAS --}}
                                 <div class="space-y-6">
                                     <div>
                                         <x-input-label for="banner" :value="__('Gambar Profil Depan Sekolah')"
                                             class="text-md font-bold text-gray-600 capitalize" />
 
-                                        {{-- Ubah $profil->banner menjadi $profil->banner_path --}}
                                         @if ($profil->banner_path)
                                             <img src="{{ asset('storage/' . $profil->banner_path) }}"
                                                 class="w-40 h-auto object-contain mb-3 rounded-lg border p-2 bg-gray-50">
@@ -110,11 +104,6 @@
                                         <textarea id="alasan_memilih" name="alasan_memilih"
                                             class="block mt-1 w-full border-gray-300 rounded-lg bg-gray-50 focus:bg-white transition" rows="3">{{ old('alasan_memilih', $profil->alasan_memilih) }}</textarea>
                                     </div>
-
-                                    {{-- <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-
-                                    </div> --}}
                                 </div>
 
                                 <div class="space-y-6">
@@ -194,15 +183,15 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                                 <div>
                                     <x-input-label for="info_penting" :value="__('Info Penting')"
-                                        class="text-md font-bold text-gray-600 capitalize"  />
+                                        class="text-md font-bold text-gray-600 capitalize" />
                                     <x-text-input id="info_penting" class="block mt-1 w-full rounded-lg bg-gray-50"
-                                        type="text" name="info_penting" :value="old('info_penting', $profil->info_penting)" placeholder="Masukkan Judul Info" />
+                                        type="text" name="info_penting" :value="old('info_penting', $profil->info_penting)"
+                                        placeholder="Masukkan Judul Info" />
                                 </div>
                                 <div>
                                     <x-input-label for="brosur_info" :value="__('Gambar Brosur Info Penting')"
                                         class="text-md font-bold text-gray-600 capitalize" />
 
-                                    {{-- Ubah $profil->banner menjadi $profil->banner_path --}}
                                     @if ($profil->brosur_info)
                                         <img src="{{ asset('storage/' . $profil->brosur_info) }}"
                                             class="w-40 h-auto object-contain mb-3 rounded-lg border p-2 bg-gray-50">
@@ -214,14 +203,6 @@
 
 
                             </div>
-                            {{-- <div
-                                class="px-4 py-2 hover:bg-blue-800 transition-colors {{ request()->routeIs('admin.galeri.*') ? 'bg-blue-900 border-l-4 border-yellow-400' : '' }}">
-                                <a href="{{ route('admin.galeri.index') }}"
-                                    class="flex items-center gap-3 text-white">
-                                    <i class="fas fa-images w-5 text-center"></i>
-                                    <span class="font-medium">Galeri Kegiatan</span>
-                                </a>
-                            </div> --}}
                             <div class="flex items-center justify-end mt-10 pt-6 border-t border-gray-100">
                                 <a href="{{ route('admin.profil.edit', ['tab' => 'info']) }}">
                                     <x-primary-button class="bg-[#1072B8] hover:bg-blue-800 rounded-lg">
@@ -232,7 +213,7 @@
                         </form>
                     </div>
 
-                    <div x-show="activeTab === 'galeri'" x-transition class="space-y-6"> {{-- TAMBAHKAN BARIS INI --}}
+                    <div x-show="activeTab === 'galeri'" x-transition class="space-y-6">
                         <div
                             class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-gray-100">
                             <div>
@@ -259,27 +240,24 @@
                                     <div class="p-3">
                                         <h4 class="font-bold text-gray-800 text-sm truncate">{{ $item->judul }}</h4>
                                         <div class="flex justify-between items-center mt-3">
-                                            {{-- Tombol Edit --}}
                                             <a href="{{ route('admin.galeri.edit', $item->id) }}"
                                                 class="text-indigo-600 hover:text-indigo-900 font-semibold transition">
                                                 Edit
                                             </a>
 
-                                            {{-- PEMANGGILAN MODAL GLOBAL --}}
                                             <x-modal-delete-global trigger="confirm-delete-galeri-{{ $item->id }}"
                                                 :action="route('admin.galeri.destroy', $item->id)" title=""
                                                 message="Menghapus Galeri {{ $item->judul }}"
-                                                submitText="Ya, Hapus Permanen" class="text-xs px-3 py-1"
-                                                {{-- Mengecilkan tombol agar serasi dengan tombol edit --}} />
+                                                submitText="Ya, Hapus Permanen" class="text-xs px-3 py-1" />
                                         </div>
                                     </div>
                                 </div>
-                            @empty
-                                <div
-                                    class="col-span-full py-10 text-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 text-gray-400">
-                                    <i class="fas fa-images text-4xl mb-3"></i>
-                                    <p>Belum ada foto di galeri.</p>
-                                </div>
+                                @empty
+                                    <div
+                                        class="col-span-full py-10 text-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-200 text-gray-400">
+                                        <i class="fas fa-images text-4xl mb-3"></i>
+                                        <p>Belum ada foto di galeri.</p>
+                                    </div>
                             @endforelse
                         </div>
                         <div class="mt-8 flex justify-center">
@@ -291,6 +269,5 @@
                 </div>
             </div>
         </div>
-    </div> {{-- TAMBAHKAN PENUTUP INI UNTUK x-show galeri --}}
-    {{-- Penutup p-8 --}}
+    </div>
 </x-app-layout>

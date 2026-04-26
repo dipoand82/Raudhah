@@ -1,7 +1,6 @@
 @extends('layouts.landing')
 
 @section('content')
-    {{-- BAGIAN BANNER HERO (Letak Tetap Sama) --}}
     <div class="max-w-[1440px] mx-auto">
         <div class="relative bg-gray-900 h-[500px] md:h-[600px] flex items-center justify-center overflow-hidden rounded-md">
             @if ($profil_sekolah && $profil_sekolah->banner_path)
@@ -41,32 +40,70 @@
         </div>
     </div>
 
-    {{-- PEMBUNGKUS KONTEN UTAMA DENGAN BG-GRAY-50 --}}
-    <div class="bg-gray-50 py-1"> {{-- Menambahkan background abu-abu terang --}}
+    <div class="bg-gray-50 py-1">
 
         <main class="max-w-7xl mx-auto px-4 sm:px-2 lg:px-2 py-6 space-y-2">
-            <section class="scroll-mt-40 py-6"> {{-- Background white-50 dihapus agar menyatu dengan bg-gray-50 --}}
+            <section class="scroll-mt-40 py-6">
                 <div class="max-w-7xl mx-auto px-4">
-                    <div class="text-center mb-3">
+                    <div class="text-center mb-8">
                         <h2 data-aos="fade-up"
-                            class="text-4xl font-extrabold text-blue-900 uppercase tracking-wider animate-gradient-x">
+                            class="text-4xl md:text-5xl font-extrabold text-blue-900 uppercase tracking-tighter italic">
                             {{ $profil_sekolah->nama_sekolah ?? 'SMP IT Raudhah' }}
                         </h2>
-                        <div class="h-1.5 w-24 bg-blue-600 mx-auto mt-4 rounded-full"></div>
+                        <div class="flex justify-center items-center gap-2 mt-4">
+                            <div class="h-1.5 w-12 bg-blue-600 rounded-full"></div>
+                            <div class="h-1.5 w-3 bg-blue-400 rounded-full"></div>
+                        </div>
                     </div>
 
-                    <div class="relative mb-10 group cursor-default" data-aos="fade-up">
-                        <div class="absolute -bottom-4 -right-4 w-full h-full bg-blue-900 rounded-3xl z-0
-                                    opacity-10 transition-all duration-500 ease-out
-                                    group-hover:-bottom-3 group-hover:-right-3 group-hover:opacity-10">
+                    <div class="relative mb-16 group mx-auto max-w-5xl" data-aos="zoom-in">
+                        <div
+                            class="absolute -top-6 -left-6 w-24 h-24 bg-[radial-gradient(#1e3a8a_1px,transparent_1px)] [background-size:12px_12px] opacity-20">
+                        </div>
+                        <div
+                            class="absolute -bottom-6 -right-6 w-24 h-24 bg-[radial-gradient(#1e3a8a_1px,transparent_1px)] [background-size:12px_12px] opacity-20">
                         </div>
 
-                        <div class="bg-white p-8 md:p-12 rounded-3xl shadow-xl border border-gray-300 relative overflow-hidden z-10
-                                    transition-transform duration-500 group-hover:-translate-y-2">
-                            <div class="prose prose-lg max-w-none  text-gray-700 leading-loose text-center justify-center relative z-10"
-                                style="font-family: 'Nunito', sans-serif; font-weight: 600;">
-                                {!! nl2br(e($profil_sekolah->deskripsi_singkat ?? 'Deskripsi sekolah belum diisi.')) !!}
+                        <div
+                            class="absolute inset-0 bg-blue-900 rounded-[2.5rem] translate-x-3 translate-y-3 opacity-5 group-hover:translate-x-1 group-hover:translate-y-1 transition-all duration-500">
+                        </div>
+
+                        <div
+                            class="relative bg-white/80 backdrop-blur-sm p-10 md:p-14 rounded-[2.5rem] shadow-2xl border border-gray-100 overflow-hidden z-10 transition-all duration-500 group-hover:shadow-blue-200/50">
+
+                            <div class="absolute top-4 left-6 text-blue-100 text-8xl font-serif select-none">“</div>
+
+                            <div class="prose prose-lg max-w-none relative z-10">
+                                <p class="text-gray-600 leading-relaxed md:leading-[2.5rem] text-center italic tracking-wide"
+                                    style="font-family: 'Nunito', sans-serif; font-weight: 500; font-size: 1.15rem;">
+
+                                    @php
+                                        $deskripsi =
+                                            $profil_sekolah->deskripsi_singkat ?? 'Deskripsi sekolah belum diisi.';
+                                        $keywords = [
+                                            'SMP IT Raudhah',
+                                            'Yayasan Raudhah El Jannah',
+                                            'Kurikulum Nasional',
+                                            'nilai-nilai Islam',
+                                            'Karakter Islami',
+                                            'Unggul',
+                                            'kurikulum nasional',
+                                        ];
+                                        foreach ($keywords as $key) {
+                                            $deskripsi = str_replace(
+                                                $key,
+                                                "<span class='text-blue-900 font-bold not-italic'>$key</span>",
+                                                $deskripsi,
+                                            );
+                                        }
+                                    @endphp
+
+                                    {!! nl2br($deskripsi) !!}
+                                </p>
                             </div>
+
+                            <div class="absolute bottom-4 right-6 text-blue-100 text-8xl font-serif select-none rotate-180">
+                                “</div>
                         </div>
                     </div>
 
@@ -74,7 +111,8 @@
                         <div data-aos="flip-right"
                             class="group bg-white p-8 rounded-3xl border-t-8 border-blue-600 shadow-lg hover:shadow-2xl duration-300">
                             <div class="flex items-center mb-6">
-                                <div class="p-3 bg-blue-100 rounded-2xl mr-4 group-hover:bg-blue-600 transition-colors"></div>
+                                <div class="p-3 bg-blue-100 rounded-2xl mr-4 group-hover:bg-blue-600 transition-colors">
+                                </div>
                                 <h3 class="text-2xl font-bold text-blue-800 uppercase tracking-wide">Program Unggulan</h3>
                             </div>
                             <p class="text-gray-600 text-lg leading-relaxed ">
@@ -82,8 +120,10 @@
                                     @foreach (explode("\n", $profil_sekolah->program_unggulan) as $program)
                                         @if (trim($program) != '')
                                             <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition">
-                                                <span class="flex-shrink-0 w-6 h-6 bg-teal-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">★</span>
-                                                <span class="text-gray-600 font-bold leading-relaxed">{{ $program }}</span>
+                                                <span
+                                                    class="flex-shrink-0 w-6 h-6 bg-teal-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold">★</span>
+                                                <span
+                                                    class="text-gray-600 font-bold leading-relaxed">{{ $program }}</span>
                                             </div>
                                         @endif
                                     @endforeach
@@ -96,17 +136,22 @@
                         <div data-aos="flip-right"
                             class="group bg-white p-8 rounded-3xl border-t-8 border-green-500 shadow-lg hover:shadow-2xl transition-all duration-300">
                             <div class="flex items-center mb-6">
-                                <div class="p-3 bg-green-100 rounded-2xl mr-4 group-hover:bg-green-500 transition-colors"></div>
-                                <h3 class="text-2xl font-bold text-green-800 uppercase tracking-wide">Alasan Memilih Kami</h3>
+                                <div class="p-3 bg-green-100 rounded-2xl mr-4 group-hover:bg-green-500 transition-colors">
+                                </div>
+                                <h3 class="text-2xl font-bold text-green-800 uppercase tracking-wide">Alasan Memilih Kami
+                                </h3>
                             </div>
                             <div class="text-gray-600 text-lg leading-relaxed space-y-2">
                                 <div class="space-y-1">
                                     @if ($profil_sekolah && $profil_sekolah->alasan_memilih)
                                         @foreach (explode("\n", $profil_sekolah->alasan_memilih) as $alasan)
                                             @if (trim($alasan) != '')
-                                                <div class="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition">
-                                                    <span class="flex-shrink-0 w-6 h-6 bg-blue-100 text-green-600 rounded-full flex items-center justify-center text-sm font-bold">✓</span>
-                                                    <span class="text-gray-600 font-bold leading-relaxed">{{ $alasan }}</span>
+                                                <div
+                                                    class="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50 transition">
+                                                    <span
+                                                        class="flex-shrink-0 w-6 h-6 bg-blue-100 text-green-600 rounded-full flex items-center justify-center text-sm font-bold">✓</span>
+                                                    <span
+                                                        class="text-gray-600 font-bold leading-relaxed">{{ $alasan }}</span>
                                                 </div>
                                             @endif
                                         @endforeach
@@ -118,22 +163,28 @@
                         </div>
                     </div>
 
-                    <div class="bg-white p-8 rounded-3xl shadow-xl shadow-blue-100/50 border border-gray-100 relative overflow-hidden">
+                    <div
+                        class="bg-white p-8 rounded-3xl shadow-xl shadow-blue-100/50 border border-gray-100 relative overflow-hidden">
                         <div data-aos="fade-left" class="flex items-center gap-3 mb-6 relative z-10">
                             <div class="p-3 bg-[#1072B8] rounded-2xl text-white shadow-md">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z" />
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z" />
                                 </svg>
                             </div>
                             <h2 class="text-2xl font-bold text-gray-800">Visi</h2>
                         </div>
 
-                        <div data-aos="fade-left" class="relative" style="font-family: 'Nunito', sans-serif; font-weight: 600;">
+                        <div data-aos="fade-left" class="relative"
+                            style="font-family: 'Nunito', sans-serif; font-weight: 600;">
                             @if ($profil_sekolah && $profil_sekolah->visi)
                                 <div class="flex gap-1 items-start ">
                                     <div class="flex-shrink-0 text-[#1072B8] px-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                            fill="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
                                         </svg>
                                     </div>
                                     <p class="text-gray-700 text-md leading-relaxed ml-2">{!! nl2br(e($profil_sekolah->visi)) !!}</p>
@@ -147,14 +198,17 @@
                     <div class="bg-white p-8 rounded-3xl shadow-xl shadow-green-100/50 border border-gray-100 mt-12">
                         <div data-aos="fade-left" class="flex items-center gap-3 mb-6">
                             <div class="p-3 bg-teal-500 rounded-2xl text-white">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
                             <h2 class="text-2xl font-bold text-gray-800">Misi</h2>
                         </div>
 
-                        <div data-aos="fade-left" class="space-y-4" style="font-family: 'Nunito', sans-serif; font-weight: 600;">
+                        <div data-aos="fade-left" class="space-y-4"
+                            style="font-family: 'Nunito', sans-serif; font-weight: 600;">
                             @if ($profil_sekolah && $profil_sekolah->misi)
                                 @php
                                     $lines = explode("\n", str_replace("\r", '', $profil_sekolah->misi ?? ''));
@@ -163,8 +217,10 @@
 
                                 @forelse ($daftar_misi as $item)
                                     <div class="flex gap-3 items-start">
-                                        <span class="font-bold text-teal-600 text-lg ml-6 leading-tight min-w-[25px] ">{{ $loop->iteration }}.</span>
-                                        <p class="text-gray-700 leading-relaxed">{{ preg_replace('/^\d+\.\s*/', '', $item) }}</p>
+                                        <span
+                                            class="font-bold text-teal-600 text-lg ml-6 leading-tight min-w-[25px] ">{{ $loop->iteration }}.</span>
+                                        <p class="text-gray-700 leading-relaxed">
+                                            {{ preg_replace('/^\d+\.\s*/', '', $item) }}</p>
                                     </div>
                                 @empty
                                     <p class="text-gray-500 text-lg">Misi belum tersedia</p>
@@ -175,22 +231,25 @@
                         </div>
                     </div>
 
-                    <div data-aos="fade-up" class="mt-12 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+                    <div data-aos="fade-up"
+                        class="mt-12 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
                         <div class="p-7 border-b border-gray-50 bg-gray-50/90">
                             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                                <div  class="text-center md:text-left">
+                                <div class="text-center md:text-left">
                                     <h3 class="text-2xl font-bold text-blue-900 uppercase ">
                                         {{ $profil_sekolah->info_penting ?? 'Informasi Penting' }}
                                     </h3>
                                     <p class="text-gray-500">Tahun Akademik {{ date('Y') }}/{{ date('Y') + 1 }}</p>
                                 </div>
-                                <span class="px-4 py-1.5 bg-amber-100 text-amber-700 text-sm font-bold rounded-full uppercase tracking-wider">Informasi</span>
+                                <span
+                                    class="px-4 py-1.5 bg-amber-100 text-amber-700 text-sm font-bold rounded-full uppercase tracking-wider">Informasi</span>
                             </div>
                         </div>
                         <div class="p-4 md:p-6 flex justify-center">
                             <div class="w-full max-w-2xl px-4 group relative">
                                 @if ($profil_sekolah && $profil_sekolah->brosur_info)
-                                    <img src="{{ asset('storage/' . $profil_sekolah->brosur_info) }}" alt="Informasi penting"
+                                    <img src="{{ asset('storage/' . $profil_sekolah->brosur_info) }}"
+                                        alt="Informasi penting"
                                         class="w-full h-auto rounded-2xl shadow-lg border border-gray-100 transition-all duration-500 group-hover:scale-[1.01]">
                                 @else
                                     <img src="{{ asset('storage/logos/brosur.png') }}" alt="Informasi penting"
@@ -211,28 +270,32 @@
 
                 <div data-aos="fade-up" class="grid grid-cols-2 md:grid-cols-4 gap-4 px-4">
                     @forelse($galeri->take(4) as $item)
-                        <div class="aspect-square bg-gray-200 rounded-xl overflow-hidden group border-4 border-white shadow-md relative">
+                        <div
+                            class="aspect-square bg-gray-200 rounded-xl overflow-hidden group border-4 border-white shadow-md relative">
                             <a href="{{ route('galeri.show', $item->id) }}">
                                 <img src="{{ asset('storage/' . $item->gambar) }}"
-                                     class="w-full h-full object-cover group-hover:scale-110 transition duration-500 cursor-pointer"
-                                     alt="{{ $item->judul }}">
-                                <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-2 text-center">
+                                    class="w-full h-full object-cover group-hover:scale-110 transition duration-500 cursor-pointer"
+                                    alt="{{ $item->judul }}">
+                                <div
+                                    class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-2 text-center">
                                     <p class="text-white text-xs font-bold uppercase">{{ $item->judul }}</p>
                                 </div>
                             </a>
                         </div>
                     @empty
                         @for ($i = 1; $i <= 4; $i++)
-                        <div class="aspect-square bg-gray-200 rounded-xl overflow-hidden group border-4 border-white shadow-md">
-                            <img src="https://via.placeholder.com/400x400?text=Kegiatan+{{ $i }}"
-                                 class="w-full h-full object-cover group-hover:scale-110 transition duration-500 cursor-pointer">
-                        </div>
+                            <div
+                                class="aspect-square bg-gray-200 rounded-xl overflow-hidden group border-4 border-white shadow-md">
+                                <img src="https://via.placeholder.com/400x400?text=Kegiatan+{{ $i }}"
+                                    class="w-full h-full object-cover group-hover:scale-110 transition duration-500 cursor-pointer">
+                            </div>
                         @endfor
                     @endforelse
                 </div>
 
                 <div class="text-center mt-10">
-                    <a href="{{ route('galeri.index') }}" class="px-8 py-3 bg-blue-600 text-white font-bold rounded-full hover:bg-blue-700 transition all transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg inline-flex items-center gap-2">
+                    <a href="{{ route('galeri.index') }}"
+                        class="px-8 py-3 bg-blue-600 text-white font-bold rounded-full hover:bg-blue-700 transition all transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg inline-flex items-center gap-2">
                         Lihat Galeri Lainnya <i class="fas fa-arrow-right text-sm"></i>
                     </a>
                 </div>

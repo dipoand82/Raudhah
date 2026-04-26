@@ -8,29 +8,22 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // 1. TABEL USERS (UTAMA)
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            // $table->string('username')->unique();
             $table->string('email')->unique()->nullable();
             $table->string('password'); // Hash
-            
-            // REVISI: Hanya 3 Role sesuai permintaanmu
-            $table->enum('role', ['admin', 'guru', 'siswa']); 
-            
+            $table->enum('role', ['admin', 'guru', 'siswa']);
             $table->rememberToken();
             $table->timestamps();
         });
 
-        // 2. TABEL PASSWORD RESET (WAJIB ADA untuk fitur Lupa Password)
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
         });
 
-        // 3. TABEL SESSIONS (Standar Laravel)
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->foreignId('user_id')->nullable()->index();

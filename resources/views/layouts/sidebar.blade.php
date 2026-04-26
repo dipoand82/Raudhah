@@ -1,10 +1,8 @@
 <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
     class="w-64 bg-white border-r border-gray-200 flex flex-col h-screen fixed left-0 top-0 z-50 transition-transform duration-300 ease-in-out md:translate-x-0 ">
 
-    {{-- HEADER SIDEBAR --}}
-    {{-- HEADER SIDEBAR --}}
+
     <div class="h-20 border-b border-gray-200 flex items-center px-4 relative">
-        {{-- Tambahkan tag <a> di sini --}}
         <a href="{{ url('/') }}" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <div
                 class="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-white flex items-center justify-center border-[#1072B8] p-1 shadow-sm">
@@ -28,8 +26,6 @@
             </div>
         </a>
 
-        {{-- Penutup tag <a> --}}
-        {{-- Tombol Tutup Sidebar (Mobile Only) Tetap di luar <a> agar tidak ikut terklik --}}
         <button @click="sidebarOpen = false"
             class="md:hidden absolute right-2 top-2 text-gray-400 hover:text-red-500 transition">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,10 +34,8 @@
         </button>
     </div>
 
-    {{-- MENU NAVIGASI --}}
     <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
 
-        {{-- ================= MENU ADMIN ================= --}}
         @if (Auth::user()->role == 'admin')
             <a href="{{ route('admin.dashboard') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.dashboard') ? 'bg-[#0A78BD] text-white shadow-md' : 'text-gray-700 hover:bg-gray-100' }}">
@@ -83,7 +77,6 @@
                 <span class="font-medium">Kelola Tahun Ajaran</span>
             </a>
 
-            {{-- MENU KEUANGAN & TAGIHAN (Dropdown) --}}
             <div x-data="{ open: {{ request()->routeIs('admin.keuangan.master.*', 'admin.keuangan.tagihan.*', 'admin.keuangan.pembayaran.*') ? 'true' : 'false' }} }">
                 <button @click="open = !open"
                     class="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors patterns:
@@ -138,7 +131,6 @@
                 </div>
             </div>
 
-            {{-- MENU LAPORAN --}}
             <a href="{{ route('admin.keuangan.laporan.index') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.keuangan.laporan.*') ? 'bg-[#0A78BD] text-white shadow-md' : 'text-gray-700 hover:bg-gray-100' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,14 +160,6 @@
                 </svg>
                 <span class="font-medium">Manajemen User</span>
             </a>
-
-            {{-- <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link> --}}
-
-            {{-- Tambahkan menu lainnya sesuai kebutuhan --}}
-
-            {{-- ================= MENU GURU ================= --}}
         @elseif(Auth::user()->role == 'guru')
             <a href="{{ route('admin.dashboard') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.dashboard') ? 'bg-[#0A78BD] text-white shadow-md' : 'text-gray-700 hover:bg-gray-100' }}">
@@ -215,8 +199,6 @@
                 </svg>
                 <span class="font-medium">Ubah Password</span>
             </a>
-
-            {{-- ================= MENU SISWA ================= --}}
         @elseif(Auth::user()->role == 'siswa')
             <a href="{{ route('siswa.dashboard') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('siswa.dashboard') ? 'bg-[#0A78BD] text-white shadow-md' : 'text-gray-700 hover:bg-gray-100' }}">
@@ -250,7 +232,6 @@
             </a>
         @endif
 
-        {{-- LOGOUT (Untuk Semua Role) --}}
         <div class="mt-8 border-t border-gray-200 pt-4 pb-4">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
