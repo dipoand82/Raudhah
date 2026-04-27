@@ -5,7 +5,7 @@ namespace App\Providers;
 use App\Models\ProfilSekolah;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\URL; // Tambahkan ini di atas
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -24,7 +24,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (str_contains(request()->getHost(), 'ngrok-free') || str_contains(config('app.url'), 'ngrok')) {
+
+        if (app()->environment('production') || str_contains(request()->getHost(), 'ngrok-free')) {
             URL::forceScheme('https');
         }
 
